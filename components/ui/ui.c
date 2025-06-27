@@ -20,6 +20,7 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
 };
 
 static lv_obj_t *tabview;
+static lv_obj_t *notif_label;
 
 const char *ui_get_text(ui_text_id_t id)
 {
@@ -82,4 +83,15 @@ void ui_init(ui_language_t lang, ui_theme_t theme)
 
     lv_label_create(tab3);
     lv_label_set_text(lv_obj_get_child(tab3, 0), ui_get_text(TXT_SETTINGS));
+
+    notif_label = lv_label_create(lv_scr_act());
+    lv_obj_align(notif_label, LV_ALIGN_BOTTOM_MID, 0, -10);
+    lv_label_set_text(notif_label, "");
+}
+
+void ui_notify(const char *msg)
+{
+    if (!notif_label || !msg)
+        return;
+    lv_label_set_text(notif_label, msg);
 }

@@ -51,4 +51,9 @@ void ui_set_theme(ui_theme_t theme);
  */
 const char *ui_get_text(ui_text_id_t id);
 
+/**
+ * \brief Affiche une notification temporaire.
+ */
+void ui_notify(const char *msg);
+
 #endif // UI_H

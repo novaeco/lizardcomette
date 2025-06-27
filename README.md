@@ -4,10 +4,12 @@ Projet ESP-IDF pour la gestion complète d'un élevage de reptiles. Ce dépôt f
 
 ## Structure
 - `main/` : point d'entrée de l'application.
- - `components/` : modules fonctionnels (base de données, UI, authentification,
-   gestion des animaux, des terrariums, **drivers de capteurs** et génération de
-   documents légaux).
-   Les mots de passe sont hachés en SHA‑256 et les fichiers exportés sont chiffrés.
+- `components/` : modules fonctionnels (base de données, UI, authentification,
+  gestion des animaux, des terrariums, **drivers de capteurs**, un **planificateur**
+  et génération de documents légaux).
+  - `scheduler/` : planificateur émettant des notifications sur les échéances,
+    le stock et la conformité.
+  Les mots de passe sont hachés en SHA‑256 et les fichiers exportés sont chiffrés.
 - `docs/` : documentation légale et guides d'utilisation (voir `docs/UI_USAGE.md` pour l'interface).
 
 ## Compilation

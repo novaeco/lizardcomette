@@ -10,6 +10,7 @@
 #include "storage.h"
 #include "animals.h"
 #include "terrariums.h"
+#include "scheduler.h"
 
 /**
  * \brief Point d'entrée de l'application.
@@ -32,6 +33,7 @@ void app_main(void)
     // Initialisation des modules metier
     animals_init();
     terrariums_init();
+    scheduler_init();
 
     // Boucle principale
     while (1)
