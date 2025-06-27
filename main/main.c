@@ -8,6 +8,8 @@
 #include "auth.h"
 #include "legal.h"
 #include "storage.h"
+#include "animals.h"
+#include "terrariums.h"
 
 /**
  * \brief Point d'entrée de l'application.
@@ -26,6 +28,10 @@ void app_main(void)
 
     // Initialisation de l'authentification
     auth_init();
+
+    // Initialisation des modules metier
+    animals_init();
+    terrariums_init();
 
     // Boucle principale
     while (1)
