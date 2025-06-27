@@ -4,8 +4,8 @@ Projet ESP-IDF pour la gestion complète d'un élevage de reptiles. Ce dépôt f
 
 ## Structure
 - `main/` : point d'entrée de l'application.
-- `components/` : modules fonctionnels (base de données, UI, authentification,
-  gestion des animaux et des terrariums, etc.).
+ - `components/` : modules fonctionnels (base de données, UI, authentification,
+   gestion des animaux, des terrariums et génération de documents légaux).
 - `docs/` : documentation légale et guides d'utilisation (voir `docs/UI_USAGE.md` pour l'interface).
 
 ## Compilation
