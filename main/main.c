@@ -21,7 +21,7 @@ void app_main(void)
 
     // Initialisation de LVGL et de l'interface
     lv_init();
-    ui_init();
+    ui_init(UI_LANG_EN, UI_THEME_LIGHT);
 
     // Initialisation de la base de données
     db_init();
