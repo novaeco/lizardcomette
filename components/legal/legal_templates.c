@@ -39,3 +39,33 @@ const char cites_official_template[] =
     "Nom: %s\n"
     "Espece: %s\n"
     "I-FAP: %s\n";
+
+const char cerfa_14367_template[] =
+    "CERFA 14367\n"
+    "Nom: %s\n"
+    "Espece: %s\n"
+    "Sexe: %s\n"
+    "Date de naissance: %s\n"
+    "CDC: %s\n"
+    "AOE: %s\n"
+    "I-FAP: %s\n";
+
+const char cerfa_12447_template[] =
+    "CERFA 12447\n"
+    "Nom: %s\n"
+    "Espece: %s\n"
+    "Sexe: %s\n"
+    "Date de naissance: %s\n"
+    "I-FAP: %s\n";
+
+const char cites_import_template[] =
+    "CITES Import\n"
+    "Nom: %s\n"
+    "Espece: %s\n"
+    "I-FAP: %s\n";
+
+const char cites_export_template[] =
+    "CITES Export\n"
+    "Nom: %s\n"
+    "Espece: %s\n"
+    "I-FAP: %s\n";

@@ -21,9 +21,12 @@ TEST_CASE("legal document generation","[legal]")
         .cites_valid_until = (int)time(NULL)+3600
     };
     TEST_ASSERT_TRUE(legal_generate_cerfa("cerfa_test.pdf", &r));
-    struct stat st; 
+    TEST_ASSERT_TRUE(legal_generate_cerfa_14367("cerfa_14367_test.pdf", &r));
+    struct stat st;
     TEST_ASSERT_EQUAL_INT(0, stat("cerfa_test.pdf", &st));
+    TEST_ASSERT_EQUAL_INT(0, stat("cerfa_14367_test.pdf", &st));
     unlink("cerfa_test.pdf");
+    unlink("cerfa_14367_test.pdf");
 }
 
 TEST_CASE("legal validation","[legal]")
@@ -41,4 +44,15 @@ TEST_CASE("legal validation","[legal]")
     TEST_ASSERT_TRUE(legal_is_cerfa_valid(&r));
     TEST_ASSERT_TRUE(legal_is_cites_valid(&r));
     TEST_ASSERT_TRUE(legal_quota_remaining(&r));
+}
+
+TEST_CASE("quota edge cases","[legal]")
+{
+    Reptile r = { .quota_limit = 0, .quota_used = 5 };
+    TEST_ASSERT_TRUE(legal_quota_remaining(&r));
+    r.quota_limit = 5;
+    r.quota_used = 5;
+    TEST_ASSERT_FALSE(legal_quota_remaining(&r));
+    r.quota_used = -1;
+    TEST_ASSERT_FALSE(legal_quota_remaining(&r));
 }
