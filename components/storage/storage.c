@@ -47,7 +47,54 @@ bool storage_encrypt_file(const char *path)
         return false;
     }
 
+    uint32_t orig_len = (uint32_t)len;
+    fwrite(&orig_len, 1, sizeof(orig_len), f);
     fwrite(buf, 1, padded_len, f);
+    fclose(f);
+    free(buf);
+    return true;
+}
+
+bool storage_decrypt_file(const char *src, const char *dst)
+{
+    FILE *f = fopen(src, "rb");
+    if (!f)
+        return false;
+
+    uint32_t orig_len;
+    if (fread(&orig_len, 1, sizeof(orig_len), f) != sizeof(orig_len)) {
+        fclose(f);
+        return false;
+    }
+
+    fseek(f, 0, SEEK_END);
+    long file_len = ftell(f);
+    long enc_len = file_len - sizeof(orig_len);
+    fseek(f, sizeof(orig_len), SEEK_SET);
+
+    unsigned char *buf = malloc(enc_len);
+    if (!buf) {
+        fclose(f);
+        return false;
+    }
+
+    fread(buf, 1, enc_len, f);
+    fclose(f);
+
+    mbedtls_aes_context ctx;
+    mbedtls_aes_init(&ctx);
+    mbedtls_aes_setkey_dec(&ctx, aes_key, 128);
+    unsigned char iv[16] = {0};
+    mbedtls_aes_crypt_cbc(&ctx, MBEDTLS_AES_DECRYPT, enc_len, iv, buf, buf);
+    mbedtls_aes_free(&ctx);
+
+    f = fopen(dst, "wb");
+    if (!f) {
+        free(buf);
+        return false;
+    }
+
+    fwrite(buf, 1, orig_len, f);
     fclose(f);
     free(buf);
     return true;
@@ -112,21 +159,7 @@ bool storage_wifi_transfer(const char *path, const char *url)
 void storage_restore(void)
 {
     ESP_LOGI(TAG, "Restauration de la base de donnees");
-    FILE *src = fopen("/sdcard/lizard_backup.db", "rb");
-    if (!src) {
-        ESP_LOGE(TAG, "Backup introuvable");
-        return;
+    if (!storage_decrypt_file("/sdcard/lizard_backup.db", "/spiffs/lizard.db")) {
+        ESP_LOGE(TAG, "Echec restauration");
     }
-    FILE *dst = fopen("/spiffs/lizard.db", "wb");
-    if (!dst) {
-        fclose(src);
-        ESP_LOGE(TAG, "Ecriture impossible");
-        return;
-    }
-    char buf[512];
-    size_t n;
-    while ((n = fread(buf, 1, sizeof(buf), src)) > 0)
-        fwrite(buf, 1, n, dst);
-    fclose(src);
-    fclose(dst);
 }

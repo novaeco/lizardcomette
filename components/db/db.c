@@ -1,5 +1,6 @@
 #include "db.h"
 #include "esp_log.h"
+#include "storage.h"
 #include <sqlite3.h>
 #include <stdio.h>
 #include <string.h>
@@ -71,7 +72,7 @@ void db_backup(void)
         return;
 
     sqlite3 *backup_db = NULL;
-    if (sqlite3_open("/spiffs/lizard_backup.db", &backup_db) != SQLITE_OK) {
+    if (sqlite3_open("/sdcard/lizard_backup.db", &backup_db) != SQLITE_OK) {
         ESP_LOGE(TAG, "Erreur ouverture fichier backup");
         return;
     }
@@ -82,6 +83,7 @@ void db_backup(void)
         sqlite3_backup_finish(backup);
     }
     sqlite3_close(backup_db);
+    storage_encrypt_file("/sdcard/lizard_backup.db");
 }
 
 static void export_animals_csv(FILE *f)
