@@ -2,6 +2,7 @@
 #define DB_H
 
 #include <sqlite3.h>
+#include <stdbool.h>
 
 /**
  * \brief Initialise la base de données locale.
@@ -36,5 +37,12 @@ bool db_exec(const char *format, ...);
  * \brief Prepare une requete SELECT et renvoie l'objet sqlite3_stmt.
  */
 sqlite3_stmt *db_query(const char *format, ...);
+
+/**
+ * \brief Définit la clé SQLCipher à utiliser pour chiffrer la base.
+ * \param key Chaîne de caractères UTF-8.
+ * \return true si la clé a été enregistrée.
+ */
+bool db_set_key(const char *key);
 
 #endif // DB_H

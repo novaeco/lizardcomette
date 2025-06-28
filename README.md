@@ -26,6 +26,12 @@ idf.py build
 ## Utilisation
 Une fois flashé sur votre ESP32, le firmware démarre l'interface graphique en français ou en anglais selon la configuration. Les modules s'initialisent automatiquement puis le planificateur vérifie les tâches à venir. Consultez `docs/UI_USAGE.md` pour le détail des écrans et `docs/NOTICE.md` pour les avertissements légaux.
 
+## Base de données chiffrée
+Si SQLCipher est disponible, la base `lizard.db` est chiffrée. Définissez
+`CONFIG_DB_DEFAULT_KEY` dans `sdkconfig` ou saisissez un mot de passe au
+premier démarrage. La clef est ensuite stockée dans l'espace NVS "db" et
+peut être modifiée avec `db_set_key()`.
+
 ## Obligations et responsabilités
 Vous êtes seul responsable de la conformité des documents générés et du respect de la législation locale (France, Europe, international). Les exemples fournis ne constituent pas un conseil juridique et peuvent requérir l'avis d'un professionnel avant usage.
 
