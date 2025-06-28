@@ -29,6 +29,7 @@ typedef enum {
     TXT_TERRARIUMS,
     TXT_STOCKS,
     TXT_TRANSACTIONS,
+    TXT_ELEVAGES,
     TXT_SETTINGS,
     TXT_EXPORT,
     TXT_IMPORT,
