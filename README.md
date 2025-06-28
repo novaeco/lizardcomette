@@ -18,6 +18,7 @@ LizardComette est un exemple de projet ESP‑IDF permettant de gérer un élevag
 2. Définissez la variable `IDF_PATH` correspondant à votre installation.
 3. Inspirez‑vous de `docs/CONFIG_EXAMPLE.md` pour créer votre propre `sdkconfig` (Wi‑Fi, stockage, REST/MQTT, etc.).
 4. Placez vos fichiers de licences CITES et autres documents dans le répertoire approprié.
+5. Ajustez `partition_table.csv` si vous avez besoin d'une taille différente pour les partitions SPIFFS ou SD afin de stocker la base de données.
 
 ## Compilation
 ```bash
