@@ -46,4 +46,11 @@ void storage_restore(void);
  */
 bool storage_encrypt_file(const char *path);
 
+/**
+ * \brief Dechiffre un fichier chiffre vers une nouvelle destination.
+ * \param src Fichier chiffre source.
+ * \param dst Fichier de sortie dechiffre.
+ */
+bool storage_decrypt_file(const char *src, const char *dst);
+
 #endif // STORAGE_H
