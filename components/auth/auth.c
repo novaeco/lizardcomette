@@ -2,6 +2,8 @@
 #include "esp_log.h"
 #include <string.h>
 #include "mbedtls/sha256.h"
+#include "db.h"
+#include <sqlite3.h>
 
 static void sha256_hash(const char *input, unsigned char output[32])
 {
@@ -13,6 +15,37 @@ static void sha256_hash(const char *input, unsigned char output[32])
     mbedtls_sha256_free(&ctx);
 }
 
+static void hash_to_hex(const unsigned char hash[32], char out[65])
+{
+    static const char hexchars[] = "0123456789abcdef";
+    for (int i = 0; i < 32; ++i) {
+        out[i * 2] = hexchars[(hash[i] >> 4) & 0xF];
+        out[i * 2 + 1] = hexchars[hash[i] & 0xF];
+    }
+    out[64] = '\0';
+}
+
+static bool hex_to_hash(const char *hex, unsigned char out[32])
+{
+    if (!hex || strlen(hex) != 64)
+        return false;
+    for (int i = 0; i < 32; ++i) {
+        int hi, lo;
+        char c1 = hex[i * 2];
+        char c2 = hex[i * 2 + 1];
+        if (c1 >= '0' && c1 <= '9') hi = c1 - '0';
+        else if (c1 >= 'a' && c1 <= 'f') hi = c1 - 'a' + 10;
+        else if (c1 >= 'A' && c1 <= 'F') hi = c1 - 'A' + 10;
+        else return false;
+        if (c2 >= '0' && c2 <= '9') lo = c2 - '0';
+        else if (c2 >= 'a' && c2 <= 'f') lo = c2 - 'a' + 10;
+        else if (c2 >= 'A' && c2 <= 'F') lo = c2 - 'A' + 10;
+        else return false;
+        out[i] = (hi << 4) | lo;
+    }
+    return true;
+}
+
 static const char *TAG = "auth";
 static auth_user_t users[AUTH_MAX_USERS];
 static int user_count = 0;
@@ -21,8 +54,30 @@ void auth_init(void)
 {
     ESP_LOGI(TAG, "Initialisation du module d'authentification");
     user_count = 0;
-    auth_add_user("admin", "changeme", ROLE_PARTICULIER);
-    auth_link_elevage("admin", 0);
+    memset(users, 0, sizeof(users));
+
+    sqlite3_stmt *stmt = db_query("SELECT username,hash,role FROM users;");
+    if (stmt) {
+        while (sqlite3_step(stmt) == SQLITE_ROW && user_count < AUTH_MAX_USERS) {
+            const char *uname = (const char *)sqlite3_column_text(stmt, 0);
+            const char *hash_hex = (const char *)sqlite3_column_text(stmt, 1);
+            int role = sqlite3_column_int(stmt, 2);
+            if (uname && hash_hex) {
+                strncpy(users[user_count].username, uname,
+                        sizeof(users[user_count].username) - 1);
+                hex_to_hash(hash_hex, users[user_count].hash);
+                users[user_count].role = role;
+                users[user_count].elevage_count = 0;
+                user_count++;
+            }
+        }
+        sqlite3_finalize(stmt);
+    }
+
+    if (user_count == 0) {
+        auth_add_user("admin", "changeme", ROLE_PARTICULIER);
+        auth_link_elevage("admin", 0);
+    }
 }
 
 bool auth_add_user(const char *username, const char *password, user_role_t role)
@@ -34,6 +89,13 @@ bool auth_add_user(const char *username, const char *password, user_role_t role)
     sha256_hash(password, users[user_count].hash);
     users[user_count].role = role;
     users[user_count].elevage_count = 0;
+
+    char hex[65];
+    hash_to_hex(users[user_count].hash, hex);
+    if (!db_exec("INSERT INTO users(username,hash,role) VALUES('%s','%s',%d);",
+                 users[user_count].username, hex, role))
+        return false;
+
     user_count++;
     return true;
 }

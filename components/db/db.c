@@ -70,6 +70,10 @@ static void create_tables(void)
                 "quantity INTEGER,""
                 "type TEXT,""
                 "timestamp INTEGER DEFAULT (strftime('%s','now')));");
+    exec_simple("CREATE TABLE IF NOT EXISTS users(""
+                "username TEXT PRIMARY KEY,""
+                "hash TEXT,""
+                "role INTEGER);");
     exec_simple("CREATE TABLE IF NOT EXISTS health_records("""
                 "id INTEGER PRIMARY KEY,"""
                 "animal_id INTEGER,"""
@@ -244,6 +248,10 @@ void db_init(void)
                 "quantity INTEGER,""
                 "type TEXT,""
                 "timestamp INTEGER DEFAULT (strftime('%s','now')));");
+    exec_simple("CREATE TABLE IF NOT EXISTS users(""
+                "username TEXT PRIMARY KEY,""
+                "hash TEXT,""
+                "role INTEGER);");
     exec_simple("CREATE TABLE IF NOT EXISTS health_records("""
                 "id INTEGER PRIMARY KEY,"""
                 "animal_id INTEGER,"""
