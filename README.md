@@ -20,6 +20,15 @@ LizardComette est un exemple de projet ESP‑IDF permettant de gérer un élevag
 4. Placez vos fichiers de licences CITES et autres documents dans le répertoire approprié.
 5. Ajustez `partition_table.csv` si vous avez besoin d'une taille différente pour les partitions SPIFFS ou SD afin de stocker la base de données.
 
+## Installation des composants tiers
+Certaines bibliothèques ne sont pas incluses dans ce dépôt et doivent être téléchargées via le registre d'Espressif. Utilisez `idf.py add-dependency` pour installer chaque composant indiqué dans `idf_component.yml`. Par exemple, le projet requiert le composant `sqlite3` :
+
+```bash
+idf.py add-dependency "espressif/sqlite3"
+```
+
+Vous pouvez aussi copier manuellement les composants dans le dossier `components/`.
+
 ## Compilation
 ```bash
 idf.py set-target esp32s3
