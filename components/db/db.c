@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 static const char *TAG = "db";
 static sqlite3 *db_handle = NULL;
@@ -15,6 +16,39 @@ static void exec_simple(const char *sql)
         ESP_LOGE(TAG, "SQL error: %s", err ? err : "unknown");
         sqlite3_free(err);
     }
+}
+
+bool db_exec(const char *format, ...)
+{
+    char sql[256];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(sql, sizeof(sql), format, args);
+    va_end(args);
+
+    char *err = NULL;
+    if (sqlite3_exec(db_handle, sql, NULL, NULL, &err) != SQLITE_OK) {
+        ESP_LOGE(TAG, "SQL exec error: %s", err ? err : "unknown");
+        sqlite3_free(err);
+        return false;
+    }
+    return true;
+}
+
+sqlite3_stmt *db_query(const char *format, ...)
+{
+    char sql[256];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(sql, sizeof(sql), format, args);
+    va_end(args);
+
+    sqlite3_stmt *stmt = NULL;
+    if (sqlite3_prepare_v2(db_handle, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        ESP_LOGE(TAG, "SQL query error: %s", sqlite3_errmsg(db_handle));
+        return NULL;
+    }
+    return stmt;
 }
 
 void db_init(void)
