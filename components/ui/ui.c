@@ -661,6 +661,18 @@ static void breeding_list_event(lv_event_t *e)
     open_breeding_list(id);
 }
 
+static void animal_export_event(lv_event_t *e)
+{
+    AnimalFormCtx *ctx = (AnimalFormCtx *)lv_event_get_user_data(e);
+    if (!ctx)
+        return;
+    const Reptile *r = animals_get(ctx->orig_id);
+    if (!r)
+        return;
+    storage_export_pdf("/sdcard", r);
+    ui_notify("Export OK");
+}
+
 static void open_animal_form(const Reptile *r)
 {
     animal_form.is_new = (r == NULL);
@@ -764,6 +776,11 @@ static void open_animal_form(const Reptile *r)
         lv_obj_align(btn_breed, LV_ALIGN_BOTTOM_MID, 0, -50);
         lv_obj_add_event_cb(btn_breed, breeding_list_event, LV_EVENT_CLICKED, (void *)(intptr_t)animal_form.orig_id);
         lv_label_set_text(lv_label_create(btn_breed), "Breeding");
+
+        lv_obj_t *btn_export = lv_btn_create(animal_form.win);
+        lv_obj_align(btn_export, LV_ALIGN_BOTTOM_MID, 0, -90);
+        lv_obj_add_event_cb(btn_export, animal_export_event, LV_EVENT_CLICKED, &animal_form);
+        lv_label_set_text(lv_label_create(btn_export), ui_get_text(TXT_EXPORT));
     }
 }
 
