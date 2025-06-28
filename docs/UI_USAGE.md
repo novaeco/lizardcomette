@@ -29,6 +29,10 @@ Selon le rôle retourné par `auth_get_role()`, certains onglets sont affichés�
 - Rôle particulier : seulement "Animaux", "Terrariums" et "Paramètres".
 - Rôle professionnel : accès supplémentaire aux onglets "Stocks" et "Transactions".
 
+Une fois connecté, si l'utilisateur dispose de plusieurs élevages liés à son compte,
+un écran de sélection permet de choisir celui à utiliser. Le changement appelle
+`ui_set_elevage()` afin que toutes les listes reflètent l'élevage sélectionné.
+
 ## Onglets disponibles
 
 - **Animaux** : liste les reptiles avec l'état de leurs documents légaux.
