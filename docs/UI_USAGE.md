@@ -19,3 +19,11 @@ ui_set_theme(UI_THEME_DARK);
 ```
 
 Les textes des onglets sont mis à jour automatiquement selon la langue sélectionnée.
+
+## Onglets disponibles
+
+- **Animaux** : liste les reptiles avec l'état de leurs documents légaux.
+- **Terrariums** : affiche les terrariums disponibles.
+- **Stocks** : permet de consulter le matériel ou la nourriture en stock.
+- **Transactions** : liste les mouvements de stock.
+- **Paramètres** : choix de la langue et du thème, export et import des données.

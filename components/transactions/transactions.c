@@ -64,3 +64,15 @@ bool transactions_delete(int id)
     return true;
 }
 
+int transactions_count(void)
+{
+    return transaction_count;
+}
+
+const Transaction *transactions_get_by_index(int index)
+{
+    if (index < 0 || index >= transaction_count)
+        return NULL;
+    return &transactions[index];
+}
+

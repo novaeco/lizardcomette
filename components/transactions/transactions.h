@@ -22,5 +22,7 @@ bool transactions_add(const Transaction *t);
 const Transaction *transactions_get(int id);
 bool transactions_update(int id, const Transaction *t);
 bool transactions_delete(int id);
+int transactions_count(void);
+const Transaction *transactions_get_by_index(int index);
 
 #endif // TRANSACTIONS_H
