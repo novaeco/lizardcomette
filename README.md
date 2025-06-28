@@ -25,6 +25,9 @@ LizardComette est un exemple de projet ESP‑IDF permettant de gérer un élevag
 idf.py set-target esp32s3
 idf.py build
 ```
+Le composant `espressif/sqlite` déclaré dans `idf_component.yml` sera alors
+téléchargé automatiquement via le component manager. Vous pouvez aussi
+l'ajouter explicitement avec `idf.py add-dependency`.
 
 ## Utilisation
 Une fois flashé sur votre ESP32, le firmware démarre l'interface graphique en français ou en anglais selon la configuration. Les modules s'initialisent automatiquement puis le planificateur vérifie les tâches à venir. Consultez `docs/UI_USAGE.md` pour le détail des écrans et `docs/NOTICE.md` pour les avertissements légaux.
