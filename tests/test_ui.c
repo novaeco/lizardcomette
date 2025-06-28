@@ -159,9 +159,13 @@ TEST_CASE("ui language switching","[ui]")
 {
     ui_init(UI_LANG_EN, UI_THEME_LIGHT);
     TEST_ASSERT_EQUAL_STRING("Animals", ui_get_text(TXT_ANIMALS));
+    TEST_ASSERT_EQUAL_STRING("Import CSV", ui_get_text(TXT_IMPORT_CSV));
+    TEST_ASSERT_EQUAL_STRING("Stock ID", ui_get_text(TXT_STOCK_ID));
     ui_set_language(UI_LANG_FR);
     TEST_ASSERT_EQUAL_STRING("Animaux", ui_get_text(TXT_ANIMALS));
     TEST_ASSERT_EQUAL_STRING("Fermer", ui_get_text(TXT_CLOSE));
+    TEST_ASSERT_EQUAL_STRING("Importer CSV", ui_get_text(TXT_IMPORT_CSV));
+    TEST_ASSERT_EQUAL_STRING("ID Stock", ui_get_text(TXT_STOCK_ID));
 }
 
 TEST_CASE("ui theme switching","[ui]")
