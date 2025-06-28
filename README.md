@@ -6,7 +6,7 @@ LizardComette est un exemple de projet ESP‑IDF permettant de gérer un élevag
 - Gestion des animaux, des terrariums, du stock et des transactions.
 - Authentification multi-utilisateur avec mots de passe hachés et rôles.
 - Séparation des données par identifiant d'élevage pour les animaux et terrariums.
-- Drivers I2C/SPI pour capteurs environnementaux avec envoi REST/MQTT.
+- Drivers I2C/SPI pour capteurs environnementaux (température, humidité, CO₂) et éclairage avec envoi REST/MQTT.
 - Planificateur avec notifications (stocks, échéances, conformité).
 - Génération de formulaires administratifs via superposition sur les
   modèles officiels CERFA et CITES.
