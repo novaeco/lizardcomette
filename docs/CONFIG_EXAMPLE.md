@@ -23,6 +23,10 @@ Ce fichier illustre comment définir certaines options via `sdkconfig`.
 Si le serveur requiert une authentification basique, renseignez
 `CONFIG_STORAGE_TRANSFER_USERNAME` et `CONFIG_STORAGE_TRANSFER_PASSWORD`.
 
+`CONFIG_DB_DEFAULT_KEY` permet de définir la clé SQLCipher utilisée lors du
+premier démarrage. Laisser ce champ vide obligera l'utilisateur à saisir la
+clé manuellement.
+
 Pour r\xC3\xA9importer une sauvegarde CSV, copiez le fichier chiffr\xC3\xA9 sur la
 carte SD puis utilisez le bouton **Import CSV** dans l'interface. La base sera
 alors vid\xC3\xA9e et remplie avec les donn\xC3\xA9es du fichier.
