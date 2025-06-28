@@ -8,6 +8,7 @@ CONFIG_STORAGE_TRANSFER_URL="http://example.com/upload"
 CONFIG_DRIVERS_REST_URL="http://example.com/sensors"
 CONFIG_DRIVERS_MQTT_URI="mqtt://broker"
 CONFIG_DRIVERS_MQTT_TOPIC="/lizard/data"
+CONFIG_DB_DEFAULT_KEY="MonMotDePasseBD"
 ```
 
 Ce fichier illustre comment définir certaines options via `sdkconfig`.

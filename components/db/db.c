@@ -1,13 +1,54 @@
 #include "db.h"
 #include "esp_log.h"
 #include "storage.h"
+#include "nvs.h"
+#include "nvs_flash.h"
 #include <sqlite3.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include "sdkconfig.h"
 
 static const char *TAG = "db";
 static sqlite3 *db_handle = NULL;
+static char db_key[64];
+
+static void load_db_key(void)
+{
+    nvs_handle_t h;
+    size_t len = sizeof(db_key);
+    if (nvs_open("db", NVS_READONLY, &h) == ESP_OK) {
+        if (nvs_get_str(h, "key", db_key, &len) != ESP_OK) {
+            db_key[0] = '\0';
+        }
+        nvs_close(h);
+    } else {
+        db_key[0] = '\0';
+    }
+
+#ifdef CONFIG_DB_DEFAULT_KEY
+    if (db_key[0] == '\0' && strlen(CONFIG_DB_DEFAULT_KEY) > 0) {
+        strncpy(db_key, CONFIG_DB_DEFAULT_KEY, sizeof(db_key) - 1);
+        db_key[sizeof(db_key) - 1] = '\0';
+    }
+#endif
+}
+
+bool db_set_key(const char *key)
+{
+    if (!key)
+        return false;
+    strncpy(db_key, key, sizeof(db_key) - 1);
+    db_key[sizeof(db_key) - 1] = '\0';
+    nvs_handle_t h;
+    if (nvs_open("db", NVS_READWRITE, &h) != ESP_OK)
+        return false;
+    esp_err_t err = nvs_set_str(h, "key", db_key);
+    if (err == ESP_OK)
+        err = nvs_commit(h);
+    nvs_close(h);
+    return err == ESP_OK;
+}
 
 static void exec_simple(const char *sql)
 {
@@ -55,10 +96,26 @@ void db_init(void)
 {
     ESP_LOGI(TAG, "Initialisation de la base de données");
 
+    load_db_key();
+    if (db_key[0] == '\0') {
+        char buf[64];
+        printf("Mot de passe BD: ");
+        fflush(stdout);
+        if (fgets(buf, sizeof(buf), stdin)) {
+            buf[strcspn(buf, "\r\n")] = '\0';
+            db_set_key(buf);
+        }
+    }
+
     if (sqlite3_open("/spiffs/lizard.db", &db_handle) != SQLITE_OK) {
         ESP_LOGE(TAG, "Impossible d'ouvrir la base de données: %s", sqlite3_errmsg(db_handle));
         return;
     }
+#ifdef SQLITE_HAS_CODEC
+    if (db_key[0] != '\0') {
+        sqlite3_key(db_handle, db_key, strlen(db_key));
+    }
+#endif
 
     exec_simple("CREATE TABLE IF NOT EXISTS animals("
                 "id INTEGER PRIMARY KEY,"
