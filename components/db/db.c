@@ -74,6 +74,10 @@ static void create_tables(void)
                 "username TEXT PRIMARY KEY,""
                 "hash TEXT,""
                 "role INTEGER);");
+
+    exec_simple("CREATE TABLE IF NOT EXISTS user_elevages(""
+                "username TEXT,""
+                "elevage_id INTEGER);");
     exec_simple("CREATE TABLE IF NOT EXISTS health_records("""
                 "id INTEGER PRIMARY KEY,"""
                 "animal_id INTEGER,"""
