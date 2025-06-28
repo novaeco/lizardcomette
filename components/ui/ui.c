@@ -7,6 +7,7 @@
 #include "legal.h"
 #include "storage.h"
 #include "auth.h"
+#include <stdlib.h>
 
 static const char *TAG = "ui";
 
@@ -53,6 +54,60 @@ static lv_obj_t *tabview;
 static lv_obj_t *notif_label;
 static lv_obj_t *tab_animals;
 static lv_obj_t *tab_terrariums;
+static lv_obj_t *tab_stocks;
+static lv_obj_t *tab_transactions;
+static lv_obj_t *list_animals;
+static lv_obj_t *list_terrariums;
+static lv_obj_t *list_stocks;
+static lv_obj_t *list_transactions;
+
+typedef struct {
+    lv_obj_t *win;
+    lv_obj_t *ta_id;
+    lv_obj_t *ta_name;
+    lv_obj_t *ta_species;
+    lv_obj_t *ta_sex;
+    lv_obj_t *ta_birth;
+    bool is_new;
+    int orig_id;
+} AnimalFormCtx;
+
+static AnimalFormCtx animal_form;
+
+typedef struct {
+    lv_obj_t *win;
+    lv_obj_t *ta_id;
+    lv_obj_t *ta_name;
+    lv_obj_t *ta_capacity;
+    bool is_new;
+    int orig_id;
+} TerrariumFormCtx;
+
+static TerrariumFormCtx terrarium_form;
+
+typedef struct {
+    lv_obj_t *win;
+    lv_obj_t *ta_id;
+    lv_obj_t *ta_name;
+    lv_obj_t *ta_qty;
+    lv_obj_t *ta_min;
+    bool is_new;
+    int orig_id;
+} StockFormCtx;
+
+static StockFormCtx stock_form;
+
+typedef struct {
+    lv_obj_t *win;
+    lv_obj_t *ta_id;
+    lv_obj_t *ta_stock_id;
+    lv_obj_t *ta_qty;
+    lv_obj_t *dd_type;
+    bool is_new;
+    int orig_id;
+} TransactionFormCtx;
+
+static TransactionFormCtx transaction_form;
 static lv_obj_t *login_win;
 static lv_obj_t *ta_user;
 static lv_obj_t *ta_pass;
@@ -114,13 +169,13 @@ static void build_tabs(void)
     tab_terrariums = lv_tabview_add_tab(tabview, ui_get_text(TXT_TERRARIUMS));
     lv_obj_t *tab_settings;
     if (logged_role == ROLE_PROFESSIONNEL) {
-        lv_obj_t *tab3 = lv_tabview_add_tab(tabview, ui_get_text(TXT_STOCKS));
-        lv_obj_t *tab4 = lv_tabview_add_tab(tabview, ui_get_text(TXT_TRANSACTIONS));
+        tab_stocks = lv_tabview_add_tab(tabview, ui_get_text(TXT_STOCKS));
+        tab_transactions = lv_tabview_add_tab(tabview, ui_get_text(TXT_TRANSACTIONS));
         tab_settings = lv_tabview_add_tab(tabview, ui_get_text(TXT_SETTINGS));
         animals_tab_create(tab_animals);
         terrariums_tab_create(tab_terrariums);
-        stocks_tab_create(tab3);
-        transactions_tab_create(tab4);
+        stocks_tab_create(tab_stocks);
+        transactions_tab_create(tab_transactions);
     } else {
         tab_settings = lv_tabview_add_tab(tabview, ui_get_text(TXT_SETTINGS));
         animals_tab_create(tab_animals);
@@ -131,50 +186,65 @@ static void build_tabs(void)
 
 static void animals_tab_create(lv_obj_t *tab)
 {
-    lv_obj_t *list = lv_list_create(tab);
-    lv_obj_set_size(list, 380, 420);
+    list_animals = lv_list_create(tab);
+    lv_obj_set_size(list_animals, 380, 420);
     for (int i = 0; i < animals_count_for_elevage(current_elevage_id); ++i) {
         const Reptile *r = animals_get_by_index_for_elevage(i, current_elevage_id);
         if (!r) continue;
         const char *status = (legal_is_cerfa_valid(r) && legal_is_cites_valid(r)) ?
                                 ui_get_text(TXT_LEGAL_OK) : ui_get_text(TXT_LEGAL_EXPIRED);
-        lv_obj_t *btn = lv_list_add_btn(list, NULL, r->name);
+        lv_obj_t *btn = lv_list_add_btn(list_animals, NULL, r->name);
+        lv_obj_add_event_cb(btn, animal_edit_event, LV_EVENT_CLICKED, (void *)(intptr_t)r->id);
         lv_obj_t *lbl = lv_label_create(btn);
         lv_label_set_text(lbl, status);
         lv_obj_align(lbl, LV_ALIGN_RIGHT_MID, -10, 0);
     }
+    lv_obj_t *btn_add = lv_btn_create(tab);
+    lv_obj_align(btn_add, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+    lv_obj_add_event_cb(btn_add, animal_add_event, LV_EVENT_CLICKED, NULL);
+    lv_label_set_text(lv_label_create(btn_add), "Add");
 }
 
 static void terrariums_tab_create(lv_obj_t *tab)
 {
-    lv_obj_t *list = lv_list_create(tab);
-    lv_obj_set_size(list, 380, 420);
+    list_terrariums = lv_list_create(tab);
+    lv_obj_set_size(list_terrariums, 380, 420);
     for (int i = 0; i < terrariums_count_for_elevage(current_elevage_id); ++i) {
         const Terrarium *t = terrariums_get_by_index_for_elevage(i, current_elevage_id);
         if (!t) continue;
         char buf[64];
         snprintf(buf, sizeof(buf), "%s (%d)", t->name, t->capacity);
-        lv_list_add_btn(list, NULL, buf);
+        lv_obj_t *btn = lv_list_add_btn(list_terrariums, NULL, buf);
+        lv_obj_add_event_cb(btn, terrarium_edit_event, LV_EVENT_CLICKED, (void *)(intptr_t)t->id);
     }
+    lv_obj_t *btn_add = lv_btn_create(tab);
+    lv_obj_align(btn_add, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+    lv_obj_add_event_cb(btn_add, terrarium_add_event, LV_EVENT_CLICKED, NULL);
+    lv_label_set_text(lv_label_create(btn_add), "Add");
 }
 
 static void stocks_tab_create(lv_obj_t *tab)
 {
-    lv_obj_t *list = lv_list_create(tab);
-    lv_obj_set_size(list, 380, 420);
+    list_stocks = lv_list_create(tab);
+    lv_obj_set_size(list_stocks, 380, 420);
     for (int i = 0; i < stocks_count(); ++i) {
         const StockItem *s = stocks_get_by_index(i);
         if (!s) continue;
         char buf[64];
         snprintf(buf, sizeof(buf), "%s (%d)", s->name, s->quantity);
-        lv_list_add_btn(list, NULL, buf);
+        lv_obj_t *btn = lv_list_add_btn(list_stocks, NULL, buf);
+        lv_obj_add_event_cb(btn, stock_edit_event, LV_EVENT_CLICKED, (void *)(intptr_t)s->id);
     }
+    lv_obj_t *btn_add = lv_btn_create(tab);
+    lv_obj_align(btn_add, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+    lv_obj_add_event_cb(btn_add, stock_add_event, LV_EVENT_CLICKED, NULL);
+    lv_label_set_text(lv_label_create(btn_add), "Add");
 }
 
 static void transactions_tab_create(lv_obj_t *tab)
 {
-    lv_obj_t *list = lv_list_create(tab);
-    lv_obj_set_size(list, 380, 420);
+    list_transactions = lv_list_create(tab);
+    lv_obj_set_size(list_transactions, 380, 420);
     for (int i = 0; i < transactions_count(); ++i) {
         const Transaction *tr = transactions_get_by_index(i);
         if (!tr) continue;
@@ -182,24 +252,409 @@ static void transactions_tab_create(lv_obj_t *tab)
         snprintf(buf, sizeof(buf), "%d %s %d", tr->stock_id,
                  tr->type == TRANSACTION_PURCHASE ? "+" : "-",
                  tr->quantity);
-        lv_list_add_btn(list, NULL, buf);
+        lv_obj_t *btn = lv_list_add_btn(list_transactions, NULL, buf);
+        lv_obj_add_event_cb(btn, transaction_edit_event, LV_EVENT_CLICKED, (void *)(intptr_t)tr->id);
     }
+    lv_obj_t *btn_add = lv_btn_create(tab);
+    lv_obj_align(btn_add, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+    lv_obj_add_event_cb(btn_add, transaction_add_event, LV_EVENT_CLICKED, NULL);
+    lv_label_set_text(lv_label_create(btn_add), "Add");
 }
 
 void ui_set_elevage(int elevage_id)
 {
     current_elevage_id = elevage_id;
-    if (tab_animals && tab_terrariums) {
-        lv_obj_clean(tab_animals);
-        lv_obj_clean(tab_terrariums);
-        animals_tab_create(tab_animals);
-        terrariums_tab_create(tab_terrariums);
-    }
+    if (tab_animals)
+        refresh_animals();
+    if (tab_terrariums)
+        refresh_terrariums();
+    if (tab_stocks)
+        refresh_stocks();
+    if (tab_transactions)
+        refresh_transactions();
 }
 
 int ui_get_elevage(void)
 {
     return current_elevage_id;
+}
+
+static void refresh_animals(void)
+{
+    if (tab_animals) {
+        lv_obj_clean(tab_animals);
+        animals_tab_create(tab_animals);
+    }
+}
+
+static void refresh_terrariums(void)
+{
+    if (tab_terrariums) {
+        lv_obj_clean(tab_terrariums);
+        terrariums_tab_create(tab_terrariums);
+    }
+}
+
+static void refresh_stocks(void)
+{
+    if (tab_stocks) {
+        lv_obj_clean(tab_stocks);
+        stocks_tab_create(tab_stocks);
+    }
+}
+
+static void refresh_transactions(void)
+{
+    if (tab_transactions) {
+        lv_obj_clean(tab_transactions);
+        transactions_tab_create(tab_transactions);
+    }
+}
+
+/* ---- Animal form handlers ---- */
+
+static void animal_save_event(lv_event_t *e)
+{
+    AnimalFormCtx *ctx = (AnimalFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    Reptile r = {0};
+    r.id = atoi(lv_textarea_get_text(ctx->ta_id));
+    r.elevage_id = current_elevage_id;
+    strncpy(r.name, lv_textarea_get_text(ctx->ta_name), sizeof(r.name) - 1);
+    strncpy(r.species, lv_textarea_get_text(ctx->ta_species), sizeof(r.species) - 1);
+    strncpy(r.sex, lv_textarea_get_text(ctx->ta_sex), sizeof(r.sex) - 1);
+    strncpy(r.birth_date, lv_textarea_get_text(ctx->ta_birth), sizeof(r.birth_date) - 1);
+    if (ctx->is_new)
+        animals_add(&r);
+    else
+        animals_update(ctx->orig_id, &r);
+    lv_obj_del(ctx->win);
+    refresh_animals();
+}
+
+static void animal_delete_event(lv_event_t *e)
+{
+    AnimalFormCtx *ctx = (AnimalFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    animals_delete(ctx->orig_id);
+    lv_obj_del(ctx->win);
+    refresh_animals();
+}
+
+static void open_animal_form(const Reptile *r)
+{
+    animal_form.is_new = (r == NULL);
+    animal_form.orig_id = r ? r->id : 0;
+    animal_form.win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(animal_form.win, 300, 250);
+    lv_obj_center(animal_form.win);
+
+    animal_form.ta_id = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_id, 280);
+    lv_textarea_set_placeholder_text(animal_form.ta_id, "ID");
+    if (r) {
+        char buf[16];
+        sprintf(buf, "%d", r->id);
+        lv_textarea_set_text(animal_form.ta_id, buf);
+    }
+
+    animal_form.ta_name = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_name, 280);
+    lv_obj_align(animal_form.ta_name, LV_ALIGN_TOP_MID, 0, 40);
+    lv_textarea_set_placeholder_text(animal_form.ta_name, "Name");
+    if (r) lv_textarea_set_text(animal_form.ta_name, r->name);
+
+    animal_form.ta_species = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_species, 280);
+    lv_obj_align(animal_form.ta_species, LV_ALIGN_TOP_MID, 0, 80);
+    lv_textarea_set_placeholder_text(animal_form.ta_species, "Species");
+    if (r) lv_textarea_set_text(animal_form.ta_species, r->species);
+
+    animal_form.ta_sex = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_sex, 280);
+    lv_obj_align(animal_form.ta_sex, LV_ALIGN_TOP_MID, 0, 120);
+    lv_textarea_set_placeholder_text(animal_form.ta_sex, "Sex");
+    if (r) lv_textarea_set_text(animal_form.ta_sex, r->sex);
+
+    animal_form.ta_birth = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_birth, 280);
+    lv_obj_align(animal_form.ta_birth, LV_ALIGN_TOP_MID, 0, 160);
+    lv_textarea_set_placeholder_text(animal_form.ta_birth, "Birth");
+    if (r) lv_textarea_set_text(animal_form.ta_birth, r->birth_date);
+
+    lv_obj_t *btn_save = lv_btn_create(animal_form.win);
+    lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);
+    lv_obj_add_event_cb(btn_save, animal_save_event, LV_EVENT_CLICKED, &animal_form);
+    lv_label_set_text(lv_label_create(btn_save), "Save");
+
+    if (!animal_form.is_new) {
+        lv_obj_t *btn_del = lv_btn_create(animal_form.win);
+        lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+        lv_obj_add_event_cb(btn_del, animal_delete_event, LV_EVENT_CLICKED, &animal_form);
+        lv_label_set_text(lv_label_create(btn_del), "Delete");
+    }
+}
+
+static void animal_add_event(lv_event_t *e)
+{
+    (void)e;
+    open_animal_form(NULL);
+}
+
+static void animal_edit_event(lv_event_t *e)
+{
+    int id = (int)(intptr_t)lv_event_get_user_data(e);
+    const Reptile *r = animals_get(id);
+    if (r) open_animal_form(r);
+}
+
+/* ---- Terrarium form handlers ---- */
+
+static void terrarium_save_event(lv_event_t *e)
+{
+    TerrariumFormCtx *ctx = (TerrariumFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    Terrarium t = {0};
+    t.id = atoi(lv_textarea_get_text(ctx->ta_id));
+    t.elevage_id = current_elevage_id;
+    strncpy(t.name, lv_textarea_get_text(ctx->ta_name), sizeof(t.name) - 1);
+    t.capacity = atoi(lv_textarea_get_text(ctx->ta_capacity));
+    if (ctx->is_new)
+        terrariums_add(&t);
+    else
+        terrariums_update(ctx->orig_id, &t);
+    lv_obj_del(ctx->win);
+    refresh_terrariums();
+}
+
+static void terrarium_delete_event(lv_event_t *e)
+{
+    TerrariumFormCtx *ctx = (TerrariumFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    terrariums_delete(ctx->orig_id);
+    lv_obj_del(ctx->win);
+    refresh_terrariums();
+}
+
+static void open_terrarium_form(const Terrarium *t)
+{
+    terrarium_form.is_new = (t == NULL);
+    terrarium_form.orig_id = t ? t->id : 0;
+    terrarium_form.win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(terrarium_form.win, 300, 200);
+    lv_obj_center(terrarium_form.win);
+
+    terrarium_form.ta_id = lv_textarea_create(terrarium_form.win);
+    lv_obj_set_width(terrarium_form.ta_id, 280);
+    lv_textarea_set_placeholder_text(terrarium_form.ta_id, "ID");
+    if (t) { char buf[16]; sprintf(buf, "%d", t->id); lv_textarea_set_text(terrarium_form.ta_id, buf); }
+
+    terrarium_form.ta_name = lv_textarea_create(terrarium_form.win);
+    lv_obj_set_width(terrarium_form.ta_name, 280);
+    lv_obj_align(terrarium_form.ta_name, LV_ALIGN_TOP_MID, 0, 40);
+    lv_textarea_set_placeholder_text(terrarium_form.ta_name, "Name");
+    if (t) lv_textarea_set_text(terrarium_form.ta_name, t->name);
+
+    terrarium_form.ta_capacity = lv_textarea_create(terrarium_form.win);
+    lv_obj_set_width(terrarium_form.ta_capacity, 280);
+    lv_obj_align(terrarium_form.ta_capacity, LV_ALIGN_TOP_MID, 0, 80);
+    lv_textarea_set_placeholder_text(terrarium_form.ta_capacity, "Capacity");
+    if (t) { char buf[16]; sprintf(buf, "%d", t->capacity); lv_textarea_set_text(terrarium_form.ta_capacity, buf); }
+
+    lv_obj_t *btn_save = lv_btn_create(terrarium_form.win);
+    lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);
+    lv_obj_add_event_cb(btn_save, terrarium_save_event, LV_EVENT_CLICKED, &terrarium_form);
+    lv_label_set_text(lv_label_create(btn_save), "Save");
+
+    if (!terrarium_form.is_new) {
+        lv_obj_t *btn_del = lv_btn_create(terrarium_form.win);
+        lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+        lv_obj_add_event_cb(btn_del, terrarium_delete_event, LV_EVENT_CLICKED, &terrarium_form);
+        lv_label_set_text(lv_label_create(btn_del), "Delete");
+    }
+}
+
+static void terrarium_add_event(lv_event_t *e)
+{
+    (void)e;
+    open_terrarium_form(NULL);
+}
+
+static void terrarium_edit_event(lv_event_t *e)
+{
+    int id = (int)(intptr_t)lv_event_get_user_data(e);
+    const Terrarium *t = terrariums_get(id);
+    if (t) open_terrarium_form(t);
+}
+
+/* ---- Stock form handlers ---- */
+
+static void stock_save_event(lv_event_t *e)
+{
+    StockFormCtx *ctx = (StockFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    StockItem s = {0};
+    s.id = atoi(lv_textarea_get_text(ctx->ta_id));
+    strncpy(s.name, lv_textarea_get_text(ctx->ta_name), sizeof(s.name) - 1);
+    s.quantity = atoi(lv_textarea_get_text(ctx->ta_qty));
+    s.min_quantity = atoi(lv_textarea_get_text(ctx->ta_min));
+    if (ctx->is_new)
+        stocks_add(&s);
+    else
+        stocks_update(ctx->orig_id, &s);
+    lv_obj_del(ctx->win);
+    refresh_stocks();
+}
+
+static void stock_delete_event(lv_event_t *e)
+{
+    StockFormCtx *ctx = (StockFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    stocks_delete(ctx->orig_id);
+    lv_obj_del(ctx->win);
+    refresh_stocks();
+}
+
+static void open_stock_form(const StockItem *s)
+{
+    stock_form.is_new = (s == NULL);
+    stock_form.orig_id = s ? s->id : 0;
+    stock_form.win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(stock_form.win, 300, 200);
+    lv_obj_center(stock_form.win);
+
+    stock_form.ta_id = lv_textarea_create(stock_form.win);
+    lv_obj_set_width(stock_form.ta_id, 280);
+    lv_textarea_set_placeholder_text(stock_form.ta_id, "ID");
+    if (s) { char buf[16]; sprintf(buf, "%d", s->id); lv_textarea_set_text(stock_form.ta_id, buf); }
+
+    stock_form.ta_name = lv_textarea_create(stock_form.win);
+    lv_obj_set_width(stock_form.ta_name, 280);
+    lv_obj_align(stock_form.ta_name, LV_ALIGN_TOP_MID, 0, 40);
+    lv_textarea_set_placeholder_text(stock_form.ta_name, "Name");
+    if (s) lv_textarea_set_text(stock_form.ta_name, s->name);
+
+    stock_form.ta_qty = lv_textarea_create(stock_form.win);
+    lv_obj_set_width(stock_form.ta_qty, 280);
+    lv_obj_align(stock_form.ta_qty, LV_ALIGN_TOP_MID, 0, 80);
+    lv_textarea_set_placeholder_text(stock_form.ta_qty, "Quantity");
+    if (s) { char buf[16]; sprintf(buf, "%d", s->quantity); lv_textarea_set_text(stock_form.ta_qty, buf); }
+
+    stock_form.ta_min = lv_textarea_create(stock_form.win);
+    lv_obj_set_width(stock_form.ta_min, 280);
+    lv_obj_align(stock_form.ta_min, LV_ALIGN_TOP_MID, 0, 120);
+    lv_textarea_set_placeholder_text(stock_form.ta_min, "Min");
+    if (s) { char buf[16]; sprintf(buf, "%d", s->min_quantity); lv_textarea_set_text(stock_form.ta_min, buf); }
+
+    lv_obj_t *btn_save = lv_btn_create(stock_form.win);
+    lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);
+    lv_obj_add_event_cb(btn_save, stock_save_event, LV_EVENT_CLICKED, &stock_form);
+    lv_label_set_text(lv_label_create(btn_save), "Save");
+
+    if (!stock_form.is_new) {
+        lv_obj_t *btn_del = lv_btn_create(stock_form.win);
+        lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+        lv_obj_add_event_cb(btn_del, stock_delete_event, LV_EVENT_CLICKED, &stock_form);
+        lv_label_set_text(lv_label_create(btn_del), "Delete");
+    }
+}
+
+static void stock_add_event(lv_event_t *e)
+{
+    (void)e;
+    open_stock_form(NULL);
+}
+
+static void stock_edit_event(lv_event_t *e)
+{
+    int id = (int)(intptr_t)lv_event_get_user_data(e);
+    const StockItem *s = stocks_get(id);
+    if (s) open_stock_form(s);
+}
+
+/* ---- Transaction form handlers ---- */
+
+static void transaction_save_event(lv_event_t *e)
+{
+    TransactionFormCtx *ctx = (TransactionFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    Transaction t = {0};
+    t.id = atoi(lv_textarea_get_text(ctx->ta_id));
+    t.stock_id = atoi(lv_textarea_get_text(ctx->ta_stock_id));
+    t.quantity = atoi(lv_textarea_get_text(ctx->ta_qty));
+    t.type = lv_dropdown_get_selected(ctx->dd_type) == 0 ? TRANSACTION_PURCHASE : TRANSACTION_SALE;
+    if (ctx->is_new)
+        transactions_add(&t);
+    else
+        transactions_update(ctx->orig_id, &t);
+    lv_obj_del(ctx->win);
+    refresh_transactions();
+}
+
+static void transaction_delete_event(lv_event_t *e)
+{
+    TransactionFormCtx *ctx = (TransactionFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    transactions_delete(ctx->orig_id);
+    lv_obj_del(ctx->win);
+    refresh_transactions();
+}
+
+static void open_transaction_form(const Transaction *t)
+{
+    transaction_form.is_new = (t == NULL);
+    transaction_form.orig_id = t ? t->id : 0;
+    transaction_form.win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(transaction_form.win, 300, 220);
+    lv_obj_center(transaction_form.win);
+
+    transaction_form.ta_id = lv_textarea_create(transaction_form.win);
+    lv_obj_set_width(transaction_form.ta_id, 280);
+    lv_textarea_set_placeholder_text(transaction_form.ta_id, "ID");
+    if (t) { char buf[16]; sprintf(buf, "%d", t->id); lv_textarea_set_text(transaction_form.ta_id, buf); }
+
+    transaction_form.ta_stock_id = lv_textarea_create(transaction_form.win);
+    lv_obj_set_width(transaction_form.ta_stock_id, 280);
+    lv_obj_align(transaction_form.ta_stock_id, LV_ALIGN_TOP_MID, 0, 40);
+    lv_textarea_set_placeholder_text(transaction_form.ta_stock_id, "Stock ID");
+    if (t) { char buf[16]; sprintf(buf, "%d", t->stock_id); lv_textarea_set_text(transaction_form.ta_stock_id, buf); }
+
+    transaction_form.ta_qty = lv_textarea_create(transaction_form.win);
+    lv_obj_set_width(transaction_form.ta_qty, 280);
+    lv_obj_align(transaction_form.ta_qty, LV_ALIGN_TOP_MID, 0, 80);
+    lv_textarea_set_placeholder_text(transaction_form.ta_qty, "Quantity");
+    if (t) { char buf[16]; sprintf(buf, "%d", t->quantity); lv_textarea_set_text(transaction_form.ta_qty, buf); }
+
+    transaction_form.dd_type = lv_dropdown_create(transaction_form.win);
+    lv_obj_set_width(transaction_form.dd_type, 280);
+    lv_obj_align(transaction_form.dd_type, LV_ALIGN_TOP_MID, 0, 120);
+    lv_dropdown_set_options(transaction_form.dd_type, "Purchase\nSale");
+    if (t) lv_dropdown_set_selected(transaction_form.dd_type, t->type == TRANSACTION_PURCHASE ? 0 : 1);
+
+    lv_obj_t *btn_save = lv_btn_create(transaction_form.win);
+    lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);
+    lv_obj_add_event_cb(btn_save, transaction_save_event, LV_EVENT_CLICKED, &transaction_form);
+    lv_label_set_text(lv_label_create(btn_save), "Save");
+
+    if (!transaction_form.is_new) {
+        lv_obj_t *btn_del = lv_btn_create(transaction_form.win);
+        lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+        lv_obj_add_event_cb(btn_del, transaction_delete_event, LV_EVENT_CLICKED, &transaction_form);
+        lv_label_set_text(lv_label_create(btn_del), "Delete");
+    }
+}
+
+static void transaction_add_event(lv_event_t *e)
+{
+    (void)e;
+    open_transaction_form(NULL);
+}
+
+static void transaction_edit_event(lv_event_t *e)
+{
+    int id = (int)(intptr_t)lv_event_get_user_data(e);
+    const Transaction *t = transactions_get(id);
+    if (t) open_transaction_form(t);
 }
 
 static void export_event(lv_event_t *e)
