@@ -111,52 +111,120 @@ typedef struct {
 
 static AnimalFormCtx animal_form;
 
+static lv_obj_t *health_list_win;
+static int health_list_animal_id;
+static lv_obj_t *breeding_list_win;
+static int breeding_list_animal_id;
+
+static void open_health_form(const HealthRecord *rec, int animal_id);
+static void open_breeding_form(const BreedingEvent *ev, int animal_id);
+
 static void close_win_event(lv_event_t *e)
 {
     lv_obj_del(lv_obj_get_parent(lv_event_get_current_target(e)));
 }
 
+static void health_close_event(lv_event_t *e)
+{
+    (void)e;
+    if (health_list_win) {
+        lv_obj_del(health_list_win);
+        health_list_win = NULL;
+    }
+}
+
+static void health_add_event(lv_event_t *e)
+{
+    (void)e;
+    open_health_form(NULL, health_list_animal_id);
+}
+
+static void health_edit_event(lv_event_t *e)
+{
+    int id = (int)(intptr_t)lv_event_get_user_data(e);
+    const HealthRecord *r = health_get(id);
+    if (r) open_health_form(r, r->animal_id);
+}
+
 static void open_health_list(int animal_id)
 {
-    lv_obj_t *win = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(win, 300, 200);
-    lv_obj_center(win);
+    health_list_animal_id = animal_id;
+    health_list_win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(health_list_win, 300, 200);
+    lv_obj_center(health_list_win);
 
-    lv_obj_t *list = lv_list_create(win);
+    lv_obj_t *list = lv_list_create(health_list_win);
     lv_obj_set_size(list, 280, 160);
     for (int i = 0; i < health_count_for_animal(animal_id); ++i) {
         const HealthRecord *r = health_get_by_index_for_animal(i, animal_id);
         if (!r) continue;
         char buf[64];
         snprintf(buf, sizeof(buf), "%d %s", r->date, r->description);
-        lv_list_add_btn(list, NULL, buf);
+        lv_obj_t *btn = lv_list_add_btn(list, NULL, buf);
+        lv_obj_add_event_cb(btn, health_edit_event, LV_EVENT_CLICKED,
+                            (void *)(intptr_t)r->id);
     }
 
-    lv_obj_t *btn = lv_btn_create(win);
+    lv_obj_t *btn_add = lv_btn_create(health_list_win);
+    lv_obj_align(btn_add, LV_ALIGN_BOTTOM_LEFT, 10, -10);
+    lv_obj_add_event_cb(btn_add, health_add_event, LV_EVENT_CLICKED, NULL);
+    lv_label_set_text(lv_label_create(btn_add), ui_get_text(TXT_ADD));
+
+    lv_obj_t *btn = lv_btn_create(health_list_win);
     lv_obj_align(btn, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
-    lv_obj_add_event_cb(btn, close_win_event, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, health_close_event, LV_EVENT_CLICKED, NULL);
     lv_label_set_text(lv_label_create(btn), "Close");
+}
+
+static void breeding_close_event(lv_event_t *e)
+{
+    (void)e;
+    if (breeding_list_win) {
+        lv_obj_del(breeding_list_win);
+        breeding_list_win = NULL;
+    }
+}
+
+static void breeding_add_event(lv_event_t *e)
+{
+    (void)e;
+    open_breeding_form(NULL, breeding_list_animal_id);
+}
+
+static void breeding_edit_event(lv_event_t *e)
+{
+    int id = (int)(intptr_t)lv_event_get_user_data(e);
+    const BreedingEvent *ev = breeding_get(id);
+    if (ev) open_breeding_form(ev, ev->animal_id);
 }
 
 static void open_breeding_list(int animal_id)
 {
-    lv_obj_t *win = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(win, 300, 200);
-    lv_obj_center(win);
+    breeding_list_animal_id = animal_id;
+    breeding_list_win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(breeding_list_win, 300, 200);
+    lv_obj_center(breeding_list_win);
 
-    lv_obj_t *list = lv_list_create(win);
+    lv_obj_t *list = lv_list_create(breeding_list_win);
     lv_obj_set_size(list, 280, 160);
     for (int i = 0; i < breeding_count_for_animal(animal_id); ++i) {
         const BreedingEvent *ev = breeding_get_by_index_for_animal(i, animal_id);
         if (!ev) continue;
         char buf[64];
         snprintf(buf, sizeof(buf), "%d %s", ev->date, ev->description);
-        lv_list_add_btn(list, NULL, buf);
+        lv_obj_t *btn = lv_list_add_btn(list, NULL, buf);
+        lv_obj_add_event_cb(btn, breeding_edit_event, LV_EVENT_CLICKED,
+                            (void *)(intptr_t)ev->id);
     }
 
-    lv_obj_t *btn = lv_btn_create(win);
+    lv_obj_t *btn_add = lv_btn_create(breeding_list_win);
+    lv_obj_align(btn_add, LV_ALIGN_BOTTOM_LEFT, 10, -10);
+    lv_obj_add_event_cb(btn_add, breeding_add_event, LV_EVENT_CLICKED, NULL);
+    lv_label_set_text(lv_label_create(btn_add), ui_get_text(TXT_ADD));
+
+    lv_obj_t *btn = lv_btn_create(breeding_list_win);
     lv_obj_align(btn, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
-    lv_obj_add_event_cb(btn, close_win_event, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, breeding_close_event, LV_EVENT_CLICKED, NULL);
     lv_label_set_text(lv_label_create(btn), "Close");
 }
 
@@ -194,6 +262,30 @@ typedef struct {
 } TransactionFormCtx;
 
 static TransactionFormCtx transaction_form;
+
+typedef struct {
+    lv_obj_t *win;
+    lv_obj_t *ta_id;
+    lv_obj_t *ta_desc;
+    lv_obj_t *ta_date;
+    bool is_new;
+    int orig_id;
+    int animal_id;
+} HealthFormCtx;
+
+static HealthFormCtx health_form;
+
+typedef struct {
+    lv_obj_t *win;
+    lv_obj_t *ta_id;
+    lv_obj_t *ta_desc;
+    lv_obj_t *ta_date;
+    bool is_new;
+    int orig_id;
+    int animal_id;
+} BreedingFormCtx;
+
+static BreedingFormCtx breeding_form;
 
 typedef struct {
     lv_obj_t *win;
@@ -660,6 +752,148 @@ static void animal_edit_event(lv_event_t *e)
     int id = (int)(intptr_t)lv_event_get_user_data(e);
     const Reptile *r = animals_get(id);
     if (r) open_animal_form(r);
+}
+
+/* ---- Health form handlers ---- */
+
+static void health_save_event(lv_event_t *e)
+{
+    HealthFormCtx *ctx = (HealthFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    HealthRecord r = {0};
+    r.id = atoi(lv_textarea_get_text(ctx->ta_id));
+    r.animal_id = ctx->animal_id;
+    strncpy(r.description, lv_textarea_get_text(ctx->ta_desc), sizeof(r.description) - 1);
+    r.date = atoi(lv_textarea_get_text(ctx->ta_date));
+    if (ctx->is_new)
+        health_add(&r);
+    else
+        health_update(ctx->orig_id, &r);
+    lv_obj_del(ctx->win);
+    open_health_list(ctx->animal_id);
+}
+
+static void health_delete_event(lv_event_t *e)
+{
+    HealthFormCtx *ctx = (HealthFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    health_delete(ctx->orig_id);
+    lv_obj_del(ctx->win);
+    open_health_list(ctx->animal_id);
+}
+
+static void open_health_form(const HealthRecord *rec, int animal_id)
+{
+    if (health_list_win) {
+        lv_obj_del(health_list_win);
+        health_list_win = NULL;
+    }
+    health_form.is_new = (rec == NULL);
+    health_form.orig_id = rec ? rec->id : 0;
+    health_form.animal_id = animal_id;
+    health_form.win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(health_form.win, 300, 160);
+    lv_obj_center(health_form.win);
+
+    health_form.ta_id = lv_textarea_create(health_form.win);
+    lv_obj_set_width(health_form.ta_id, 280);
+    lv_textarea_set_placeholder_text(health_form.ta_id, "ID");
+    if (rec) { char buf[16]; sprintf(buf, "%d", rec->id); lv_textarea_set_text(health_form.ta_id, buf); }
+
+    health_form.ta_desc = lv_textarea_create(health_form.win);
+    lv_obj_set_width(health_form.ta_desc, 280);
+    lv_obj_align(health_form.ta_desc, LV_ALIGN_TOP_MID, 0, 40);
+    lv_textarea_set_placeholder_text(health_form.ta_desc, "Description");
+    if (rec) lv_textarea_set_text(health_form.ta_desc, rec->description);
+
+    health_form.ta_date = lv_textarea_create(health_form.win);
+    lv_obj_set_width(health_form.ta_date, 280);
+    lv_obj_align(health_form.ta_date, LV_ALIGN_TOP_MID, 0, 80);
+    lv_textarea_set_placeholder_text(health_form.ta_date, "Date");
+    if (rec) { char buf[16]; sprintf(buf, "%d", rec->date); lv_textarea_set_text(health_form.ta_date, buf); }
+
+    lv_obj_t *btn_save = lv_btn_create(health_form.win);
+    lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);
+    lv_obj_add_event_cb(btn_save, health_save_event, LV_EVENT_CLICKED, &health_form);
+    lv_label_set_text(lv_label_create(btn_save), ui_get_text(TXT_SAVE));
+
+    if (!health_form.is_new) {
+        lv_obj_t *btn_del = lv_btn_create(health_form.win);
+        lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+        lv_obj_add_event_cb(btn_del, health_delete_event, LV_EVENT_CLICKED, &health_form);
+        lv_label_set_text(lv_label_create(btn_del), ui_get_text(TXT_DELETE));
+    }
+}
+
+/* ---- Breeding form handlers ---- */
+
+static void breeding_save_event(lv_event_t *e)
+{
+    BreedingFormCtx *ctx = (BreedingFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    BreedingEvent ev = {0};
+    ev.id = atoi(lv_textarea_get_text(ctx->ta_id));
+    ev.animal_id = ctx->animal_id;
+    strncpy(ev.description, lv_textarea_get_text(ctx->ta_desc), sizeof(ev.description) - 1);
+    ev.date = atoi(lv_textarea_get_text(ctx->ta_date));
+    if (ctx->is_new)
+        breeding_add(&ev);
+    else
+        breeding_update(ctx->orig_id, &ev);
+    lv_obj_del(ctx->win);
+    open_breeding_list(ctx->animal_id);
+}
+
+static void breeding_delete_event(lv_event_t *e)
+{
+    BreedingFormCtx *ctx = (BreedingFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    breeding_delete(ctx->orig_id);
+    lv_obj_del(ctx->win);
+    open_breeding_list(ctx->animal_id);
+}
+
+static void open_breeding_form(const BreedingEvent *ev, int animal_id)
+{
+    if (breeding_list_win) {
+        lv_obj_del(breeding_list_win);
+        breeding_list_win = NULL;
+    }
+    breeding_form.is_new = (ev == NULL);
+    breeding_form.orig_id = ev ? ev->id : 0;
+    breeding_form.animal_id = animal_id;
+    breeding_form.win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(breeding_form.win, 300, 160);
+    lv_obj_center(breeding_form.win);
+
+    breeding_form.ta_id = lv_textarea_create(breeding_form.win);
+    lv_obj_set_width(breeding_form.ta_id, 280);
+    lv_textarea_set_placeholder_text(breeding_form.ta_id, "ID");
+    if (ev) { char buf[16]; sprintf(buf, "%d", ev->id); lv_textarea_set_text(breeding_form.ta_id, buf); }
+
+    breeding_form.ta_desc = lv_textarea_create(breeding_form.win);
+    lv_obj_set_width(breeding_form.ta_desc, 280);
+    lv_obj_align(breeding_form.ta_desc, LV_ALIGN_TOP_MID, 0, 40);
+    lv_textarea_set_placeholder_text(breeding_form.ta_desc, "Description");
+    if (ev) lv_textarea_set_text(breeding_form.ta_desc, ev->description);
+
+    breeding_form.ta_date = lv_textarea_create(breeding_form.win);
+    lv_obj_set_width(breeding_form.ta_date, 280);
+    lv_obj_align(breeding_form.ta_date, LV_ALIGN_TOP_MID, 0, 80);
+    lv_textarea_set_placeholder_text(breeding_form.ta_date, "Date");
+    if (ev) { char buf[16]; sprintf(buf, "%d", ev->date); lv_textarea_set_text(breeding_form.ta_date, buf); }
+
+    lv_obj_t *btn_save = lv_btn_create(breeding_form.win);
+    lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);
+    lv_obj_add_event_cb(btn_save, breeding_save_event, LV_EVENT_CLICKED, &breeding_form);
+    lv_label_set_text(lv_label_create(btn_save), ui_get_text(TXT_SAVE));
+
+    if (!breeding_form.is_new) {
+        lv_obj_t *btn_del = lv_btn_create(breeding_form.win);
+        lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+        lv_obj_add_event_cb(btn_del, breeding_delete_event, LV_EVENT_CLICKED, &breeding_form);
+        lv_label_set_text(lv_label_create(btn_del), ui_get_text(TXT_DELETE));
+    }
 }
 
 /* ---- Terrarium form handlers ---- */
