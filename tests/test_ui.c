@@ -1,0 +1,96 @@
+#include "unity.h"
+#include <string.h>
+
+typedef enum { UI_LANG_EN, UI_LANG_FR, UI_LANG_COUNT } ui_language_t;
+typedef enum { UI_THEME_LIGHT, UI_THEME_DARK, UI_THEME_COUNT } ui_theme_t;
+typedef enum {
+    TXT_ANIMALS,
+    TXT_TERRARIUMS,
+    TXT_STOCKS,
+    TXT_TRANSACTIONS,
+    TXT_SETTINGS,
+    TXT_EXPORT,
+    TXT_IMPORT,
+    TXT_LEGAL_OK,
+    TXT_LEGAL_EXPIRED,
+    TXT_LANGUAGE,
+    TXT_THEME,
+    TXT_LOGIN,
+    TXT_USERNAME,
+    TXT_PASSWORD,
+    TXT_COUNT
+} ui_text_id_t;
+
+static ui_language_t current_lang;
+static ui_theme_t current_theme;
+
+static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
+    [UI_LANG_EN] = {
+        [TXT_ANIMALS] = "Animals",
+        [TXT_TERRARIUMS] = "Terrariums",
+        [TXT_STOCKS] = "Stock",
+        [TXT_TRANSACTIONS] = "Transactions",
+        [TXT_SETTINGS] = "Settings",
+        [TXT_EXPORT] = "Export",
+        [TXT_IMPORT] = "Import",
+        [TXT_LEGAL_OK] = "OK",
+        [TXT_LEGAL_EXPIRED] = "Expired",
+        [TXT_LANGUAGE] = "Language",
+        [TXT_THEME] = "Theme",
+        [TXT_LOGIN] = "Login",
+        [TXT_USERNAME] = "Username",
+        [TXT_PASSWORD] = "Password",
+    },
+    [UI_LANG_FR] = {
+        [TXT_ANIMALS] = "Animaux",
+        [TXT_TERRARIUMS] = "Terrariums",
+        [TXT_STOCKS] = "Stocks",
+        [TXT_TRANSACTIONS] = "Transactions",
+        [TXT_SETTINGS] = "Param\xC3\xA8tres",
+        [TXT_EXPORT] = "Exporter",
+        [TXT_IMPORT] = "Importer",
+        [TXT_LEGAL_OK] = "OK",
+        [TXT_LEGAL_EXPIRED] = "Expire",
+        [TXT_LANGUAGE] = "Langue",
+        [TXT_THEME] = "Th\xC3\xA8me",
+        [TXT_LOGIN] = "Connexion",
+        [TXT_USERNAME] = "Utilisateur",
+        [TXT_PASSWORD] = "Mot de passe",
+    }
+};
+
+void ui_init(ui_language_t lang, ui_theme_t theme)
+{
+    current_lang = lang;
+    current_theme = theme;
+}
+
+void ui_set_language(ui_language_t lang)
+{
+    current_lang = lang;
+}
+
+void ui_set_theme(ui_theme_t theme)
+{
+    current_theme = theme;
+}
+
+const char *ui_get_text(ui_text_id_t id)
+{
+    return translations[current_lang][id];
+}
+
+TEST_CASE("ui language switching","[ui]")
+{
+    ui_init(UI_LANG_EN, UI_THEME_LIGHT);
+    TEST_ASSERT_EQUAL_STRING("Animals", ui_get_text(TXT_ANIMALS));
+    ui_set_language(UI_LANG_FR);
+    TEST_ASSERT_EQUAL_STRING("Animaux", ui_get_text(TXT_ANIMALS));
+}
+
+TEST_CASE("ui theme switching","[ui]")
+{
+    ui_init(UI_LANG_EN, UI_THEME_LIGHT);
+    ui_set_theme(UI_THEME_DARK);
+    TEST_ASSERT_EQUAL_INT(UI_THEME_DARK, current_theme);
+}
