@@ -45,4 +45,18 @@ sqlite3_stmt *db_query(const char *format, ...);
  */
 bool db_set_key(const char *key);
 
+/**
+ * \brief Ouvre la base de données à un chemin personnalisé.
+ *        Utilisé principalement pour les tests unitaires.
+ * \param path Chemin du fichier SQLite ou ":memory:".
+ * \return true si l'ouverture a réussi.
+ */
+bool db_open_custom(const char *path);
+
+/**
+ * \brief Ferme la base de données courante.
+ */
+void db_close(void);
+
+
 #endif // DB_H
