@@ -4,6 +4,9 @@
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 #include "mbedtls/aes.h"
+#include "nvs.h"
+#include "nvs_flash.h"
+#include "esp_system.h"
 #include "db.h"
 #include "legal.h"
 #include "esp_http_client.h"
@@ -12,7 +15,36 @@
 #include <stdio.h>
 
 static const char *TAG = "storage";
-static const unsigned char aes_key[16] = "lizard-secret!!";
+static unsigned char aes_key[16];
+
+static void load_aes_key(void)
+{
+    nvs_handle_t h;
+    size_t len = sizeof(aes_key);
+    if (nvs_open("storage", NVS_READONLY, &h) == ESP_OK) {
+        if (nvs_get_blob(h, "aes_key", aes_key, &len) != ESP_OK || len != sizeof(aes_key)) {
+            memset(aes_key, 0, sizeof(aes_key));
+        }
+        nvs_close(h);
+    } else {
+        memset(aes_key, 0, sizeof(aes_key));
+    }
+}
+
+bool storage_set_aes_key(const unsigned char key[16])
+{
+    memcpy(aes_key, key, 16);
+    nvs_handle_t h;
+    if (nvs_open("storage", NVS_READWRITE, &h) != ESP_OK) {
+        return false;
+    }
+    esp_err_t err = nvs_set_blob(h, "aes_key", key, 16);
+    if (err == ESP_OK) {
+        err = nvs_commit(h);
+    }
+    nvs_close(h);
+    return err == ESP_OK;
+}
 
 bool storage_encrypt_file(const char *path)
 {
@@ -37,7 +69,8 @@ bool storage_encrypt_file(const char *path)
     mbedtls_aes_context ctx;
     mbedtls_aes_init(&ctx);
     mbedtls_aes_setkey_enc(&ctx, aes_key, 128);
-    unsigned char iv[16] = {0};
+    unsigned char iv[16];
+    esp_fill_random(iv, sizeof(iv));
     mbedtls_aes_crypt_cbc(&ctx, MBEDTLS_AES_ENCRYPT, padded_len, iv, buf, buf);
     mbedtls_aes_free(&ctx);
 
@@ -49,6 +82,7 @@ bool storage_encrypt_file(const char *path)
 
     uint32_t orig_len = (uint32_t)len;
     fwrite(&orig_len, 1, sizeof(orig_len), f);
+    fwrite(iv, 1, sizeof(iv), f);
     fwrite(buf, 1, padded_len, f);
     fclose(f);
     free(buf);
@@ -67,10 +101,16 @@ bool storage_decrypt_file(const char *src, const char *dst)
         return false;
     }
 
+    unsigned char iv[16];
+    if (fread(iv, 1, sizeof(iv), f) != sizeof(iv)) {
+        fclose(f);
+        return false;
+    }
+
     fseek(f, 0, SEEK_END);
     long file_len = ftell(f);
-    long enc_len = file_len - sizeof(orig_len);
-    fseek(f, sizeof(orig_len), SEEK_SET);
+    long enc_len = file_len - sizeof(orig_len) - sizeof(iv);
+    fseek(f, sizeof(orig_len) + sizeof(iv), SEEK_SET);
 
     unsigned char *buf = malloc(enc_len);
     if (!buf) {
@@ -84,7 +124,6 @@ bool storage_decrypt_file(const char *src, const char *dst)
     mbedtls_aes_context ctx;
     mbedtls_aes_init(&ctx);
     mbedtls_aes_setkey_dec(&ctx, aes_key, 128);
-    unsigned char iv[16] = {0};
     mbedtls_aes_crypt_cbc(&ctx, MBEDTLS_AES_DECRYPT, enc_len, iv, buf, buf);
     mbedtls_aes_free(&ctx);
 
@@ -125,6 +164,7 @@ bool storage_mount_sdcard(void)
 void storage_init(void)
 {
     ESP_LOGI(TAG, "Initialisation du stockage externe");
+    load_aes_key();
     storage_mount_sdcard();
 }
 
