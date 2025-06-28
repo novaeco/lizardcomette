@@ -20,6 +20,15 @@ ui_set_theme(UI_THEME_DARK);
 
 Les textes des onglets sont mis à jour automatiquement selon la langue sélectionnée.
 
+## Connexion
+
+Au démarrage, un formulaire de connexion demande l'utilisateur et le mot de passe.
+Les identifiants sont vérifiés via `auth_check()`.
+Selon le rôle retourné par `auth_get_role()`, certains onglets sont affichés :
+
+- Rôle particulier : seulement "Animaux", "Terrariums" et "Paramètres".
+- Rôle professionnel : accès supplémentaire aux onglets "Stocks" et "Transactions".
+
 ## Onglets disponibles
 
 - **Animaux** : liste les reptiles avec l'état de leurs documents légaux.

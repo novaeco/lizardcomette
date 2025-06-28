@@ -36,6 +36,9 @@ typedef enum {
     TXT_LEGAL_EXPIRED,
     TXT_LANGUAGE,
     TXT_THEME,
+    TXT_LOGIN,
+    TXT_USERNAME,
+    TXT_PASSWORD,
     TXT_COUNT
 } ui_text_id_t;
 
