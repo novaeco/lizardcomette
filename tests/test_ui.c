@@ -23,6 +23,13 @@ typedef enum {
     TXT_SAVE,
     TXT_DELETE,
     TXT_OK,
+    TXT_CDC_NUMBER,
+    TXT_AOE_NUMBER,
+    TXT_IFAP_ID,
+    TXT_QUOTA_LIMIT,
+    TXT_QUOTA_USED,
+    TXT_CERFA_EXPIRY,
+    TXT_CITES_EXPIRY,
     TXT_COUNT
 } ui_text_id_t;
 
@@ -50,6 +57,13 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_SAVE] = "Save",
         [TXT_DELETE] = "Delete",
         [TXT_OK] = "OK",
+        [TXT_CDC_NUMBER] = "CDC number",
+        [TXT_AOE_NUMBER] = "AOE number",
+        [TXT_IFAP_ID] = "I-FAP ID",
+        [TXT_QUOTA_LIMIT] = "Quota limit",
+        [TXT_QUOTA_USED] = "Quota used",
+        [TXT_CERFA_EXPIRY] = "Cerfa expiry",
+        [TXT_CITES_EXPIRY] = "CITES expiry",
     },
     [UI_LANG_FR] = {
         [TXT_ANIMALS] = "Animaux",
@@ -71,6 +85,13 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_SAVE] = "Sauvegarder",
         [TXT_DELETE] = "Supprimer",
         [TXT_OK] = "OK",
+        [TXT_CDC_NUMBER] = "N° CDC",
+        [TXT_AOE_NUMBER] = "N° AOE",
+        [TXT_IFAP_ID] = "Identifiant I-FAP",
+        [TXT_QUOTA_LIMIT] = "Quota limite",
+        [TXT_QUOTA_USED] = "Quota utilisé",
+        [TXT_CERFA_EXPIRY] = "Validité Cerfa",
+        [TXT_CITES_EXPIRY] = "Validité CITES",
     }
 };
 
