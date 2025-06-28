@@ -257,3 +257,14 @@ void storage_restore(void)
         ESP_LOGE(TAG, "Echec restauration");
     }
 }
+
+void storage_import_csv(const char *path)
+{
+    ESP_LOGI(TAG, "Import CSV depuis %s", path);
+    if (!storage_decrypt_file(path, "/sdcard/import_tmp.csv")) {
+        ESP_LOGE(TAG, "Echec dechiffrement");
+        return;
+    }
+    db_import_csv("/sdcard/import_tmp.csv");
+    remove("/sdcard/import_tmp.csv");
+}

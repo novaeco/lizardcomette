@@ -63,6 +63,7 @@ typedef enum {
     TXT_QUANTITY,
     TXT_MIN,
     TXT_STOCK_ID,
+    TXT_IMPORT_CSV,
     TXT_COUNT
 } ui_text_id_t;
 

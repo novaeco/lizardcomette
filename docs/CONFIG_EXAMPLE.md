@@ -22,3 +22,7 @@ Ce fichier illustre comment définir certaines options via `sdkconfig`.
 `CONFIG_STORAGE_TRANSFER_URL` indique l'endpoint HTTP pour l'envoi de fichiers.
 Si le serveur requiert une authentification basique, renseignez
 `CONFIG_STORAGE_TRANSFER_USERNAME` et `CONFIG_STORAGE_TRANSFER_PASSWORD`.
+
+Pour r\xC3\xA9importer une sauvegarde CSV, copiez le fichier chiffr\xC3\xA9 sur la
+carte SD puis utilisez le bouton **Import CSV** dans l'interface. La base sera
+alors vid\xC3\xA9e et remplie avec les donn\xC3\xA9es du fichier.
