@@ -1,5 +1,6 @@
 idf_component_register(SRCS "db.c"
-                       INCLUDE_DIRS ".")
+                       INCLUDE_DIRS "."
+                       REQUIRES sqlite3)
 
 # Expose project configuration options
 set_property(TARGET ${COMPONENT_LIB} PROPERTY
