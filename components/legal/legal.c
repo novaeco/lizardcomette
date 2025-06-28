@@ -1,5 +1,6 @@
 #include "legal.h"
 #include "legal_templates.h"
+#include "legal_numbers.h"
 #include "esp_log.h"
 #include "ui.h"
 #include <stdio.h>
@@ -16,8 +17,6 @@ static const char *cites_form_path = "forms/cites_base.pdf";
 static const char *cites_import_form_path = "forms/cites_import_base.pdf";
 static const char *cites_export_form_path = "forms/cites_export_base.pdf";
 
-static const char *valid_cdc_numbers[] = { "CDC12345", "CDC67890", NULL };
-static const char *valid_aoe_numbers[] = { "AOE12345", "AOE67890", NULL };
 
 static bool write_basic_pdf(const char *path, const char *content)
 {
@@ -186,25 +185,15 @@ bool legal_is_cerfa_valid(const Reptile *r)
     return r->cerfa_valid_until > (int)time(NULL);
 }
 
-static bool number_in_list(const char *num, const char *const list[])
-{
-    if (!num || !list)
-        return false;
-    for (int i = 0; list[i]; ++i) {
-        if (strcmp(num, list[i]) == 0)
-            return true;
-    }
-    return false;
-}
 
 bool legal_is_cdc_valid(const Reptile *r)
 {
-    return r && number_in_list(r->cdc_number, valid_cdc_numbers);
+    return r && legal_numbers_is_cdc_valid(r->cdc_number, NULL, r->elevage_id);
 }
 
 bool legal_is_aoe_valid(const Reptile *r)
 {
-    return r && number_in_list(r->aoe_number, valid_aoe_numbers);
+    return r && legal_numbers_is_aoe_valid(r->aoe_number, NULL, r->elevage_id);
 }
 
 bool legal_is_cites_valid(const Reptile *r)

@@ -6,6 +6,7 @@
 #include "transactions.h"
 #include "health.h"
 #include "breeding.h"
+#include "legal_numbers.h"
 
 TEST_CASE("animals crud","[animals]")
 {
@@ -113,5 +114,24 @@ TEST_CASE("breeding events crud","[breeding]")
     TEST_ASSERT_EQUAL_STRING("laid", ge->description);
     TEST_ASSERT_TRUE(breeding_delete(1));
     TEST_ASSERT_NULL(breeding_get(1));
+    db_close();
+}
+
+TEST_CASE("legal numbers crud","[legal_numbers]")
+{
+    db_set_key("");
+    TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    legal_numbers_init();
+    LegalNumber n = { .id=1, .username="user", .elevage_id=0, .type="CDC", .number="CDC999" };
+    TEST_ASSERT_TRUE(legal_numbers_add(&n));
+    TEST_ASSERT_EQUAL_INT(1, legal_numbers_count());
+    const LegalNumber *gn = legal_numbers_get(1);
+    TEST_ASSERT_NOT_NULL(gn);
+    strcpy(n.number, "CDC888");
+    TEST_ASSERT_TRUE(legal_numbers_update(1,&n));
+    gn = legal_numbers_get(1);
+    TEST_ASSERT_EQUAL_STRING("CDC888", gn->number);
+    TEST_ASSERT_TRUE(legal_numbers_delete(1));
+    TEST_ASSERT_EQUAL_INT(0, legal_numbers_count());
     db_close();
 }

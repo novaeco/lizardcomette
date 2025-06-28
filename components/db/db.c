@@ -89,6 +89,13 @@ static void create_tables(void)
                 "animal_id INTEGER,"""
                 "description TEXT,"""
                 "date INTEGER);");
+
+    exec_simple("CREATE TABLE IF NOT EXISTS cdc_aoe_numbers("""
+                "id INTEGER PRIMARY KEY,"""
+                "username TEXT,"""
+                "elevage_id INTEGER,"""
+                "type TEXT,"""
+                "number TEXT);");
 }
 
 static void load_db_key(void)

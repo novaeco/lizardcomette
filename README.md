@@ -29,6 +29,13 @@ idf.py build
 ## Utilisation
 Une fois flashé sur votre ESP32, le firmware démarre l'interface graphique en français ou en anglais selon la configuration. Les modules s'initialisent automatiquement puis le planificateur vérifie les tâches à venir. Consultez `docs/UI_USAGE.md` pour le détail des écrans et `docs/NOTICE.md` pour les avertissements légaux.
 
+## Gestion des numéros CDC/AOE
+Les numéros d'autorisation (CDC et AOE) ne sont plus codés en dur. Ils sont stockés dans la
+table `cdc_aoe_numbers`. Chaque entrée possède un `id`, éventuellement un `username`,
+un `elevage_id`, un `type` (`CDC` ou `AOE`) et le `number`. Utilisez les fonctions de
+`legal_numbers.h` pour manipuler ces listes et ajoutez vos valeurs pour que
+`legal_is_cdc_valid()` et `legal_is_aoe_valid()` fonctionnent correctement.
+
 ## Base de données chiffrée
 Si SQLCipher est disponible, la base `lizard.db` est chiffrée. Définissez
 `CONFIG_DB_DEFAULT_KEY` dans `sdkconfig` ou saisissez un mot de passe au
