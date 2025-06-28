@@ -117,6 +117,11 @@ void db_init(void)
     }
 #endif
 
+    exec_simple("CREATE TABLE IF NOT EXISTS elevages(""
+                "id INTEGER PRIMARY KEY,""
+                "name TEXT,""
+                "description TEXT);");
+
     exec_simple("CREATE TABLE IF NOT EXISTS animals("
                 "id INTEGER PRIMARY KEY,"
                 "elevage_id INTEGER,"
@@ -175,6 +180,26 @@ void db_backup(void)
     }
     sqlite3_close(backup_db);
     storage_encrypt_file("/sdcard/lizard_backup.db");
+}
+
+static void export_elevages_csv(FILE *f)
+{
+    fprintf(f, "elevages\n");
+    fprintf(f, "id,name,description\n");
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db_handle,
+                           "SELECT id,name,description FROM elevages;",
+                           -1, &stmt, NULL) == SQLITE_OK) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            fprintf(f, "%d,%s,%s\n",
+                    sqlite3_column_int(stmt, 0),
+                    sqlite3_column_text(stmt, 1),
+                    sqlite3_column_text(stmt, 2));
+        }
+        sqlite3_finalize(stmt);
+    }
+    fprintf(f, "\n");
 }
 
 static void export_animals_csv(FILE *f)
@@ -268,6 +293,27 @@ static void export_transactions_csv(FILE *f)
     fprintf(f, "\n");
 }
 
+static void export_elevages_json(FILE *f)
+{
+    fprintf(f, "  \"elevages\": [\n");
+    sqlite3_stmt *stmt;
+    bool first = true;
+    if (sqlite3_prepare_v2(db_handle,
+                           "SELECT id,name,description FROM elevages;",
+                           -1, &stmt, NULL) == SQLITE_OK) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            if (!first) fprintf(f, ",\n");
+            first = false;
+            fprintf(f, "    {\"id\":%d,\"name\":\"%s\",\"description\":\"%s\"}",
+                    sqlite3_column_int(stmt, 0),
+                    sqlite3_column_text(stmt, 1),
+                    sqlite3_column_text(stmt, 2));
+        }
+        sqlite3_finalize(stmt);
+    }
+    fprintf(f, "\n  ],\n");
+}
+
 void db_export_csv(const char *path)
 {
     if (!db_handle || !path)
@@ -279,6 +325,7 @@ void db_export_csv(const char *path)
         return;
     }
 
+    export_elevages_csv(f);
     export_animals_csv(f);
     export_terrariums_csv(f);
     export_stocks_csv(f);
@@ -395,6 +442,8 @@ void db_export_json(const char *path)
     }
 
     fprintf(f, "{\n");
+    export_elevages_json(f);
+    fprintf(f, ",\n");
     export_animals_json(f);
     fprintf(f, ",\n");
     export_terrariums_json(f);

@@ -64,4 +64,7 @@ const char *ui_get_text(ui_text_id_t id);
  */
 void ui_notify(const char *msg);
 
+void ui_set_elevage(int elevage_id);
+int ui_get_elevage(void);
+
 #endif // UI_H
