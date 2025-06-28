@@ -10,7 +10,11 @@
 static const char *TAG = "legal";
 
 static const char *cerfa_form_path = "forms/cerfa_base.pdf";
+static const char *cerfa_14367_form_path = "forms/cerfa_14367_base.pdf";
+static const char *cerfa_12447_form_path = "forms/cerfa_12447_base.pdf";
 static const char *cites_form_path = "forms/cites_base.pdf";
+static const char *cites_import_form_path = "forms/cites_import_base.pdf";
+static const char *cites_export_form_path = "forms/cites_export_base.pdf";
 
 static const char *valid_cdc_numbers[] = { "CDC12345", "CDC67890", NULL };
 static const char *valid_aoe_numbers[] = { "AOE12345", "AOE67890", NULL };
@@ -133,6 +137,48 @@ bool legal_generate_cites_official(const char *path, const Reptile *r)
     return write_overlay_pdf(cites_form_path, path, buffer);
 }
 
+bool legal_generate_cerfa_14367(const char *path, const Reptile *r)
+{
+    if (!r)
+        return false;
+    char buffer[512];
+    snprintf(buffer, sizeof(buffer), cerfa_14367_template,
+             r->name, r->species, r->sex, r->birth_date,
+             r->cdc_number, r->aoe_number, r->ifap_id);
+    return write_overlay_pdf(cerfa_14367_form_path, path, buffer);
+}
+
+bool legal_generate_cerfa_12447(const char *path, const Reptile *r)
+{
+    if (!r)
+        return false;
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), cerfa_12447_template,
+             r->name, r->species, r->sex, r->birth_date,
+             r->ifap_id);
+    return write_overlay_pdf(cerfa_12447_form_path, path, buffer);
+}
+
+bool legal_generate_cites_import(const char *path, const Reptile *r)
+{
+    if (!r)
+        return false;
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), cites_import_template,
+             r->name, r->species, r->ifap_id);
+    return write_overlay_pdf(cites_import_form_path, path, buffer);
+}
+
+bool legal_generate_cites_export(const char *path, const Reptile *r)
+{
+    if (!r)
+        return false;
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), cites_export_template,
+             r->name, r->species, r->ifap_id);
+    return write_overlay_pdf(cites_export_form_path, path, buffer);
+}
+
 bool legal_is_cerfa_valid(const Reptile *r)
 {
     if (!r)
@@ -171,6 +217,10 @@ bool legal_is_cites_valid(const Reptile *r)
 bool legal_quota_remaining(const Reptile *r)
 {
     if (!r)
+        return false;
+    if (r->quota_limit <= 0)
+        return true;
+    if (r->quota_used < 0)
         return false;
     return r->quota_used < r->quota_limit;
 }
@@ -229,6 +279,18 @@ void legal_generate_all(const char *dir, const Reptile *r)
 
     snprintf(path, sizeof(path), "%s/cites_officiel.pdf", dir);
     legal_generate_cites_official(path, r);
+
+    snprintf(path, sizeof(path), "%s/cerfa_14367.pdf", dir);
+    legal_generate_cerfa_14367(path, r);
+
+    snprintf(path, sizeof(path), "%s/cerfa_12447.pdf", dir);
+    legal_generate_cerfa_12447(path, r);
+
+    snprintf(path, sizeof(path), "%s/cites_import.pdf", dir);
+    legal_generate_cites_import(path, r);
+
+    snprintf(path, sizeof(path), "%s/cites_export.pdf", dir);
+    legal_generate_cites_export(path, r);
 
     snprintf(path, sizeof(path), "%s/invoice.pdf", dir);
     legal_generate_invoice(path, r);
