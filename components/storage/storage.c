@@ -185,13 +185,67 @@ void storage_export_pdf(const char *dir, const Reptile *r)
 bool storage_wifi_transfer(const char *path, const char *url)
 {
     ESP_LOGI(TAG, "Transfert Wi-Fi de %s vers %s", path, url);
+
     FILE *f = fopen(path, "rb");
     if (!f) {
         ESP_LOGE(TAG, "Fichier %s introuvable", path);
         return false;
     }
+
+    fseek(f, 0, SEEK_END);
+    long len = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    unsigned char *buf = malloc(len);
+    if (!buf) {
+        fclose(f);
+        ESP_LOGE(TAG, "Memoire insuffisante");
+        return false;
+    }
+
+    if (fread(buf, 1, len, f) != (size_t)len) {
+        ESP_LOGE(TAG, "Lecture du fichier echouee");
+        fclose(f);
+        free(buf);
+        return false;
+    }
     fclose(f);
-    // Simulation d'envoi HTTP; a implementer reellement avec esp_http_client
+
+    esp_http_client_config_t cfg = {
+        .url = url,
+        .method = HTTP_METHOD_POST,
+#ifdef CONFIG_STORAGE_TRANSFER_USERNAME
+        .username = CONFIG_STORAGE_TRANSFER_USERNAME,
+#endif
+#ifdef CONFIG_STORAGE_TRANSFER_PASSWORD
+        .password = CONFIG_STORAGE_TRANSFER_PASSWORD,
+#endif
+    };
+
+    esp_http_client_handle_t client = esp_http_client_init(&cfg);
+    if (!client) {
+        ESP_LOGE(TAG, "Initialisation client HTTP echouee");
+        free(buf);
+        return false;
+    }
+
+    esp_http_client_set_header(client, "Content-Type", "application/octet-stream");
+    esp_http_client_set_post_field(client, (const char *)buf, len);
+    esp_err_t err = esp_http_client_perform(client);
+    int status = esp_http_client_get_status_code(client);
+    esp_http_client_cleanup(client);
+    free(buf);
+
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Erreur HTTP: %s", esp_err_to_name(err));
+        return false;
+    }
+
+    if (status >= 400) {
+        ESP_LOGE(TAG, "Serveur a repondu statut %d", status);
+        return false;
+    }
+
     ESP_LOGI(TAG, "Transfert termine");
     return true;
 }
