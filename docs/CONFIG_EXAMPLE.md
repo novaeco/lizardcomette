@@ -11,6 +11,11 @@ CONFIG_DRIVERS_REST_URL="http://example.com/sensors"
 CONFIG_DRIVERS_MQTT_URI="mqtt://broker"
 CONFIG_DRIVERS_MQTT_TOPIC="/lizard/data"
 CONFIG_DB_DEFAULT_KEY="MonMotDePasseBD"
+CONFIG_LIGHTING_PWM_GPIO=5
+CONFIG_LIGHTING_REST_URL="http://example.com/light"
+CONFIG_LIGHTING_MQTT_TOPIC="/lizard/light"
+CONFIG_CO2_REST_URL="http://example.com/co2"
+CONFIG_CO2_MQTT_TOPIC="/lizard/co2"
 ```
 
 Ce fichier illustre comment définir certaines options via `sdkconfig`.
