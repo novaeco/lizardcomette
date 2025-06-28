@@ -27,6 +27,7 @@ void db_init(void)
 
     exec_simple("CREATE TABLE IF NOT EXISTS animals("
                 "id INTEGER PRIMARY KEY,"
+                "elevage_id INTEGER,"
                 "name TEXT,"
                 "species TEXT,"
                 "sex TEXT,"
@@ -36,6 +37,7 @@ void db_init(void)
 
     exec_simple("CREATE TABLE IF NOT EXISTS terrariums("
                 "id INTEGER PRIMARY KEY,"
+                "elevage_id INTEGER,"
                 "name TEXT,"
                 "capacity INTEGER,"
                 "inventory TEXT,"
@@ -85,21 +87,22 @@ void db_backup(void)
 static void export_animals_csv(FILE *f)
 {
     fprintf(f, "animals\n");
-    fprintf(f, "id,name,species,sex,birth_date,health,breeding_cycle\n");
+    fprintf(f, "id,elevage_id,name,species,sex,birth_date,health,breeding_cycle\n");
 
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db_handle,
-                           "SELECT id,name,species,sex,birth_date,health,breeding_cycle FROM animals;",
+                           "SELECT id,elevage_id,name,species,sex,birth_date,health,breeding_cycle FROM animals;",
                            -1, &stmt, NULL) == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
-            fprintf(f, "%d,%s,%s,%s,%s,%s,%s\n",
+            fprintf(f, "%d,%d,%s,%s,%s,%s,%s,%s\n",
                     sqlite3_column_int(stmt, 0),
-                    sqlite3_column_text(stmt, 1),
+                    sqlite3_column_int(stmt, 1),
                     sqlite3_column_text(stmt, 2),
                     sqlite3_column_text(stmt, 3),
                     sqlite3_column_text(stmt, 4),
                     sqlite3_column_text(stmt, 5),
-                    sqlite3_column_text(stmt, 6));
+                    sqlite3_column_text(stmt, 6),
+                    sqlite3_column_text(stmt, 7));
         }
         sqlite3_finalize(stmt);
     }
@@ -109,19 +112,20 @@ static void export_animals_csv(FILE *f)
 static void export_terrariums_csv(FILE *f)
 {
     fprintf(f, "terrariums\n");
-    fprintf(f, "id,name,capacity,inventory,notes\n");
+    fprintf(f, "id,elevage_id,name,capacity,inventory,notes\n");
 
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db_handle,
-                           "SELECT id,name,capacity,inventory,notes FROM terrariums;",
+                           "SELECT id,elevage_id,name,capacity,inventory,notes FROM terrariums;",
                            -1, &stmt, NULL) == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
-            fprintf(f, "%d,%s,%d,%s,%s\n",
+            fprintf(f, "%d,%d,%s,%d,%s,%s\n",
                     sqlite3_column_int(stmt, 0),
-                    sqlite3_column_text(stmt, 1),
-                    sqlite3_column_int(stmt, 2),
-                    sqlite3_column_text(stmt, 3),
-                    sqlite3_column_text(stmt, 4));
+                    sqlite3_column_int(stmt, 1),
+                    sqlite3_column_text(stmt, 2),
+                    sqlite3_column_int(stmt, 3),
+                    sqlite3_column_text(stmt, 4),
+                    sqlite3_column_text(stmt, 5));
         }
         sqlite3_finalize(stmt);
     }
@@ -197,19 +201,20 @@ static void export_animals_json(FILE *f)
     sqlite3_stmt *stmt;
     bool first = true;
     if (sqlite3_prepare_v2(db_handle,
-                           "SELECT id,name,species,sex,birth_date,health,breeding_cycle FROM animals;",
+                           "SELECT id,elevage_id,name,species,sex,birth_date,health,breeding_cycle FROM animals;",
                            -1, &stmt, NULL) == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             if (!first) fprintf(f, ",\n");
             first = false;
-            fprintf(f, "    {\"id\":%d,\"name\":\"%s\",\"species\":\"%s\",\"sex\":\"%s\",\"birth_date\":\"%s\",\"health\":\"%s\",\"breeding_cycle\":\"%s\"}",
+            fprintf(f, "    {\"id\":%d,\"elevage_id\":%d,\"name\":\"%s\",\"species\":\"%s\",\"sex\":\"%s\",\"birth_date\":\"%s\",\"health\":\"%s\",\"breeding_cycle\":\"%s\"}",
                     sqlite3_column_int(stmt, 0),
-                    sqlite3_column_text(stmt, 1),
+                    sqlite3_column_int(stmt, 1),
                     sqlite3_column_text(stmt, 2),
                     sqlite3_column_text(stmt, 3),
                     sqlite3_column_text(stmt, 4),
                     sqlite3_column_text(stmt, 5),
-                    sqlite3_column_text(stmt, 6));
+                    sqlite3_column_text(stmt, 6),
+                    sqlite3_column_text(stmt, 7));
         }
         sqlite3_finalize(stmt);
     }
@@ -222,17 +227,18 @@ static void export_terrariums_json(FILE *f)
     sqlite3_stmt *stmt;
     bool first = true;
     if (sqlite3_prepare_v2(db_handle,
-                           "SELECT id,name,capacity,inventory,notes FROM terrariums;",
+                           "SELECT id,elevage_id,name,capacity,inventory,notes FROM terrariums;",
                            -1, &stmt, NULL) == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             if (!first) fprintf(f, ",\n");
             first = false;
-            fprintf(f, "    {\"id\":%d,\"name\":\"%s\",\"capacity\":%d,\"inventory\":\"%s\",\"notes\":\"%s\"}",
+            fprintf(f, "    {\"id\":%d,\"elevage_id\":%d,\"name\":\"%s\",\"capacity\":%d,\"inventory\":\"%s\",\"notes\":\"%s\"}",
                     sqlite3_column_int(stmt, 0),
-                    sqlite3_column_text(stmt, 1),
-                    sqlite3_column_int(stmt, 2),
-                    sqlite3_column_text(stmt, 3),
-                    sqlite3_column_text(stmt, 4));
+                    sqlite3_column_int(stmt, 1),
+                    sqlite3_column_text(stmt, 2),
+                    sqlite3_column_int(stmt, 3),
+                    sqlite3_column_text(stmt, 4),
+                    sqlite3_column_text(stmt, 5));
         }
         sqlite3_finalize(stmt);
     }

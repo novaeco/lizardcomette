@@ -76,3 +76,26 @@ void terrariums_log_transaction(const char *msg)
     ESP_LOGI(TAG, "Log: %s", logs[log_count]);
     log_count++;
 }
+
+int terrariums_count_for_elevage(int elevage_id)
+{
+    int count = 0;
+    for (int i = 0; i < terrarium_count; ++i) {
+        if (terrariums[i].elevage_id == elevage_id)
+            count++;
+    }
+    return count;
+}
+
+const Terrarium *terrariums_get_by_index_for_elevage(int index, int elevage_id)
+{
+    int current = 0;
+    for (int i = 0; i < terrarium_count; ++i) {
+        if (terrariums[i].elevage_id == elevage_id) {
+            if (current == index)
+                return &terrariums[i];
+            current++;
+        }
+    }
+    return NULL;
+}
