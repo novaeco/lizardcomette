@@ -46,6 +46,19 @@ void db_init(void)
                 "terrarium_id INTEGER,"
                 "message TEXT,"
                 "timestamp INTEGER DEFAULT (strftime('%s','now')));");
+
+    exec_simple("CREATE TABLE IF NOT EXISTS stocks(""
+                "id INTEGER PRIMARY KEY,""
+                "name TEXT,""
+                "quantity INTEGER,""
+                "min_quantity INTEGER);");
+
+    exec_simple("CREATE TABLE IF NOT EXISTS transactions(""
+                "id INTEGER PRIMARY KEY AUTOINCREMENT,""
+                "stock_id INTEGER,""
+                "quantity INTEGER,""
+                "type TEXT,""
+                "timestamp INTEGER DEFAULT (strftime('%s','now')));");
 }
 
 void db_backup(void)
@@ -115,6 +128,49 @@ static void export_terrariums_csv(FILE *f)
     fprintf(f, "\n");
 }
 
+static void export_stocks_csv(FILE *f)
+{
+    fprintf(f, "stocks\n");
+    fprintf(f, "id,name,quantity,min_quantity\n");
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db_handle,
+                           "SELECT id,name,quantity,min_quantity FROM stocks;",
+                           -1, &stmt, NULL) == SQLITE_OK) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            fprintf(f, "%d,%s,%d,%d\n",
+                    sqlite3_column_int(stmt, 0),
+                    sqlite3_column_text(stmt, 1),
+                    sqlite3_column_int(stmt, 2),
+                    sqlite3_column_int(stmt, 3));
+        }
+        sqlite3_finalize(stmt);
+    }
+    fprintf(f, "\n");
+}
+
+static void export_transactions_csv(FILE *f)
+{
+    fprintf(f, "transactions\n");
+    fprintf(f, "id,stock_id,quantity,type,timestamp\n");
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db_handle,
+                           "SELECT id,stock_id,quantity,type,timestamp FROM transactions;",
+                           -1, &stmt, NULL) == SQLITE_OK) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            fprintf(f, "%d,%d,%d,%s,%d\n",
+                    sqlite3_column_int(stmt, 0),
+                    sqlite3_column_int(stmt, 1),
+                    sqlite3_column_int(stmt, 2),
+                    sqlite3_column_text(stmt, 3),
+                    sqlite3_column_int(stmt, 4));
+        }
+        sqlite3_finalize(stmt);
+    }
+    fprintf(f, "\n");
+}
+
 void db_export_csv(const char *path)
 {
     if (!db_handle || !path)
@@ -128,6 +184,8 @@ void db_export_csv(const char *path)
 
     export_animals_csv(f);
     export_terrariums_csv(f);
+    export_stocks_csv(f);
+    export_transactions_csv(f);
 
     fclose(f);
     ESP_LOGI(TAG, "Export CSV vers %s termine", path);
@@ -181,6 +239,51 @@ static void export_terrariums_json(FILE *f)
     fprintf(f, "\n  ]\n");
 }
 
+static void export_stocks_json(FILE *f)
+{
+    fprintf(f, "  \"stocks\": [\n");
+    sqlite3_stmt *stmt;
+    bool first = true;
+    if (sqlite3_prepare_v2(db_handle,
+                           "SELECT id,name,quantity,min_quantity FROM stocks;",
+                           -1, &stmt, NULL) == SQLITE_OK) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            if (!first) fprintf(f, ",\n");
+            first = false;
+            fprintf(f, "    {\"id\":%d,\"name\":\"%s\",\"quantity\":%d,\"min_quantity\":%d}",
+                    sqlite3_column_int(stmt, 0),
+                    sqlite3_column_text(stmt, 1),
+                    sqlite3_column_int(stmt, 2),
+                    sqlite3_column_int(stmt, 3));
+        }
+        sqlite3_finalize(stmt);
+    }
+    fprintf(f, "\n  ],\n");
+}
+
+static void export_transactions_json(FILE *f)
+{
+    fprintf(f, "  \"transactions\": [\n");
+    sqlite3_stmt *stmt;
+    bool first = true;
+    if (sqlite3_prepare_v2(db_handle,
+                           "SELECT id,stock_id,quantity,type,timestamp FROM transactions;",
+                           -1, &stmt, NULL) == SQLITE_OK) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            if (!first) fprintf(f, ",\n");
+            first = false;
+            fprintf(f, "    {\"id\":%d,\"stock_id\":%d,\"quantity\":%d,\"type\":\"%s\",\"timestamp\":%d}",
+                    sqlite3_column_int(stmt, 0),
+                    sqlite3_column_int(stmt, 1),
+                    sqlite3_column_int(stmt, 2),
+                    sqlite3_column_text(stmt, 3),
+                    sqlite3_column_int(stmt, 4));
+        }
+        sqlite3_finalize(stmt);
+    }
+    fprintf(f, "\n  ]\n");
+}
+
 void db_export_json(const char *path)
 {
     if (!db_handle || !path)
@@ -196,6 +299,10 @@ void db_export_json(const char *path)
     export_animals_json(f);
     fprintf(f, ",\n");
     export_terrariums_json(f);
+    fprintf(f, ",\n");
+    export_stocks_json(f);
+    fprintf(f, ",\n");
+    export_transactions_json(f);
     fprintf(f, "}\n");
 
     fclose(f);
