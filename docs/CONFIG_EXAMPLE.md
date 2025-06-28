@@ -20,8 +20,10 @@ CONFIG_CO2_MQTT_TOPIC="/lizard/co2"
 
 Ce fichier illustre comment définir certaines options via `sdkconfig`.
 `CONFIG_STORAGE_TRANSFER_URL` indique l'endpoint HTTP pour l'envoi de fichiers.
-Si le serveur requiert une authentification basique, renseignez
-`CONFIG_STORAGE_TRANSFER_USERNAME` et `CONFIG_STORAGE_TRANSFER_PASSWORD`.
+L'authentification HTTP est facultative. Si elle est nécessaire,
+renseignez `CONFIG_STORAGE_TRANSFER_USERNAME` et
+`CONFIG_STORAGE_TRANSFER_PASSWORD` ; sinon, ces variables peuvent être
+laissées vides ou omises.
 
 `CONFIG_DB_DEFAULT_KEY` permet de définir la clé SQLCipher utilisée lors du
 premier démarrage. Laisser ce champ vide obligera l'utilisateur à saisir la
