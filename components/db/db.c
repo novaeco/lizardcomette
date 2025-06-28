@@ -207,62 +207,7 @@ void db_init(void)
     }
 #endif
 
-    exec_simple("CREATE TABLE IF NOT EXISTS elevages(""
-                "id INTEGER PRIMARY KEY,""
-                "name TEXT,""
-                "description TEXT);");
-
-    exec_simple("CREATE TABLE IF NOT EXISTS animals("
-                "id INTEGER PRIMARY KEY,"
-                "elevage_id INTEGER,"
-                "name TEXT,"
-                "species TEXT,"
-                "sex TEXT,"
-                "birth_date TEXT,"
-                "health TEXT,"
-                "breeding_cycle TEXT);");
-
-    exec_simple("CREATE TABLE IF NOT EXISTS terrariums("
-                "id INTEGER PRIMARY KEY,"
-                "elevage_id INTEGER,"
-                "name TEXT,"
-                "capacity INTEGER,"
-                "inventory TEXT,"
-                "notes TEXT);");
-
-    exec_simple("CREATE TABLE IF NOT EXISTS terrarium_logs("
-                "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                "terrarium_id INTEGER,"
-                "message TEXT,"
-                "timestamp INTEGER DEFAULT (strftime('%s','now')));");
-
-    exec_simple("CREATE TABLE IF NOT EXISTS stocks(""
-                "id INTEGER PRIMARY KEY,""
-                "name TEXT,""
-                "quantity INTEGER,""
-                "min_quantity INTEGER);");
-
-    exec_simple("CREATE TABLE IF NOT EXISTS transactions(""
-                "id INTEGER PRIMARY KEY AUTOINCREMENT,""
-                "stock_id INTEGER,""
-                "quantity INTEGER,""
-                "type TEXT,""
-                "timestamp INTEGER DEFAULT (strftime('%s','now')));");
-    exec_simple("CREATE TABLE IF NOT EXISTS users(""
-                "username TEXT PRIMARY KEY,""
-                "hash TEXT,""
-                "role INTEGER);");
-    exec_simple("CREATE TABLE IF NOT EXISTS health_records("""
-                "id INTEGER PRIMARY KEY,"""
-                "animal_id INTEGER,"""
-                "description TEXT,"""
-                "date INTEGER);");
-
-    exec_simple("CREATE TABLE IF NOT EXISTS breeding_events("""
-                "id INTEGER PRIMARY KEY,"""
-                "animal_id INTEGER,"""
-                "description TEXT,"""
-                "date INTEGER);");
+    create_tables();
 }
 
 void db_backup(void)
