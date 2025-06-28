@@ -3,6 +3,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 #include "ui.h"
+#include "stocks.h"
 
 #define SCHEDULER_INTERVAL_MS 60000
 
@@ -21,7 +22,14 @@ static void check_regulatory_deadlines(void)
 
 static void check_stock_levels(void)
 {
-    notify("Verification des niveaux de stock");
+    for (int i = 0; i < stocks_count(); ++i) {
+        const StockItem *it = stocks_get_by_index(i);
+        if (it && it->quantity <= it->min_quantity) {
+            char msg[64];
+            snprintf(msg, sizeof(msg), "Stock bas: %s", it->name);
+            notify(msg);
+        }
+    }
 }
 
 static void check_compliance(void)

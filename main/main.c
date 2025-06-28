@@ -10,6 +10,8 @@
 #include "storage.h"
 #include "animals.h"
 #include "terrariums.h"
+#include "stocks.h"
+#include "transactions.h"
 #include "scheduler.h"
 
 /**
@@ -33,6 +35,8 @@ void app_main(void)
     // Initialisation des modules metier
     animals_init();
     terrariums_init();
+    stocks_init();
+    transactions_init();
     scheduler_init();
 
     // Boucle principale
