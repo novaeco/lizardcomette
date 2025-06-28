@@ -51,6 +51,18 @@ typedef enum {
     TXT_QUOTA_USED,
     TXT_CERFA_EXPIRY,
     TXT_CITES_EXPIRY,
+    TXT_CLOSE,
+    TXT_ID,
+    TXT_NAME,
+    TXT_SPECIES,
+    TXT_SEX,
+    TXT_BIRTH,
+    TXT_DESCRIPTION,
+    TXT_DATE,
+    TXT_CAPACITY,
+    TXT_QUANTITY,
+    TXT_MIN,
+    TXT_STOCK_ID,
     TXT_COUNT
 } ui_text_id_t;
 

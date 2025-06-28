@@ -47,6 +47,18 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_QUOTA_USED] = "Quota used",
         [TXT_CERFA_EXPIRY] = "Cerfa expiry",
         [TXT_CITES_EXPIRY] = "CITES expiry",
+        [TXT_CLOSE] = "Close",
+        [TXT_ID] = "ID",
+        [TXT_NAME] = "Name",
+        [TXT_SPECIES] = "Species",
+        [TXT_SEX] = "Sex",
+        [TXT_BIRTH] = "Birth",
+        [TXT_DESCRIPTION] = "Description",
+        [TXT_DATE] = "Date",
+        [TXT_CAPACITY] = "Capacity",
+        [TXT_QUANTITY] = "Quantity",
+        [TXT_MIN] = "Min",
+        [TXT_STOCK_ID] = "Stock ID",
     },
     [UI_LANG_FR] = {
         [TXT_ANIMALS] = "Animaux",
@@ -75,6 +87,18 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_QUOTA_USED] = "Quota utilisé",
         [TXT_CERFA_EXPIRY] = "Validité Cerfa",
         [TXT_CITES_EXPIRY] = "Validité CITES",
+        [TXT_CLOSE] = "Fermer",
+        [TXT_ID] = "ID",
+        [TXT_NAME] = "Nom",
+        [TXT_SPECIES] = "Espèce",
+        [TXT_SEX] = "Sexe",
+        [TXT_BIRTH] = "Naissance",
+        [TXT_DESCRIPTION] = "Description",
+        [TXT_DATE] = "Date",
+        [TXT_CAPACITY] = "Capacité",
+        [TXT_QUANTITY] = "Quantité",
+        [TXT_MIN] = "Min",
+        [TXT_STOCK_ID] = "ID Stock",
     }
 };
 
@@ -173,7 +197,7 @@ static void open_health_list(int animal_id)
     lv_obj_t *btn = lv_btn_create(health_list_win);
     lv_obj_align(btn, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
     lv_obj_add_event_cb(btn, health_close_event, LV_EVENT_CLICKED, NULL);
-    lv_label_set_text(lv_label_create(btn), "Close");
+    lv_label_set_text(lv_label_create(btn), ui_get_text(TXT_CLOSE));
 }
 
 static void breeding_close_event(lv_event_t *e)
@@ -225,7 +249,7 @@ static void open_breeding_list(int animal_id)
     lv_obj_t *btn = lv_btn_create(breeding_list_win);
     lv_obj_align(btn, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
     lv_obj_add_event_cb(btn, breeding_close_event, LV_EVENT_CLICKED, NULL);
-    lv_label_set_text(lv_label_create(btn), "Close");
+    lv_label_set_text(lv_label_create(btn), ui_get_text(TXT_CLOSE));
 }
 
 typedef struct {
@@ -645,7 +669,7 @@ static void open_animal_form(const Reptile *r)
 
     animal_form.ta_id = lv_textarea_create(animal_form.win);
     lv_obj_set_width(animal_form.ta_id, 280);
-    lv_textarea_set_placeholder_text(animal_form.ta_id, "ID");
+    lv_textarea_set_placeholder_text(animal_form.ta_id, ui_get_text(TXT_ID));
     if (r) {
         char buf[16];
         sprintf(buf, "%d", r->id);
@@ -655,25 +679,25 @@ static void open_animal_form(const Reptile *r)
     animal_form.ta_name = lv_textarea_create(animal_form.win);
     lv_obj_set_width(animal_form.ta_name, 280);
     lv_obj_align(animal_form.ta_name, LV_ALIGN_TOP_MID, 0, 40);
-    lv_textarea_set_placeholder_text(animal_form.ta_name, "Name");
+    lv_textarea_set_placeholder_text(animal_form.ta_name, ui_get_text(TXT_NAME));
     if (r) lv_textarea_set_text(animal_form.ta_name, r->name);
 
     animal_form.ta_species = lv_textarea_create(animal_form.win);
     lv_obj_set_width(animal_form.ta_species, 280);
     lv_obj_align(animal_form.ta_species, LV_ALIGN_TOP_MID, 0, 80);
-    lv_textarea_set_placeholder_text(animal_form.ta_species, "Species");
+    lv_textarea_set_placeholder_text(animal_form.ta_species, ui_get_text(TXT_SPECIES));
     if (r) lv_textarea_set_text(animal_form.ta_species, r->species);
 
     animal_form.ta_sex = lv_textarea_create(animal_form.win);
     lv_obj_set_width(animal_form.ta_sex, 280);
     lv_obj_align(animal_form.ta_sex, LV_ALIGN_TOP_MID, 0, 120);
-    lv_textarea_set_placeholder_text(animal_form.ta_sex, "Sex");
+    lv_textarea_set_placeholder_text(animal_form.ta_sex, ui_get_text(TXT_SEX));
     if (r) lv_textarea_set_text(animal_form.ta_sex, r->sex);
 
     animal_form.ta_birth = lv_textarea_create(animal_form.win);
     lv_obj_set_width(animal_form.ta_birth, 280);
     lv_obj_align(animal_form.ta_birth, LV_ALIGN_TOP_MID, 0, 160);
-    lv_textarea_set_placeholder_text(animal_form.ta_birth, "Birth");
+    lv_textarea_set_placeholder_text(animal_form.ta_birth, ui_get_text(TXT_BIRTH));
     if (r) lv_textarea_set_text(animal_form.ta_birth, r->birth_date);
 
     animal_form.ta_cdc = lv_textarea_create(animal_form.win);
@@ -797,19 +821,19 @@ static void open_health_form(const HealthRecord *rec, int animal_id)
 
     health_form.ta_id = lv_textarea_create(health_form.win);
     lv_obj_set_width(health_form.ta_id, 280);
-    lv_textarea_set_placeholder_text(health_form.ta_id, "ID");
+    lv_textarea_set_placeholder_text(health_form.ta_id, ui_get_text(TXT_ID));
     if (rec) { char buf[16]; sprintf(buf, "%d", rec->id); lv_textarea_set_text(health_form.ta_id, buf); }
 
     health_form.ta_desc = lv_textarea_create(health_form.win);
     lv_obj_set_width(health_form.ta_desc, 280);
     lv_obj_align(health_form.ta_desc, LV_ALIGN_TOP_MID, 0, 40);
-    lv_textarea_set_placeholder_text(health_form.ta_desc, "Description");
+    lv_textarea_set_placeholder_text(health_form.ta_desc, ui_get_text(TXT_DESCRIPTION));
     if (rec) lv_textarea_set_text(health_form.ta_desc, rec->description);
 
     health_form.ta_date = lv_textarea_create(health_form.win);
     lv_obj_set_width(health_form.ta_date, 280);
     lv_obj_align(health_form.ta_date, LV_ALIGN_TOP_MID, 0, 80);
-    lv_textarea_set_placeholder_text(health_form.ta_date, "Date");
+    lv_textarea_set_placeholder_text(health_form.ta_date, ui_get_text(TXT_DATE));
     if (rec) { char buf[16]; sprintf(buf, "%d", rec->date); lv_textarea_set_text(health_form.ta_date, buf); }
 
     lv_obj_t *btn_save = lv_btn_create(health_form.win);
@@ -868,19 +892,19 @@ static void open_breeding_form(const BreedingEvent *ev, int animal_id)
 
     breeding_form.ta_id = lv_textarea_create(breeding_form.win);
     lv_obj_set_width(breeding_form.ta_id, 280);
-    lv_textarea_set_placeholder_text(breeding_form.ta_id, "ID");
+    lv_textarea_set_placeholder_text(breeding_form.ta_id, ui_get_text(TXT_ID));
     if (ev) { char buf[16]; sprintf(buf, "%d", ev->id); lv_textarea_set_text(breeding_form.ta_id, buf); }
 
     breeding_form.ta_desc = lv_textarea_create(breeding_form.win);
     lv_obj_set_width(breeding_form.ta_desc, 280);
     lv_obj_align(breeding_form.ta_desc, LV_ALIGN_TOP_MID, 0, 40);
-    lv_textarea_set_placeholder_text(breeding_form.ta_desc, "Description");
+    lv_textarea_set_placeholder_text(breeding_form.ta_desc, ui_get_text(TXT_DESCRIPTION));
     if (ev) lv_textarea_set_text(breeding_form.ta_desc, ev->description);
 
     breeding_form.ta_date = lv_textarea_create(breeding_form.win);
     lv_obj_set_width(breeding_form.ta_date, 280);
     lv_obj_align(breeding_form.ta_date, LV_ALIGN_TOP_MID, 0, 80);
-    lv_textarea_set_placeholder_text(breeding_form.ta_date, "Date");
+    lv_textarea_set_placeholder_text(breeding_form.ta_date, ui_get_text(TXT_DATE));
     if (ev) { char buf[16]; sprintf(buf, "%d", ev->date); lv_textarea_set_text(breeding_form.ta_date, buf); }
 
     lv_obj_t *btn_save = lv_btn_create(breeding_form.win);
@@ -934,19 +958,19 @@ static void open_terrarium_form(const Terrarium *t)
 
     terrarium_form.ta_id = lv_textarea_create(terrarium_form.win);
     lv_obj_set_width(terrarium_form.ta_id, 280);
-    lv_textarea_set_placeholder_text(terrarium_form.ta_id, "ID");
+    lv_textarea_set_placeholder_text(terrarium_form.ta_id, ui_get_text(TXT_ID));
     if (t) { char buf[16]; sprintf(buf, "%d", t->id); lv_textarea_set_text(terrarium_form.ta_id, buf); }
 
     terrarium_form.ta_name = lv_textarea_create(terrarium_form.win);
     lv_obj_set_width(terrarium_form.ta_name, 280);
     lv_obj_align(terrarium_form.ta_name, LV_ALIGN_TOP_MID, 0, 40);
-    lv_textarea_set_placeholder_text(terrarium_form.ta_name, "Name");
+    lv_textarea_set_placeholder_text(terrarium_form.ta_name, ui_get_text(TXT_NAME));
     if (t) lv_textarea_set_text(terrarium_form.ta_name, t->name);
 
     terrarium_form.ta_capacity = lv_textarea_create(terrarium_form.win);
     lv_obj_set_width(terrarium_form.ta_capacity, 280);
     lv_obj_align(terrarium_form.ta_capacity, LV_ALIGN_TOP_MID, 0, 80);
-    lv_textarea_set_placeholder_text(terrarium_form.ta_capacity, "Capacity");
+    lv_textarea_set_placeholder_text(terrarium_form.ta_capacity, ui_get_text(TXT_CAPACITY));
     if (t) { char buf[16]; sprintf(buf, "%d", t->capacity); lv_textarea_set_text(terrarium_form.ta_capacity, buf); }
 
     lv_obj_t *btn_save = lv_btn_create(terrarium_form.win);
@@ -1013,25 +1037,25 @@ static void open_stock_form(const StockItem *s)
 
     stock_form.ta_id = lv_textarea_create(stock_form.win);
     lv_obj_set_width(stock_form.ta_id, 280);
-    lv_textarea_set_placeholder_text(stock_form.ta_id, "ID");
+    lv_textarea_set_placeholder_text(stock_form.ta_id, ui_get_text(TXT_ID));
     if (s) { char buf[16]; sprintf(buf, "%d", s->id); lv_textarea_set_text(stock_form.ta_id, buf); }
 
     stock_form.ta_name = lv_textarea_create(stock_form.win);
     lv_obj_set_width(stock_form.ta_name, 280);
     lv_obj_align(stock_form.ta_name, LV_ALIGN_TOP_MID, 0, 40);
-    lv_textarea_set_placeholder_text(stock_form.ta_name, "Name");
+    lv_textarea_set_placeholder_text(stock_form.ta_name, ui_get_text(TXT_NAME));
     if (s) lv_textarea_set_text(stock_form.ta_name, s->name);
 
     stock_form.ta_qty = lv_textarea_create(stock_form.win);
     lv_obj_set_width(stock_form.ta_qty, 280);
     lv_obj_align(stock_form.ta_qty, LV_ALIGN_TOP_MID, 0, 80);
-    lv_textarea_set_placeholder_text(stock_form.ta_qty, "Quantity");
+    lv_textarea_set_placeholder_text(stock_form.ta_qty, ui_get_text(TXT_QUANTITY));
     if (s) { char buf[16]; sprintf(buf, "%d", s->quantity); lv_textarea_set_text(stock_form.ta_qty, buf); }
 
     stock_form.ta_min = lv_textarea_create(stock_form.win);
     lv_obj_set_width(stock_form.ta_min, 280);
     lv_obj_align(stock_form.ta_min, LV_ALIGN_TOP_MID, 0, 120);
-    lv_textarea_set_placeholder_text(stock_form.ta_min, "Min");
+    lv_textarea_set_placeholder_text(stock_form.ta_min, ui_get_text(TXT_MIN));
     if (s) { char buf[16]; sprintf(buf, "%d", s->min_quantity); lv_textarea_set_text(stock_form.ta_min, buf); }
 
     lv_obj_t *btn_save = lv_btn_create(stock_form.win);
@@ -1098,19 +1122,19 @@ static void open_transaction_form(const Transaction *t)
 
     transaction_form.ta_id = lv_textarea_create(transaction_form.win);
     lv_obj_set_width(transaction_form.ta_id, 280);
-    lv_textarea_set_placeholder_text(transaction_form.ta_id, "ID");
+    lv_textarea_set_placeholder_text(transaction_form.ta_id, ui_get_text(TXT_ID));
     if (t) { char buf[16]; sprintf(buf, "%d", t->id); lv_textarea_set_text(transaction_form.ta_id, buf); }
 
     transaction_form.ta_stock_id = lv_textarea_create(transaction_form.win);
     lv_obj_set_width(transaction_form.ta_stock_id, 280);
     lv_obj_align(transaction_form.ta_stock_id, LV_ALIGN_TOP_MID, 0, 40);
-    lv_textarea_set_placeholder_text(transaction_form.ta_stock_id, "Stock ID");
+    lv_textarea_set_placeholder_text(transaction_form.ta_stock_id, ui_get_text(TXT_STOCK_ID));
     if (t) { char buf[16]; sprintf(buf, "%d", t->stock_id); lv_textarea_set_text(transaction_form.ta_stock_id, buf); }
 
     transaction_form.ta_qty = lv_textarea_create(transaction_form.win);
     lv_obj_set_width(transaction_form.ta_qty, 280);
     lv_obj_align(transaction_form.ta_qty, LV_ALIGN_TOP_MID, 0, 80);
-    lv_textarea_set_placeholder_text(transaction_form.ta_qty, "Quantity");
+    lv_textarea_set_placeholder_text(transaction_form.ta_qty, ui_get_text(TXT_QUANTITY));
     if (t) { char buf[16]; sprintf(buf, "%d", t->quantity); lv_textarea_set_text(transaction_form.ta_qty, buf); }
 
     transaction_form.dd_type = lv_dropdown_create(transaction_form.win);
@@ -1182,19 +1206,19 @@ static void open_elevage_form(const Elevage *ev)
 
     elevage_form.ta_id = lv_textarea_create(elevage_form.win);
     lv_obj_set_width(elevage_form.ta_id, 280);
-    lv_textarea_set_placeholder_text(elevage_form.ta_id, "ID");
+    lv_textarea_set_placeholder_text(elevage_form.ta_id, ui_get_text(TXT_ID));
     if (ev) { char buf[16]; sprintf(buf, "%d", ev->id); lv_textarea_set_text(elevage_form.ta_id, buf); }
 
     elevage_form.ta_name = lv_textarea_create(elevage_form.win);
     lv_obj_set_width(elevage_form.ta_name, 280);
     lv_obj_align(elevage_form.ta_name, LV_ALIGN_TOP_MID, 0, 40);
-    lv_textarea_set_placeholder_text(elevage_form.ta_name, "Name");
+    lv_textarea_set_placeholder_text(elevage_form.ta_name, ui_get_text(TXT_NAME));
     if (ev) lv_textarea_set_text(elevage_form.ta_name, ev->name);
 
     elevage_form.ta_desc = lv_textarea_create(elevage_form.win);
     lv_obj_set_width(elevage_form.ta_desc, 280);
     lv_obj_align(elevage_form.ta_desc, LV_ALIGN_TOP_MID, 0, 80);
-    lv_textarea_set_placeholder_text(elevage_form.ta_desc, "Description");
+    lv_textarea_set_placeholder_text(elevage_form.ta_desc, ui_get_text(TXT_DESCRIPTION));
     if (ev) lv_textarea_set_text(elevage_form.ta_desc, ev->description);
 
     lv_obj_t *btn_save = lv_btn_create(elevage_form.win);
