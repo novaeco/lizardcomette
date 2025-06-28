@@ -30,6 +30,18 @@ typedef enum {
     TXT_QUOTA_USED,
     TXT_CERFA_EXPIRY,
     TXT_CITES_EXPIRY,
+    TXT_CLOSE,
+    TXT_ID,
+    TXT_NAME,
+    TXT_SPECIES,
+    TXT_SEX,
+    TXT_BIRTH,
+    TXT_DESCRIPTION,
+    TXT_DATE,
+    TXT_CAPACITY,
+    TXT_QUANTITY,
+    TXT_MIN,
+    TXT_STOCK_ID,
     TXT_COUNT
 } ui_text_id_t;
 
@@ -64,6 +76,18 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_QUOTA_USED] = "Quota used",
         [TXT_CERFA_EXPIRY] = "Cerfa expiry",
         [TXT_CITES_EXPIRY] = "CITES expiry",
+        [TXT_CLOSE] = "Close",
+        [TXT_ID] = "ID",
+        [TXT_NAME] = "Name",
+        [TXT_SPECIES] = "Species",
+        [TXT_SEX] = "Sex",
+        [TXT_BIRTH] = "Birth",
+        [TXT_DESCRIPTION] = "Description",
+        [TXT_DATE] = "Date",
+        [TXT_CAPACITY] = "Capacity",
+        [TXT_QUANTITY] = "Quantity",
+        [TXT_MIN] = "Min",
+        [TXT_STOCK_ID] = "Stock ID",
     },
     [UI_LANG_FR] = {
         [TXT_ANIMALS] = "Animaux",
@@ -92,6 +116,18 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_QUOTA_USED] = "Quota utilisé",
         [TXT_CERFA_EXPIRY] = "Validité Cerfa",
         [TXT_CITES_EXPIRY] = "Validité CITES",
+        [TXT_CLOSE] = "Fermer",
+        [TXT_ID] = "ID",
+        [TXT_NAME] = "Nom",
+        [TXT_SPECIES] = "Espèce",
+        [TXT_SEX] = "Sexe",
+        [TXT_BIRTH] = "Naissance",
+        [TXT_DESCRIPTION] = "Description",
+        [TXT_DATE] = "Date",
+        [TXT_CAPACITY] = "Capacité",
+        [TXT_QUANTITY] = "Quantité",
+        [TXT_MIN] = "Min",
+        [TXT_STOCK_ID] = "ID Stock",
     }
 };
 
@@ -122,6 +158,7 @@ TEST_CASE("ui language switching","[ui]")
     TEST_ASSERT_EQUAL_STRING("Animals", ui_get_text(TXT_ANIMALS));
     ui_set_language(UI_LANG_FR);
     TEST_ASSERT_EQUAL_STRING("Animaux", ui_get_text(TXT_ANIMALS));
+    TEST_ASSERT_EQUAL_STRING("Fermer", ui_get_text(TXT_CLOSE));
 }
 
 TEST_CASE("ui theme switching","[ui]")
