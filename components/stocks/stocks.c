@@ -1,5 +1,7 @@
 #include "stocks.h"
 #include "esp_log.h"
+#include "db.h"
+#include <sqlite3.h>
 #include <string.h>
 
 static const char *TAG = "stocks";
@@ -11,6 +13,19 @@ void stocks_init(void)
 {
     stock_count = 0;
     memset(stock_items, 0, sizeof(stock_items));
+
+    sqlite3_stmt *stmt = db_query("SELECT id,name,quantity,min_quantity FROM stocks;");
+    if (stmt) {
+        while (sqlite3_step(stmt) == SQLITE_ROW && stock_count < STOCKS_MAX) {
+            StockItem *s = &stock_items[stock_count++];
+            s->id = sqlite3_column_int(stmt, 0);
+            strncpy(s->name, (const char *)sqlite3_column_text(stmt, 1), sizeof(s->name) - 1);
+            s->quantity = sqlite3_column_int(stmt, 2);
+            s->min_quantity = sqlite3_column_int(stmt, 3);
+        }
+        sqlite3_finalize(stmt);
+    }
+
     ESP_LOGI(TAG, "Initialisation des stocks");
 }
 
@@ -26,6 +41,9 @@ static int find_index(int id)
 bool stocks_add(const StockItem *item)
 {
     if (stock_count >= STOCKS_MAX || !item)
+        return false;
+    if (!db_exec("INSERT INTO stocks(id,name,quantity,min_quantity) VALUES(%d,'%s',%d,%d);",
+                 item->id, item->name, item->quantity, item->min_quantity))
         return false;
     stock_items[stock_count] = *item;
     stock_count++;
@@ -46,6 +64,9 @@ bool stocks_update(int id, const StockItem *item)
     int idx = find_index(id);
     if (idx < 0 || !item)
         return false;
+    if (!db_exec("UPDATE stocks SET name='%s',quantity=%d,min_quantity=%d WHERE id=%d;",
+                 item->name, item->quantity, item->min_quantity, id))
+        return false;
     stock_items[idx] = *item;
     ESP_LOGI(TAG, "Mise a jour de l'article %d", id);
     return true;
@@ -55,6 +76,8 @@ bool stocks_delete(int id)
 {
     int idx = find_index(id);
     if (idx < 0)
+        return false;
+    if (!db_exec("DELETE FROM stocks WHERE id=%d;", id))
         return false;
     for (int i = idx; i < stock_count - 1; ++i) {
         stock_items[i] = stock_items[i + 1];

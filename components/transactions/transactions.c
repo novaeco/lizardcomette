@@ -1,5 +1,7 @@
 #include "transactions.h"
 #include "esp_log.h"
+#include "db.h"
+#include <sqlite3.h>
 #include <string.h>
 
 static const char *TAG = "transactions";
@@ -11,6 +13,20 @@ void transactions_init(void)
 {
     transaction_count = 0;
     memset(transactions, 0, sizeof(transactions));
+
+    sqlite3_stmt *stmt = db_query("SELECT id,stock_id,quantity,type FROM transactions;");
+    if (stmt) {
+        while (sqlite3_step(stmt) == SQLITE_ROW && transaction_count < TRANSACTIONS_MAX) {
+            Transaction *tr = &transactions[transaction_count++];
+            tr->id = sqlite3_column_int(stmt, 0);
+            tr->stock_id = sqlite3_column_int(stmt, 1);
+            tr->quantity = sqlite3_column_int(stmt, 2);
+            const char *type = (const char *)sqlite3_column_text(stmt, 3);
+            tr->type = (type && strcmp(type, "SALE") == 0) ? TRANSACTION_SALE : TRANSACTION_PURCHASE;
+        }
+        sqlite3_finalize(stmt);
+    }
+
     ESP_LOGI(TAG, "Initialisation des transactions");
 }
 
@@ -26,6 +42,10 @@ static int find_index(int id)
 bool transactions_add(const Transaction *t)
 {
     if (transaction_count >= TRANSACTIONS_MAX || !t)
+        return false;
+    const char *type = t->type == TRANSACTION_SALE ? "SALE" : "PURCHASE";
+    if (!db_exec("INSERT INTO transactions(id,stock_id,quantity,type) VALUES(%d,%d,%d,'%s');",
+                 t->id, t->stock_id, t->quantity, type))
         return false;
     transactions[transaction_count] = *t;
     transaction_count++;
@@ -46,6 +66,10 @@ bool transactions_update(int id, const Transaction *t)
     int idx = find_index(id);
     if (idx < 0 || !t)
         return false;
+    const char *type = t->type == TRANSACTION_SALE ? "SALE" : "PURCHASE";
+    if (!db_exec("UPDATE transactions SET stock_id=%d,quantity=%d,type='%s' WHERE id=%d;",
+                 t->stock_id, t->quantity, type, id))
+        return false;
     transactions[idx] = *t;
     ESP_LOGI(TAG, "Mise a jour de la transaction %d", id);
     return true;
@@ -55,6 +79,8 @@ bool transactions_delete(int id)
 {
     int idx = find_index(id);
     if (idx < 0)
+        return false;
+    if (!db_exec("DELETE FROM transactions WHERE id=%d;", id))
         return false;
     for (int i = idx; i < transaction_count - 1; ++i) {
         transactions[i] = transactions[i + 1];
