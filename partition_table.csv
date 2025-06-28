@@ -4,5 +4,5 @@ otadata,  data, ota,     0xf000,  8K
 phy_init, data, phy,     0x11000, 4K
 ota_0,    app,  ota_0,   0x20000, 1M
 ota_1,    app,  ota_1,   ,       1M
-spiffs,   data, spiffs,  ,       1.5M
+spiffs,   data, spiffs,  ,       0x180000
 sdcard,   data, fat,     ,       3M
