@@ -8,6 +8,7 @@
 #include "auth.h"
 #include "legal.h"
 #include "storage.h"
+#include "elevages.h"
 #include "animals.h"
 #include "terrariums.h"
 #include "stocks.h"
@@ -25,6 +26,7 @@ void app_main(void)
     // Initialisation de LVGL et de l'interface
     lv_init();
     ui_init(UI_LANG_EN, UI_THEME_LIGHT);
+    ui_set_elevage(0);
 
     // Initialisation de la base de données
     db_init();
@@ -33,6 +35,7 @@ void app_main(void)
     auth_init();
 
     // Initialisation des modules metier
+    elevages_init();
     animals_init();
     terrariums_init();
     stocks_init();

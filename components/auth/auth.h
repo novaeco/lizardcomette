@@ -12,11 +12,14 @@ typedef enum {
 } user_role_t;
 
 #define AUTH_MAX_USERS 5
+#define AUTH_MAX_ELEVAGES_PER_USER 5
 
 typedef struct {
     char username[32];
     unsigned char hash[32];
     user_role_t role;
+    int elevages[AUTH_MAX_ELEVAGES_PER_USER];
+    int elevage_count;
 } auth_user_t;
 
 /**
@@ -38,5 +41,9 @@ bool auth_check(const char *username, const char *password);
  * \brief Récupère le rôle d'un utilisateur.
  */
 user_role_t auth_get_role(const char *username);
+
+bool auth_link_elevage(const char *username, int elevage_id);
+int auth_get_elevage_count(const char *username);
+int auth_get_elevage_by_index(const char *username, int index);
 
 #endif // AUTH_H

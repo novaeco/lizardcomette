@@ -11,6 +11,7 @@ static const char *TAG = "ui";
 
 static ui_language_t current_lang = UI_LANG_EN;
 static ui_theme_t current_theme = UI_THEME_LIGHT;
+static int current_elevage_id = 0;
 
 static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
     [UI_LANG_EN] = {
@@ -43,13 +44,15 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
 
 static lv_obj_t *tabview;
 static lv_obj_t *notif_label;
+static lv_obj_t *tab_animals;
+static lv_obj_t *tab_terrariums;
 
 static void animals_tab_create(lv_obj_t *tab)
 {
     lv_obj_t *list = lv_list_create(tab);
     lv_obj_set_size(list, 380, 420);
-    for (int i = 0; i < animals_count(); ++i) {
-        const Reptile *r = animals_get_by_index(i);
+    for (int i = 0; i < animals_count_for_elevage(current_elevage_id); ++i) {
+        const Reptile *r = animals_get_by_index_for_elevage(i, current_elevage_id);
         if (!r) continue;
         const char *status = (legal_is_cerfa_valid(r) && legal_is_cites_valid(r)) ?
                                 ui_get_text(TXT_LEGAL_OK) : ui_get_text(TXT_LEGAL_EXPIRED);
@@ -64,8 +67,8 @@ static void terrariums_tab_create(lv_obj_t *tab)
 {
     lv_obj_t *list = lv_list_create(tab);
     lv_obj_set_size(list, 380, 420);
-    for (int i = 0; i < terrariums_count_for_elevage(0); ++i) {
-        const Terrarium *t = terrariums_get_by_index_for_elevage(i, 0);
+    for (int i = 0; i < terrariums_count_for_elevage(current_elevage_id); ++i) {
+        const Terrarium *t = terrariums_get_by_index_for_elevage(i, current_elevage_id);
         if (!t) continue;
         char buf[64];
         snprintf(buf, sizeof(buf), "%s (%d)", t->name, t->capacity);
@@ -99,6 +102,22 @@ static void transactions_tab_create(lv_obj_t *tab)
                  tr->quantity);
         lv_list_add_btn(list, NULL, buf);
     }
+}
+
+void ui_set_elevage(int elevage_id)
+{
+    current_elevage_id = elevage_id;
+    if (tab_animals && tab_terrariums) {
+        lv_obj_clean(tab_animals);
+        lv_obj_clean(tab_terrariums);
+        animals_tab_create(tab_animals);
+        terrariums_tab_create(tab_terrariums);
+    }
+}
+
+int ui_get_elevage(void)
+{
+    return current_elevage_id;
 }
 
 static void export_event(lv_event_t *e)
@@ -200,14 +219,14 @@ void ui_init(ui_language_t lang, ui_theme_t theme)
     tabview = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, 40);
     lv_obj_set_size(tabview, 800, 480);
 
-    lv_obj_t *tab1 = lv_tabview_add_tab(tabview, ui_get_text(TXT_ANIMALS));
-    lv_obj_t *tab2 = lv_tabview_add_tab(tabview, ui_get_text(TXT_TERRARIUMS));
+    tab_animals = lv_tabview_add_tab(tabview, ui_get_text(TXT_ANIMALS));
+    tab_terrariums = lv_tabview_add_tab(tabview, ui_get_text(TXT_TERRARIUMS));
     lv_obj_t *tab3 = lv_tabview_add_tab(tabview, ui_get_text(TXT_STOCKS));
     lv_obj_t *tab4 = lv_tabview_add_tab(tabview, ui_get_text(TXT_TRANSACTIONS));
     lv_obj_t *tab5 = lv_tabview_add_tab(tabview, ui_get_text(TXT_SETTINGS));
 
-    animals_tab_create(tab1);
-    terrariums_tab_create(tab2);
+    animals_tab_create(tab_animals);
+    terrariums_tab_create(tab_terrariums);
     stocks_tab_create(tab3);
     transactions_tab_create(tab4);
     settings_tab_create(tab5);
