@@ -5,6 +5,7 @@
 #include "ui.h"
 #include "stocks.h"
 #include "legal.h"
+#include "animals.h"
 #include "health.h"
 #include "breeding.h"
 #include <time.h>
@@ -40,6 +41,17 @@ static void check_stock_levels(void)
 static void check_compliance(void)
 {
     notify("Verification de la conformite");
+    for (int i = 0; i < animals_count(); ++i) {
+        const Reptile *r = animals_get_by_index(i);
+        if (!r)
+            continue;
+        if (!legal_is_cdc_valid(r))
+            notify("CDC invalide");
+        if (!legal_is_aoe_valid(r))
+            notify("AOE invalide");
+        if (!legal_quota_remaining(r))
+            notify("Quota atteint");
+    }
 }
 
 static void check_health_alerts(void)
@@ -95,4 +107,9 @@ void scheduler_check_stock_levels(void)
 void scheduler_check_regulatory_deadlines(void)
 {
     check_regulatory_deadlines();
+}
+
+void scheduler_check_compliance(void)
+{
+    check_compliance();
 }

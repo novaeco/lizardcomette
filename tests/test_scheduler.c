@@ -59,3 +59,81 @@ TEST_CASE("scheduler document expiration warning","[scheduler]")
     TEST_ASSERT_EQUAL_STRING("Documents bientot expir\xC3\xA9s", last_msg);
     db_close();
 }
+
+TEST_CASE("scheduler compliance invalid cdc","[scheduler]")
+{
+    db_set_key("");
+    TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    animals_init();
+    time_t now = time(NULL);
+    Reptile r = {
+        .id = 1,
+        .elevage_id = 0,
+        .name = "Liz",
+        .species = "Lizard",
+        .cdc_number = "BAD",
+        .aoe_number = "AOE12345",
+        .ifap_id = "IF1",
+        .quota_limit = 10,
+        .quota_used = 0,
+        .cerfa_valid_until = now + 86400,
+        .cites_valid_until = now + 86400
+    };
+    TEST_ASSERT_TRUE(animals_add(&r));
+    reset_msg();
+    scheduler_check_compliance();
+    TEST_ASSERT_EQUAL_STRING("CDC invalide", last_msg);
+    db_close();
+}
+
+TEST_CASE("scheduler compliance invalid aoe","[scheduler]")
+{
+    db_set_key("");
+    TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    animals_init();
+    time_t now = time(NULL);
+    Reptile r = {
+        .id = 2,
+        .elevage_id = 0,
+        .name = "Liz2",
+        .species = "Lizard",
+        .cdc_number = "CDC12345",
+        .aoe_number = "BAD",
+        .ifap_id = "IF2",
+        .quota_limit = 10,
+        .quota_used = 0,
+        .cerfa_valid_until = now + 86400,
+        .cites_valid_until = now + 86400
+    };
+    TEST_ASSERT_TRUE(animals_add(&r));
+    reset_msg();
+    scheduler_check_compliance();
+    TEST_ASSERT_EQUAL_STRING("AOE invalide", last_msg);
+    db_close();
+}
+
+TEST_CASE("scheduler compliance quota reached","[scheduler]")
+{
+    db_set_key("");
+    TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    animals_init();
+    time_t now = time(NULL);
+    Reptile r = {
+        .id = 3,
+        .elevage_id = 0,
+        .name = "Liz3",
+        .species = "Lizard",
+        .cdc_number = "CDC12345",
+        .aoe_number = "AOE12345",
+        .ifap_id = "IF3",
+        .quota_limit = 2,
+        .quota_used = 2,
+        .cerfa_valid_until = now + 86400,
+        .cites_valid_until = now + 86400
+    };
+    TEST_ASSERT_TRUE(animals_add(&r));
+    reset_msg();
+    scheduler_check_compliance();
+    TEST_ASSERT_EQUAL_STRING("Quota atteint", last_msg);
+    db_close();
+}
