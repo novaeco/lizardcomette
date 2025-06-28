@@ -7,6 +7,7 @@ LizardComette est un exemple de projet ESP‑IDF permettant de gérer un élevag
 - Drivers pour capteurs environnementaux.
 - Planificateur avec notifications (stocks, échéances, conformité).
 - Génération de formulaires administratifs simplifiés.
+- Support du CDC/AOE, gestion des quotas et formulaires CERFA/CITES officiels.
 
 ## Configuration
 1. Installez l'[ESP‑IDF](https://docs.espressif.com/).

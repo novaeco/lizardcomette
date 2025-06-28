@@ -22,3 +22,20 @@ const char invoice_template[] =
     "Facture\n"
     "Animal: %s\n"
     "Espece: %s\n";
+
+const char cerfa_official_template[] =
+    "CERFA Officiel\n"
+    "Nom: %s\n"
+    "Espece: %s\n"
+    "Sexe: %s\n"
+    "Date de naissance: %s\n"
+    "CDC: %s\n"
+    "AOE: %s\n"
+    "I-FAP: %s\n"
+    "Quota: %d/%d\n";
+
+const char cites_official_template[] =
+    "CITES Officiel\n"
+    "Nom: %s\n"
+    "Espece: %s\n"
+    "I-FAP: %s\n";

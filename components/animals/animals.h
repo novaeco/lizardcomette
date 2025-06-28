@@ -16,6 +16,13 @@ typedef struct {
     char birth_date[16];
     char health[64];
     char breeding_cycle[64];
+    char cdc_number[32];
+    char aoe_number[32];
+    char ifap_id[32];
+    int quota_limit;
+    int quota_used;
+    int cerfa_valid_until;
+    int cites_valid_until;
 } Reptile;
 
 /**
@@ -42,5 +49,8 @@ bool animals_update(int id, const Reptile *r);
  * \brief Supprime un reptile par id.
  */
 bool animals_delete(int id);
+
+int animals_count(void);
+const Reptile *animals_get_by_index(int index);
 
 #endif // ANIMALS_H
