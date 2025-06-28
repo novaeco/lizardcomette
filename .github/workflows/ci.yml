@@ -13,7 +13,15 @@ jobs:
       - uses: espressif/github-actions/setup-esp-idf@v1
         with:
           version: latest
+      - name: Cache managed components
+        uses: actions/cache@v3
+        with:
+          path: managed_components
+          key: ${{ runner.os }}-managed-components-${{ hashFiles('idf_component.yml') }}
+          restore-keys: ${{ runner.os }}-managed-components-
       - name: Build
-        run: idf.py build
+        run: |
+          idf.py reconfigure
+          idf.py build
       - name: Run unit tests
         run: idf.py build && idf.py unity_test
