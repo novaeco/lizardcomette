@@ -1,0 +1,17 @@
+config STORAGE_TRANSFER_URL
+    string "HTTP endpoint for file uploads"
+    default ""
+    help
+        Base URL used when transferring files via Wi-Fi.
+
+config STORAGE_TRANSFER_USERNAME
+    string "HTTP authentication username"
+    default ""
+    help
+        Optional username if the server requires authentication.
+
+config STORAGE_TRANSFER_PASSWORD
+    string "HTTP authentication password"
+    default ""
+    help
+        Optional password if the server requires authentication.
