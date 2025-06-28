@@ -42,6 +42,7 @@ typedef enum {
     TXT_QUANTITY,
     TXT_MIN,
     TXT_STOCK_ID,
+    TXT_IMPORT_CSV,
     TXT_COUNT
 } ui_text_id_t;
 
@@ -58,6 +59,7 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_SETTINGS] = "Settings",
         [TXT_EXPORT] = "Export",
         [TXT_IMPORT] = "Import",
+        [TXT_IMPORT_CSV] = "Import CSV",
         [TXT_LEGAL_OK] = "OK",
         [TXT_LEGAL_EXPIRED] = "Expired",
         [TXT_LANGUAGE] = "Language",
@@ -98,6 +100,7 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_SETTINGS] = "Param\xC3\xA8tres",
         [TXT_EXPORT] = "Exporter",
         [TXT_IMPORT] = "Importer",
+        [TXT_IMPORT_CSV] = "Importer CSV",
         [TXT_LEGAL_OK] = "OK",
         [TXT_LEGAL_EXPIRED] = "Expire",
         [TXT_LANGUAGE] = "Langue",

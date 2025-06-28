@@ -41,6 +41,12 @@ bool storage_wifi_transfer(const char *path, const char *url);
 void storage_restore(void);
 
 /**
+ * \brief Importe un fichier CSV exporte dans la base.
+ * \param path Fichier chiffre a importer.
+ */
+void storage_import_csv(const char *path);
+
+/**
  * \brief Chiffre un fichier de stockage local.
  * \param path Chemin du fichier à chiffrer.
  */

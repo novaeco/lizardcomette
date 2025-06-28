@@ -572,3 +572,107 @@ void db_export_json(const char *path) {
   fclose(f);
   ESP_LOGI(TAG, "Export JSON vers %s termine", path);
 }
+
+static char *next_token(char **line)
+{
+  char *start = *line;
+  char *comma = strchr(start, ',');
+  if (comma) {
+    *comma = '\0';
+    *line = comma + 1;
+  } else {
+    *line = start + strlen(start);
+  }
+  return start;
+}
+
+static void clear_tables(void)
+{
+  exec_simple("DELETE FROM transactions;");
+  exec_simple("DELETE FROM stocks;");
+  exec_simple("DELETE FROM terrariums;");
+  exec_simple("DELETE FROM animals;");
+  exec_simple("DELETE FROM elevages;");
+}
+
+void db_import_csv(const char *path)
+{
+  if (!db_handle || !path)
+    return;
+
+  FILE *f = fopen(path, "r");
+  if (!f) {
+    ESP_LOGE(TAG, "Impossible d'ouvrir %s", path);
+    return;
+  }
+
+  sqlite3_exec(db_handle, "BEGIN TRANSACTION;", NULL, NULL, NULL);
+  clear_tables();
+
+  char line[512];
+  char table[32] = "";
+  while (fgets(line, sizeof(line), f)) {
+    line[strcspn(line, "\r\n")] = '\0';
+    if (line[0] == '\0') {
+      table[0] = '\0';
+      continue;
+    }
+
+    if (table[0] == '\0') {
+      strncpy(table, line, sizeof(table) - 1);
+      table[sizeof(table) - 1] = '\0';
+      fgets(line, sizeof(line), f); /* skip header */
+      continue;
+    }
+
+    char *ptr = line;
+    if (strcmp(table, "elevages") == 0) {
+      char *tok_id = next_token(&ptr);
+      char *name = next_token(&ptr);
+      char *desc = ptr;
+      db_exec("INSERT INTO elevages(id,name,description) VALUES(%d,'%s','%s');",
+              atoi(tok_id), name, desc);
+    } else if (strcmp(table, "animals") == 0) {
+      char *tok[15];
+      for (int i = 0; i < 14; ++i)
+        tok[i] = next_token(&ptr);
+      tok[14] = ptr;
+      db_exec("INSERT INTO animals(id,elevage_id,name,species,sex,birth_date,health,breeding_cycle,cdc_number,aoe_number,ifap_id,quota_limit,quota_used,cerfa_valid_until,cites_valid_until) "
+              "VALUES(%d,%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s',%d,%d,%d,%d);",
+              atoi(tok[0]), atoi(tok[1]), tok[2], tok[3], tok[4], tok[5], tok[6],
+              tok[7], tok[8], tok[9], tok[10], atoi(tok[11]), atoi(tok[12]),
+              atoi(tok[13]), atoi(tok[14]));
+    } else if (strcmp(table, "terrariums") == 0) {
+      char *tok_id = next_token(&ptr);
+      char *tok_elev = next_token(&ptr);
+      char *name = next_token(&ptr);
+      char *cap = next_token(&ptr);
+      char *inv = next_token(&ptr);
+      char *notes = ptr;
+      db_exec(
+          "INSERT INTO terrariums(id,elevage_id,name,capacity,inventory,notes) "
+          "VALUES(%d,%d,'%s',%d,'%s','%s');",
+          atoi(tok_id), atoi(tok_elev), name, atoi(cap), inv, notes);
+    } else if (strcmp(table, "stocks") == 0) {
+      char *tok_id = next_token(&ptr);
+      char *name = next_token(&ptr);
+      char *qty = next_token(&ptr);
+      char *min = ptr;
+      db_exec("INSERT INTO stocks(id,name,quantity,min_quantity) VALUES(%d,'%s',%d,%d);",
+              atoi(tok_id), name, atoi(qty), atoi(min));
+    } else if (strcmp(table, "transactions") == 0) {
+      char *tok_id = next_token(&ptr);
+      char *stock_id = next_token(&ptr);
+      char *qty = next_token(&ptr);
+      char *type = next_token(&ptr);
+      char *timestamp = ptr;
+      db_exec(
+          "INSERT INTO transactions(id,stock_id,quantity,type,timestamp) VALUES(%d,%d,%d,'%s',%d);",
+          atoi(tok_id), atoi(stock_id), atoi(qty), type, atoi(timestamp));
+    }
+  }
+
+  sqlite3_exec(db_handle, "COMMIT;", NULL, NULL, NULL);
+  fclose(f);
+  ESP_LOGI(TAG, "Import CSV depuis %s termine", path);
+}

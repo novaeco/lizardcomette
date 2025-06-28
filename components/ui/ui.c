@@ -29,6 +29,7 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_SETTINGS] = "Settings",
         [TXT_EXPORT] = "Export",
         [TXT_IMPORT] = "Import",
+        [TXT_IMPORT_CSV] = "Import CSV",
         [TXT_LEGAL_OK] = "OK",
         [TXT_LEGAL_EXPIRED] = "Expired",
         [TXT_LANGUAGE] = "Language",
@@ -69,6 +70,7 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_SETTINGS] = "Param\xC3\xA8tres",
         [TXT_EXPORT] = "Exporter",
         [TXT_IMPORT] = "Importer",
+        [TXT_IMPORT_CSV] = "Importer CSV",
         [TXT_LEGAL_OK] = "OK",
         [TXT_LEGAL_EXPIRED] = "Expire",
         [TXT_LANGUAGE] = "Langue",
@@ -1259,6 +1261,12 @@ static void import_event(lv_event_t *e)
     ui_notify("Import OK");
 }
 
+static void import_csv_event(lv_event_t *e)
+{
+    storage_import_csv("/sdcard/export.csv");
+    ui_notify("Import CSV OK");
+}
+
 static void lang_event(lv_event_t *e)
 {
     uint32_t sel = lv_dropdown_get_selected(lv_event_get_target(e));
@@ -1293,6 +1301,11 @@ static void settings_tab_create(lv_obj_t *tab)
     lv_obj_add_event_cb(btn_import, import_event, LV_EVENT_CLICKED, NULL);
     lv_obj_t *lbl2 = lv_label_create(btn_import);
     lv_label_set_text(lbl2, ui_get_text(TXT_IMPORT));
+
+    lv_obj_t *btn_import_csv = lv_btn_create(tab);
+    lv_obj_align(btn_import_csv, LV_ALIGN_BOTTOM_MID, 0, -10);
+    lv_obj_add_event_cb(btn_import_csv, import_csv_event, LV_EVENT_CLICKED, NULL);
+    lv_label_set_text(lv_label_create(btn_import_csv), ui_get_text(TXT_IMPORT_CSV));
 }
 
 const char *ui_get_text(ui_text_id_t id)

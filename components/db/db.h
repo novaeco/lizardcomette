@@ -29,6 +29,13 @@ void db_export_csv(const char *path);
 void db_export_json(const char *path);
 
 /**
+ * \brief Importe les donnees depuis un fichier CSV exporte.
+ *        Le fichier doit suivre le format produit par db_export_csv().
+ * \param path Chemin du fichier CSV en clair.
+ */
+void db_import_csv(const char *path);
+
+/**
  * \brief Execute une requete SQL sans retour de resultats.
  */
 bool db_exec(const char *format, ...);
