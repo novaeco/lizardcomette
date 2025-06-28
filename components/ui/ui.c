@@ -25,6 +25,7 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_TERRARIUMS] = "Terrariums",
         [TXT_STOCKS] = "Stock",
         [TXT_TRANSACTIONS] = "Transactions",
+        [TXT_ELEVAGES] = "Farms",
         [TXT_SETTINGS] = "Settings",
         [TXT_EXPORT] = "Export",
         [TXT_IMPORT] = "Import",
@@ -45,6 +46,7 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_TERRARIUMS] = "Terrariums",
         [TXT_STOCKS] = "Stocks",
         [TXT_TRANSACTIONS] = "Transactions",
+        [TXT_ELEVAGES] = "Elevages",
         [TXT_SETTINGS] = "Param\xC3\xA8tres",
         [TXT_EXPORT] = "Exporter",
         [TXT_IMPORT] = "Importer",
@@ -68,10 +70,12 @@ static lv_obj_t *tab_animals;
 static lv_obj_t *tab_terrariums;
 static lv_obj_t *tab_stocks;
 static lv_obj_t *tab_transactions;
+static lv_obj_t *tab_elevages;
 static lv_obj_t *list_animals;
 static lv_obj_t *list_terrariums;
 static lv_obj_t *list_stocks;
 static lv_obj_t *list_transactions;
+static lv_obj_t *list_elevages;
 
 typedef struct {
     lv_obj_t *win;
@@ -169,6 +173,17 @@ typedef struct {
 } TransactionFormCtx;
 
 static TransactionFormCtx transaction_form;
+
+typedef struct {
+    lv_obj_t *win;
+    lv_obj_t *ta_id;
+    lv_obj_t *ta_name;
+    lv_obj_t *ta_desc;
+    bool is_new;
+    int orig_id;
+} ElevageFormCtx;
+
+static ElevageFormCtx elevage_form;
 static lv_obj_t *login_win;
 static lv_obj_t *ta_user;
 static lv_obj_t *ta_pass;
@@ -290,11 +305,13 @@ static void build_tabs(void)
     if (logged_role == ROLE_PROFESSIONNEL) {
         tab_stocks = lv_tabview_add_tab(tabview, ui_get_text(TXT_STOCKS));
         tab_transactions = lv_tabview_add_tab(tabview, ui_get_text(TXT_TRANSACTIONS));
+        tab_elevages = lv_tabview_add_tab(tabview, ui_get_text(TXT_ELEVAGES));
         tab_settings = lv_tabview_add_tab(tabview, ui_get_text(TXT_SETTINGS));
         animals_tab_create(tab_animals);
         terrariums_tab_create(tab_terrariums);
         stocks_tab_create(tab_stocks);
         transactions_tab_create(tab_transactions);
+        elevages_tab_create(tab_elevages);
     } else {
         tab_settings = lv_tabview_add_tab(tabview, ui_get_text(TXT_SETTINGS));
         animals_tab_create(tab_animals);
@@ -380,6 +397,22 @@ static void transactions_tab_create(lv_obj_t *tab)
     lv_label_set_text(lv_label_create(btn_add), ui_get_text(TXT_ADD));
 }
 
+static void elevages_tab_create(lv_obj_t *tab)
+{
+    list_elevages = lv_list_create(tab);
+    lv_obj_set_size(list_elevages, 380, 420);
+    for (int i = 0; i < elevages_count(); ++i) {
+        const Elevage *ev = elevages_get_by_index(i);
+        if (!ev) continue;
+        lv_obj_t *btn = lv_list_add_btn(list_elevages, NULL, ev->name);
+        lv_obj_add_event_cb(btn, elevage_edit_event, LV_EVENT_CLICKED, (void *)(intptr_t)ev->id);
+    }
+    lv_obj_t *btn_add = lv_btn_create(tab);
+    lv_obj_align(btn_add, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+    lv_obj_add_event_cb(btn_add, elevage_add_event, LV_EVENT_CLICKED, NULL);
+    lv_label_set_text(lv_label_create(btn_add), ui_get_text(TXT_ADD));
+}
+
 void ui_set_elevage(int elevage_id)
 {
     current_elevage_id = elevage_id;
@@ -391,6 +424,8 @@ void ui_set_elevage(int elevage_id)
         refresh_stocks();
     if (tab_transactions)
         refresh_transactions();
+    if (tab_elevages)
+        refresh_elevages();
 }
 
 int ui_get_elevage(void)
@@ -427,6 +462,14 @@ static void refresh_transactions(void)
     if (tab_transactions) {
         lv_obj_clean(tab_transactions);
         transactions_tab_create(tab_transactions);
+    }
+}
+
+static void refresh_elevages(void)
+{
+    if (tab_elevages) {
+        lv_obj_clean(tab_elevages);
+        elevages_tab_create(tab_elevages);
     }
 }
 
@@ -798,6 +841,84 @@ static void transaction_edit_event(lv_event_t *e)
     if (t) open_transaction_form(t);
 }
 
+/* ---- Elevage form handlers ---- */
+
+static void elevage_save_event(lv_event_t *e)
+{
+    ElevageFormCtx *ctx = (ElevageFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    Elevage ev = {0};
+    ev.id = atoi(lv_textarea_get_text(ctx->ta_id));
+    strncpy(ev.name, lv_textarea_get_text(ctx->ta_name), sizeof(ev.name) - 1);
+    strncpy(ev.description, lv_textarea_get_text(ctx->ta_desc), sizeof(ev.description) - 1);
+    if (ctx->is_new)
+        elevages_add(&ev);
+    else
+        elevages_update(ctx->orig_id, &ev);
+    lv_obj_del(ctx->win);
+    refresh_elevages();
+}
+
+static void elevage_delete_event(lv_event_t *e)
+{
+    ElevageFormCtx *ctx = (ElevageFormCtx *)lv_event_get_user_data(e);
+    if (!ctx) return;
+    elevages_delete(ctx->orig_id);
+    lv_obj_del(ctx->win);
+    refresh_elevages();
+}
+
+static void open_elevage_form(const Elevage *ev)
+{
+    elevage_form.is_new = (ev == NULL);
+    elevage_form.orig_id = ev ? ev->id : 0;
+    elevage_form.win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(elevage_form.win, 300, 180);
+    lv_obj_center(elevage_form.win);
+
+    elevage_form.ta_id = lv_textarea_create(elevage_form.win);
+    lv_obj_set_width(elevage_form.ta_id, 280);
+    lv_textarea_set_placeholder_text(elevage_form.ta_id, "ID");
+    if (ev) { char buf[16]; sprintf(buf, "%d", ev->id); lv_textarea_set_text(elevage_form.ta_id, buf); }
+
+    elevage_form.ta_name = lv_textarea_create(elevage_form.win);
+    lv_obj_set_width(elevage_form.ta_name, 280);
+    lv_obj_align(elevage_form.ta_name, LV_ALIGN_TOP_MID, 0, 40);
+    lv_textarea_set_placeholder_text(elevage_form.ta_name, "Name");
+    if (ev) lv_textarea_set_text(elevage_form.ta_name, ev->name);
+
+    elevage_form.ta_desc = lv_textarea_create(elevage_form.win);
+    lv_obj_set_width(elevage_form.ta_desc, 280);
+    lv_obj_align(elevage_form.ta_desc, LV_ALIGN_TOP_MID, 0, 80);
+    lv_textarea_set_placeholder_text(elevage_form.ta_desc, "Description");
+    if (ev) lv_textarea_set_text(elevage_form.ta_desc, ev->description);
+
+    lv_obj_t *btn_save = lv_btn_create(elevage_form.win);
+    lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);
+    lv_obj_add_event_cb(btn_save, elevage_save_event, LV_EVENT_CLICKED, &elevage_form);
+    lv_label_set_text(lv_label_create(btn_save), ui_get_text(TXT_SAVE));
+
+    if (!elevage_form.is_new) {
+        lv_obj_t *btn_del = lv_btn_create(elevage_form.win);
+        lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+        lv_obj_add_event_cb(btn_del, elevage_delete_event, LV_EVENT_CLICKED, &elevage_form);
+        lv_label_set_text(lv_label_create(btn_del), ui_get_text(TXT_DELETE));
+    }
+}
+
+static void elevage_add_event(lv_event_t *e)
+{
+    (void)e;
+    open_elevage_form(NULL);
+}
+
+static void elevage_edit_event(lv_event_t *e)
+{
+    int id = (int)(intptr_t)lv_event_get_user_data(e);
+    const Elevage *ev = elevages_get(id);
+    if (ev) open_elevage_form(ev);
+}
+
 static void export_event(lv_event_t *e)
 {
     storage_export_csv("/sdcard/export.csv");
@@ -859,11 +980,15 @@ void ui_set_language(ui_language_t lang)
         return;
     current_lang = lang;
     if (tabview) {
-        lv_tabview_set_tab_name(tabview, 0, ui_get_text(TXT_ANIMALS));
-        lv_tabview_set_tab_name(tabview, 1, ui_get_text(TXT_TERRARIUMS));
-        lv_tabview_set_tab_name(tabview, 2, ui_get_text(TXT_STOCKS));
-        lv_tabview_set_tab_name(tabview, 3, ui_get_text(TXT_TRANSACTIONS));
-        lv_tabview_set_tab_name(tabview, 4, ui_get_text(TXT_SETTINGS));
+        int idx = 0;
+        lv_tabview_set_tab_name(tabview, idx++, ui_get_text(TXT_ANIMALS));
+        lv_tabview_set_tab_name(tabview, idx++, ui_get_text(TXT_TERRARIUMS));
+        if (logged_role == ROLE_PROFESSIONNEL) {
+            lv_tabview_set_tab_name(tabview, idx++, ui_get_text(TXT_STOCKS));
+            lv_tabview_set_tab_name(tabview, idx++, ui_get_text(TXT_TRANSACTIONS));
+            lv_tabview_set_tab_name(tabview, idx++, ui_get_text(TXT_ELEVAGES));
+        }
+        lv_tabview_set_tab_name(tabview, idx, ui_get_text(TXT_SETTINGS));
     }
     if (login_win) {
         lv_textarea_set_placeholder_text(ta_user, ui_get_text(TXT_USERNAME));
