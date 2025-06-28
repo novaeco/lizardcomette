@@ -5,6 +5,8 @@
 #include "stocks.h"
 #include "transactions.h"
 #include "legal.h"
+#include "health.h"
+#include "breeding.h"
 #include "storage.h"
 #include "auth.h"
 #include <stdlib.h>
@@ -73,6 +75,55 @@ typedef struct {
 } AnimalFormCtx;
 
 static AnimalFormCtx animal_form;
+
+static void close_win_event(lv_event_t *e)
+{
+    lv_obj_del(lv_obj_get_parent(lv_event_get_current_target(e)));
+}
+
+static void open_health_list(int animal_id)
+{
+    lv_obj_t *win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(win, 300, 200);
+    lv_obj_center(win);
+
+    lv_obj_t *list = lv_list_create(win);
+    lv_obj_set_size(list, 280, 160);
+    for (int i = 0; i < health_count_for_animal(animal_id); ++i) {
+        const HealthRecord *r = health_get_by_index_for_animal(i, animal_id);
+        if (!r) continue;
+        char buf[64];
+        snprintf(buf, sizeof(buf), "%d %s", r->date, r->description);
+        lv_list_add_btn(list, NULL, buf);
+    }
+
+    lv_obj_t *btn = lv_btn_create(win);
+    lv_obj_align(btn, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+    lv_obj_add_event_cb(btn, close_win_event, LV_EVENT_CLICKED, NULL);
+    lv_label_set_text(lv_label_create(btn), "Close");
+}
+
+static void open_breeding_list(int animal_id)
+{
+    lv_obj_t *win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(win, 300, 200);
+    lv_obj_center(win);
+
+    lv_obj_t *list = lv_list_create(win);
+    lv_obj_set_size(list, 280, 160);
+    for (int i = 0; i < breeding_count_for_animal(animal_id); ++i) {
+        const BreedingEvent *ev = breeding_get_by_index_for_animal(i, animal_id);
+        if (!ev) continue;
+        char buf[64];
+        snprintf(buf, sizeof(buf), "%d %s", ev->date, ev->description);
+        lv_list_add_btn(list, NULL, buf);
+    }
+
+    lv_obj_t *btn = lv_btn_create(win);
+    lv_obj_align(btn, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+    lv_obj_add_event_cb(btn, close_win_event, LV_EVENT_CLICKED, NULL);
+    lv_label_set_text(lv_label_create(btn), "Close");
+}
 
 typedef struct {
     lv_obj_t *win;
@@ -341,6 +392,18 @@ static void animal_delete_event(lv_event_t *e)
     refresh_animals();
 }
 
+static void health_list_event(lv_event_t *e)
+{
+    int id = (int)(intptr_t)lv_event_get_user_data(e);
+    open_health_list(id);
+}
+
+static void breeding_list_event(lv_event_t *e)
+{
+    int id = (int)(intptr_t)lv_event_get_user_data(e);
+    open_breeding_list(id);
+}
+
 static void open_animal_form(const Reptile *r)
 {
     animal_form.is_new = (r == NULL);
@@ -392,6 +455,16 @@ static void open_animal_form(const Reptile *r)
         lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
         lv_obj_add_event_cb(btn_del, animal_delete_event, LV_EVENT_CLICKED, &animal_form);
         lv_label_set_text(lv_label_create(btn_del), "Delete");
+
+        lv_obj_t *btn_health = lv_btn_create(animal_form.win);
+        lv_obj_align(btn_health, LV_ALIGN_BOTTOM_MID, 0, -10);
+        lv_obj_add_event_cb(btn_health, health_list_event, LV_EVENT_CLICKED, (void *)(intptr_t)animal_form.orig_id);
+        lv_label_set_text(lv_label_create(btn_health), "Health");
+
+        lv_obj_t *btn_breed = lv_btn_create(animal_form.win);
+        lv_obj_align(btn_breed, LV_ALIGN_BOTTOM_MID, 0, -50);
+        lv_obj_add_event_cb(btn_breed, breeding_list_event, LV_EVENT_CLICKED, (void *)(intptr_t)animal_form.orig_id);
+        lv_label_set_text(lv_label_create(btn_breed), "Breeding");
     }
 }
 

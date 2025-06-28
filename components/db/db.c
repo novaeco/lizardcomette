@@ -70,6 +70,17 @@ static void create_tables(void)
                 "quantity INTEGER,""
                 "type TEXT,""
                 "timestamp INTEGER DEFAULT (strftime('%s','now')));");
+    exec_simple("CREATE TABLE IF NOT EXISTS health_records("""
+                "id INTEGER PRIMARY KEY,"""
+                "animal_id INTEGER,"""
+                "description TEXT,"""
+                "date INTEGER);");
+
+    exec_simple("CREATE TABLE IF NOT EXISTS breeding_events("""
+                "id INTEGER PRIMARY KEY,"""
+                "animal_id INTEGER,"""
+                "description TEXT,"""
+                "date INTEGER);");
 }
 
 static void load_db_key(void)
@@ -233,6 +244,17 @@ void db_init(void)
                 "quantity INTEGER,""
                 "type TEXT,""
                 "timestamp INTEGER DEFAULT (strftime('%s','now')));");
+    exec_simple("CREATE TABLE IF NOT EXISTS health_records("""
+                "id INTEGER PRIMARY KEY,"""
+                "animal_id INTEGER,"""
+                "description TEXT,"""
+                "date INTEGER);");
+
+    exec_simple("CREATE TABLE IF NOT EXISTS breeding_events("""
+                "id INTEGER PRIMARY KEY,"""
+                "animal_id INTEGER,"""
+                "description TEXT,"""
+                "date INTEGER);");
 }
 
 void db_backup(void)

@@ -4,6 +4,8 @@
 #include "terrariums.h"
 #include "stocks.h"
 #include "transactions.h"
+#include "health.h"
+#include "breeding.h"
 
 TEST_CASE("animals crud","[animals]")
 {
@@ -75,5 +77,41 @@ TEST_CASE("transactions crud","[transactions]")
     TEST_ASSERT_EQUAL_INT(3, gt->quantity);
     TEST_ASSERT_TRUE(transactions_delete(1));
     TEST_ASSERT_NULL(transactions_get(1));
+    db_close();
+}
+
+TEST_CASE("health records crud","[health]")
+{
+    db_set_key("");
+    TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    health_init();
+    HealthRecord hr = { .id=1, .animal_id=1, .description="check", .date=0 };
+    TEST_ASSERT_TRUE(health_add(&hr));
+    const HealthRecord *gr = health_get(1);
+    TEST_ASSERT_NOT_NULL(gr);
+    strcpy(hr.description, "done");
+    TEST_ASSERT_TRUE(health_update(1, &hr));
+    gr = health_get(1);
+    TEST_ASSERT_EQUAL_STRING("done", gr->description);
+    TEST_ASSERT_TRUE(health_delete(1));
+    TEST_ASSERT_NULL(health_get(1));
+    db_close();
+}
+
+TEST_CASE("breeding events crud","[breeding]")
+{
+    db_set_key("");
+    TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    breeding_init();
+    BreedingEvent ev = { .id=1, .animal_id=1, .description="pair", .date=0 };
+    TEST_ASSERT_TRUE(breeding_add(&ev));
+    const BreedingEvent *ge = breeding_get(1);
+    TEST_ASSERT_NOT_NULL(ge);
+    strcpy(ev.description, "laid");
+    TEST_ASSERT_TRUE(breeding_update(1, &ev));
+    ge = breeding_get(1);
+    TEST_ASSERT_EQUAL_STRING("laid", ge->description);
+    TEST_ASSERT_TRUE(breeding_delete(1));
+    TEST_ASSERT_NULL(breeding_get(1));
     db_close();
 }
