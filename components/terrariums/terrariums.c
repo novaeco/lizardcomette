@@ -11,7 +11,7 @@ static int terrarium_count = 0;
 static char logs[LOGS_MAX][64];
 static int log_count = 0;
 
-void terrariums_init(void)
+void terrariums_init(int log_offset)
 {
     terrarium_count = 0;
     log_count = 0;
@@ -29,6 +29,22 @@ void terrariums_init(void)
             strncpy(t->notes, (const char *)sqlite3_column_text(stmt, 5), sizeof(t->notes) - 1);
         }
         sqlite3_finalize(stmt);
+    }
+
+    // Chargement des logs existants avec pagination
+    sqlite3_stmt *log_stmt = db_query(
+        "SELECT message FROM terrarium_logs ORDER BY id DESC LIMIT %d OFFSET %d;",
+        LOGS_MAX, log_offset);
+    if (log_stmt) {
+        while (sqlite3_step(log_stmt) == SQLITE_ROW && log_count < LOGS_MAX) {
+            const unsigned char *msg = sqlite3_column_text(log_stmt, 0);
+            if (msg) {
+                strncpy(logs[log_count], (const char *)msg, sizeof(logs[0]) - 1);
+                logs[log_count][sizeof(logs[0]) - 1] = '\0';
+                log_count++;
+            }
+        }
+        sqlite3_finalize(log_stmt);
     }
 
     ESP_LOGI(TAG, "Initialisation des terrariums");

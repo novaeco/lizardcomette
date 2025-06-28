@@ -30,7 +30,7 @@ TEST_CASE("terrariums crud","[terrariums]")
 {
     db_set_key("");
     TEST_ASSERT_TRUE(db_open_custom(":memory:"));
-    terrariums_init();
+    terrariums_init(0);
     Terrarium t = { .id=1, .elevage_id=1, .name="T1", .capacity=2 };
     TEST_ASSERT_TRUE(terrariums_add(&t));
     const Terrarium *gt = terrariums_get(1);
