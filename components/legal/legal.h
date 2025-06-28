@@ -14,6 +14,8 @@ bool legal_generate_cites_official(const char *path, const Reptile *r);
 bool legal_is_cerfa_valid(const Reptile *r);
 bool legal_is_cites_valid(const Reptile *r);
 bool legal_quota_remaining(const Reptile *r);
+bool legal_is_cdc_valid(const Reptile *r);
+bool legal_is_aoe_valid(const Reptile *r);
 
 void legal_check_documents(void);
 
