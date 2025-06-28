@@ -19,9 +19,12 @@ typedef struct {
 } Terrarium;
 
 /**
- * \brief Initialise la liste des terrariums.
+ * \brief Initialise la liste des terrariums et charge les logs.
+ *
+ * \param log_offset Decalage dans l'historique des logs pour la pagination.
+ *                   Utiliser 0 pour recuperer les dernieres entrees.
  */
-void terrariums_init(void);
+void terrariums_init(int log_offset);
 
 /**
  * \brief Ajoute un terrarium.

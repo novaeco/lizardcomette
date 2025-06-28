@@ -37,7 +37,7 @@ void app_main(void)
     // Initialisation des modules metier
     elevages_init();
     animals_init();
-    terrariums_init();
+    terrariums_init(0);
     stocks_init();
     transactions_init();
     scheduler_init();
