@@ -86,3 +86,13 @@ void scheduler_init(void)
     ESP_LOGI(TAG, "Initialisation du planificateur");
     xTaskCreate(scheduler_task, "scheduler", 4096, NULL, 5, NULL);
 }
+
+void scheduler_check_stock_levels(void)
+{
+    check_stock_levels();
+}
+
+void scheduler_check_regulatory_deadlines(void)
+{
+    check_regulatory_deadlines();
+}
