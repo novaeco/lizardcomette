@@ -22,7 +22,7 @@ LizardComette est un exemple de projet ESP‑IDF permettant de gérer un élevag
 
 ## Compilation
 ```bash
-idf.py set-target esp32
+idf.py set-target esp32s3
 idf.py build
 ```
 
