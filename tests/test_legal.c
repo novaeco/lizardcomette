@@ -1,5 +1,7 @@
 #include "unity.h"
 #include "legal.h"
+#include "legal_numbers.h"
+#include "db.h"
 #include "animals.h"
 #include <sys/stat.h>
 #include <unistd.h>
@@ -7,6 +9,14 @@
 
 TEST_CASE("legal document generation","[legal]")
 {
+    db_set_key("");
+    TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    legal_numbers_init();
+    LegalNumber n1 = { .id=1, .username="", .elevage_id=0, .type="CDC", .number="CDC12345" };
+    LegalNumber n2 = { .id=2, .username="", .elevage_id=0, .type="AOE", .number="AOE12345" };
+    TEST_ASSERT_TRUE(legal_numbers_add(&n1));
+    TEST_ASSERT_TRUE(legal_numbers_add(&n2));
+
     Reptile r = {
         .name = "Test",
         .species = "Lizard",
@@ -27,10 +37,19 @@ TEST_CASE("legal document generation","[legal]")
     TEST_ASSERT_EQUAL_INT(0, stat("cerfa_14367_test.pdf", &st));
     unlink("cerfa_test.pdf");
     unlink("cerfa_14367_test.pdf");
+    db_close();
 }
 
 TEST_CASE("legal validation","[legal]")
 {
+    db_set_key("");
+    TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    legal_numbers_init();
+    LegalNumber n1 = { .id=1, .username="", .elevage_id=0, .type="CDC", .number="CDC12345" };
+    LegalNumber n2 = { .id=2, .username="", .elevage_id=0, .type="AOE", .number="AOE67890" };
+    TEST_ASSERT_TRUE(legal_numbers_add(&n1));
+    TEST_ASSERT_TRUE(legal_numbers_add(&n2));
+
     Reptile r = {
         .cdc_number = "CDC12345",
         .aoe_number = "AOE67890",
@@ -44,6 +63,7 @@ TEST_CASE("legal validation","[legal]")
     TEST_ASSERT_TRUE(legal_is_cerfa_valid(&r));
     TEST_ASSERT_TRUE(legal_is_cites_valid(&r));
     TEST_ASSERT_TRUE(legal_quota_remaining(&r));
+    db_close();
 }
 
 TEST_CASE("quota edge cases","[legal]")

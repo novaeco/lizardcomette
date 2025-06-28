@@ -7,6 +7,7 @@
 #include "db.h"
 #include "auth.h"
 #include "legal.h"
+#include "legal_numbers.h"
 #include "storage.h"
 #include "elevages.h"
 #include "animals.h"
@@ -35,6 +36,7 @@ void app_main(void)
     auth_init();
 
     // Initialisation des modules metier
+    legal_numbers_init();
     elevages_init();
     animals_init();
     terrariums_init(0);

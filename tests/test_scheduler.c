@@ -3,6 +3,8 @@
 #include "stocks.h"
 #include "animals.h"
 #include "legal.h"
+#include "legal_numbers.h"
+#include "legal_numbers.h"
 #include "scheduler.h"
 #include <string.h>
 #include <time.h>
@@ -38,6 +40,11 @@ TEST_CASE("scheduler document expiration warning","[scheduler]")
 {
     db_set_key("");
     TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    legal_numbers_init();
+    LegalNumber n1={.id=1,.username="",.elevage_id=0,.type="CDC",.number="CDC12345"};
+    LegalNumber n2={.id=2,.username="",.elevage_id=0,.type="AOE",.number="AOE12345"};
+    TEST_ASSERT_TRUE(legal_numbers_add(&n1));
+    TEST_ASSERT_TRUE(legal_numbers_add(&n2));
     animals_init();
     time_t now = time(NULL);
     Reptile r = {
@@ -64,6 +71,11 @@ TEST_CASE("scheduler compliance invalid cdc","[scheduler]")
 {
     db_set_key("");
     TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    legal_numbers_init();
+    LegalNumber n1={.id=1,.username="",.elevage_id=0,.type="AOE",.number="AOE12345"};
+    TEST_ASSERT_TRUE(legal_numbers_add(&n1));
+    LegalNumber n2={.id=2,.username="",.elevage_id=0,.type="CDC",.number="CDC12345"};
+    TEST_ASSERT_TRUE(legal_numbers_add(&n2));
     animals_init();
     time_t now = time(NULL);
     Reptile r = {
@@ -90,6 +102,11 @@ TEST_CASE("scheduler compliance invalid aoe","[scheduler]")
 {
     db_set_key("");
     TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    legal_numbers_init();
+    LegalNumber n1={.id=1,.username="",.elevage_id=0,.type="CDC",.number="CDC12345"};
+    LegalNumber n2={.id=2,.username="",.elevage_id=0,.type="AOE",.number="AOE12345"};
+    TEST_ASSERT_TRUE(legal_numbers_add(&n1));
+    TEST_ASSERT_TRUE(legal_numbers_add(&n2));
     animals_init();
     time_t now = time(NULL);
     Reptile r = {
@@ -116,6 +133,11 @@ TEST_CASE("scheduler compliance quota reached","[scheduler]")
 {
     db_set_key("");
     TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    legal_numbers_init();
+    LegalNumber n1={.id=1,.username="",.elevage_id=0,.type="CDC",.number="CDC12345"};
+    LegalNumber n2={.id=2,.username="",.elevage_id=0,.type="AOE",.number="AOE12345"};
+    TEST_ASSERT_TRUE(legal_numbers_add(&n1));
+    TEST_ASSERT_TRUE(legal_numbers_add(&n2));
     animals_init();
     time_t now = time(NULL);
     Reptile r = {
