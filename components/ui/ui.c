@@ -35,6 +35,10 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_LOGIN] = "Login",
         [TXT_USERNAME] = "Username",
         [TXT_PASSWORD] = "Password",
+        [TXT_ADD] = "Add",
+        [TXT_SAVE] = "Save",
+        [TXT_DELETE] = "Delete",
+        [TXT_OK] = "OK",
     },
     [UI_LANG_FR] = {
         [TXT_ANIMALS] = "Animaux",
@@ -51,6 +55,10 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_LOGIN] = "Connexion",
         [TXT_USERNAME] = "Utilisateur",
         [TXT_PASSWORD] = "Mot de passe",
+        [TXT_ADD] = "Ajouter",
+        [TXT_SAVE] = "Sauvegarder",
+        [TXT_DELETE] = "Supprimer",
+        [TXT_OK] = "OK",
     }
 };
 
@@ -268,7 +276,7 @@ static void open_elevage_select(void)
     lv_obj_t *btn = lv_btn_create(elevage_win);
     lv_obj_align(btn, LV_ALIGN_BOTTOM_MID, 0, -10);
     lv_obj_add_event_cb(btn, elevage_ok_event, LV_EVENT_CLICKED, NULL);
-    lv_label_set_text(lv_label_create(btn), "OK");
+    lv_label_set_text(lv_label_create(btn), ui_get_text(TXT_OK));
 }
 
 static void build_tabs(void)
@@ -313,7 +321,7 @@ static void animals_tab_create(lv_obj_t *tab)
     lv_obj_t *btn_add = lv_btn_create(tab);
     lv_obj_align(btn_add, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
     lv_obj_add_event_cb(btn_add, animal_add_event, LV_EVENT_CLICKED, NULL);
-    lv_label_set_text(lv_label_create(btn_add), "Add");
+    lv_label_set_text(lv_label_create(btn_add), ui_get_text(TXT_ADD));
 }
 
 static void terrariums_tab_create(lv_obj_t *tab)
@@ -331,7 +339,7 @@ static void terrariums_tab_create(lv_obj_t *tab)
     lv_obj_t *btn_add = lv_btn_create(tab);
     lv_obj_align(btn_add, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
     lv_obj_add_event_cb(btn_add, terrarium_add_event, LV_EVENT_CLICKED, NULL);
-    lv_label_set_text(lv_label_create(btn_add), "Add");
+    lv_label_set_text(lv_label_create(btn_add), ui_get_text(TXT_ADD));
 }
 
 static void stocks_tab_create(lv_obj_t *tab)
@@ -349,7 +357,7 @@ static void stocks_tab_create(lv_obj_t *tab)
     lv_obj_t *btn_add = lv_btn_create(tab);
     lv_obj_align(btn_add, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
     lv_obj_add_event_cb(btn_add, stock_add_event, LV_EVENT_CLICKED, NULL);
-    lv_label_set_text(lv_label_create(btn_add), "Add");
+    lv_label_set_text(lv_label_create(btn_add), ui_get_text(TXT_ADD));
 }
 
 static void transactions_tab_create(lv_obj_t *tab)
@@ -369,7 +377,7 @@ static void transactions_tab_create(lv_obj_t *tab)
     lv_obj_t *btn_add = lv_btn_create(tab);
     lv_obj_align(btn_add, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
     lv_obj_add_event_cb(btn_add, transaction_add_event, LV_EVENT_CLICKED, NULL);
-    lv_label_set_text(lv_label_create(btn_add), "Add");
+    lv_label_set_text(lv_label_create(btn_add), ui_get_text(TXT_ADD));
 }
 
 void ui_set_elevage(int elevage_id)
@@ -508,13 +516,13 @@ static void open_animal_form(const Reptile *r)
     lv_obj_t *btn_save = lv_btn_create(animal_form.win);
     lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);
     lv_obj_add_event_cb(btn_save, animal_save_event, LV_EVENT_CLICKED, &animal_form);
-    lv_label_set_text(lv_label_create(btn_save), "Save");
+    lv_label_set_text(lv_label_create(btn_save), ui_get_text(TXT_SAVE));
 
     if (!animal_form.is_new) {
         lv_obj_t *btn_del = lv_btn_create(animal_form.win);
         lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
         lv_obj_add_event_cb(btn_del, animal_delete_event, LV_EVENT_CLICKED, &animal_form);
-        lv_label_set_text(lv_label_create(btn_del), "Delete");
+        lv_label_set_text(lv_label_create(btn_del), ui_get_text(TXT_DELETE));
 
         lv_obj_t *btn_health = lv_btn_create(animal_form.win);
         lv_obj_align(btn_health, LV_ALIGN_BOTTOM_MID, 0, -10);
@@ -597,13 +605,13 @@ static void open_terrarium_form(const Terrarium *t)
     lv_obj_t *btn_save = lv_btn_create(terrarium_form.win);
     lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);
     lv_obj_add_event_cb(btn_save, terrarium_save_event, LV_EVENT_CLICKED, &terrarium_form);
-    lv_label_set_text(lv_label_create(btn_save), "Save");
+    lv_label_set_text(lv_label_create(btn_save), ui_get_text(TXT_SAVE));
 
     if (!terrarium_form.is_new) {
         lv_obj_t *btn_del = lv_btn_create(terrarium_form.win);
         lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
         lv_obj_add_event_cb(btn_del, terrarium_delete_event, LV_EVENT_CLICKED, &terrarium_form);
-        lv_label_set_text(lv_label_create(btn_del), "Delete");
+        lv_label_set_text(lv_label_create(btn_del), ui_get_text(TXT_DELETE));
     }
 }
 
@@ -682,13 +690,13 @@ static void open_stock_form(const StockItem *s)
     lv_obj_t *btn_save = lv_btn_create(stock_form.win);
     lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);
     lv_obj_add_event_cb(btn_save, stock_save_event, LV_EVENT_CLICKED, &stock_form);
-    lv_label_set_text(lv_label_create(btn_save), "Save");
+    lv_label_set_text(lv_label_create(btn_save), ui_get_text(TXT_SAVE));
 
     if (!stock_form.is_new) {
         lv_obj_t *btn_del = lv_btn_create(stock_form.win);
         lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
         lv_obj_add_event_cb(btn_del, stock_delete_event, LV_EVENT_CLICKED, &stock_form);
-        lv_label_set_text(lv_label_create(btn_del), "Delete");
+        lv_label_set_text(lv_label_create(btn_del), ui_get_text(TXT_DELETE));
     }
 }
 
@@ -767,13 +775,13 @@ static void open_transaction_form(const Transaction *t)
     lv_obj_t *btn_save = lv_btn_create(transaction_form.win);
     lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);
     lv_obj_add_event_cb(btn_save, transaction_save_event, LV_EVENT_CLICKED, &transaction_form);
-    lv_label_set_text(lv_label_create(btn_save), "Save");
+    lv_label_set_text(lv_label_create(btn_save), ui_get_text(TXT_SAVE));
 
     if (!transaction_form.is_new) {
         lv_obj_t *btn_del = lv_btn_create(transaction_form.win);
         lv_obj_align(btn_del, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
         lv_obj_add_event_cb(btn_del, transaction_delete_event, LV_EVENT_CLICKED, &transaction_form);
-        lv_label_set_text(lv_label_create(btn_del), "Delete");
+        lv_label_set_text(lv_label_create(btn_del), ui_get_text(TXT_DELETE));
     }
 }
 

@@ -39,6 +39,10 @@ typedef enum {
     TXT_LOGIN,
     TXT_USERNAME,
     TXT_PASSWORD,
+    TXT_ADD,
+    TXT_SAVE,
+    TXT_DELETE,
+    TXT_OK,
     TXT_COUNT
 } ui_text_id_t;
 
