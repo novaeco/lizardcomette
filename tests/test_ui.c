@@ -18,6 +18,10 @@ typedef enum {
     TXT_LOGIN,
     TXT_USERNAME,
     TXT_PASSWORD,
+    TXT_ADD,
+    TXT_SAVE,
+    TXT_DELETE,
+    TXT_OK,
     TXT_COUNT
 } ui_text_id_t;
 
@@ -40,6 +44,10 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_LOGIN] = "Login",
         [TXT_USERNAME] = "Username",
         [TXT_PASSWORD] = "Password",
+        [TXT_ADD] = "Add",
+        [TXT_SAVE] = "Save",
+        [TXT_DELETE] = "Delete",
+        [TXT_OK] = "OK",
     },
     [UI_LANG_FR] = {
         [TXT_ANIMALS] = "Animaux",
@@ -56,6 +64,10 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_LOGIN] = "Connexion",
         [TXT_USERNAME] = "Utilisateur",
         [TXT_PASSWORD] = "Mot de passe",
+        [TXT_ADD] = "Ajouter",
+        [TXT_SAVE] = "Sauvegarder",
+        [TXT_DELETE] = "Supprimer",
+        [TXT_OK] = "OK",
     }
 };
 
