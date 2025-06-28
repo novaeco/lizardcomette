@@ -5,6 +5,9 @@ CONFIG_WIFI_SSID="VotreSSID"
 CONFIG_WIFI_PASSWORD="VotreMotDePasse"
 CONFIG_STORAGE_MOUNT_POINT="/sdcard"
 CONFIG_STORAGE_TRANSFER_URL="http://example.com/upload"
+CONFIG_DRIVERS_REST_URL="http://example.com/sensors"
+CONFIG_DRIVERS_MQTT_URI="mqtt://broker"
+CONFIG_DRIVERS_MQTT_TOPIC="/lizard/data"
 ```
 
 Ce fichier illustre comment définir certaines options via `sdkconfig`.

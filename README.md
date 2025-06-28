@@ -6,7 +6,7 @@ LizardComette est un exemple de projet ESP‑IDF permettant de gérer un élevag
 - Gestion des animaux et des terrariums.
 - Authentification multi-utilisateur avec mots de passe hachés et rôles.
 - Séparation des données par identifiant d'élevage pour les animaux et terrariums.
-- Drivers pour capteurs environnementaux.
+- Drivers I2C/SPI pour capteurs environnementaux avec envoi REST/MQTT.
 - Planificateur avec notifications (stocks, échéances, conformité).
 - Génération de formulaires administratifs simplifiés.
 - Support du CDC/AOE, gestion des quotas et formulaires CERFA/CITES officiels.
@@ -14,7 +14,7 @@ LizardComette est un exemple de projet ESP‑IDF permettant de gérer un élevag
 ## Configuration
 1. Installez l'[ESP‑IDF](https://docs.espressif.com/).
 2. Définissez la variable `IDF_PATH` correspondant à votre installation.
-3. Inspirez‑vous de `docs/CONFIG_EXAMPLE.md` pour créer votre propre `sdkconfig` (Wi‑Fi, stockage, etc.).
+3. Inspirez‑vous de `docs/CONFIG_EXAMPLE.md` pour créer votre propre `sdkconfig` (Wi‑Fi, stockage, REST/MQTT, etc.).
 4. Placez vos fichiers de licences CITES et autres documents dans le répertoire approprié.
 
 ## Compilation
