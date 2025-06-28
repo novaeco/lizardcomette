@@ -1,0 +1,60 @@
+config DRIVERS_REST_URL
+    string "REST endpoint for sensor data"
+    default ""
+    help
+        Base URL for HTTP posts performed by the drivers component.
+
+config DRIVERS_MQTT_URI
+    string "MQTT broker URI for sensors"
+    default ""
+    help
+        URI used when connecting to the MQTT broker to publish sensor data.
+
+config DRIVERS_MQTT_TOPIC
+    string "MQTT topic for sensor data"
+    default ""
+    help
+        Topic used when publishing sensor measurements.
+
+config LIGHTING_PWM_GPIO
+    int "GPIO for lighting PWM"
+    default 5
+    help
+        Pin connected to the lighting PWM output.
+
+config LIGHTING_REST_URL
+    string "REST endpoint for lighting state"
+    default ""
+    help
+        URL used when sending lighting state over HTTP.
+
+config LIGHTING_MQTT_TOPIC
+    string "MQTT topic for lighting state"
+    default ""
+    help
+        Topic used when publishing lighting state via MQTT.
+
+config CO2_SDA_GPIO
+    int "GPIO for CO2 sensor SDA"
+    default 21
+
+config CO2_SCL_GPIO
+    int "GPIO for CO2 sensor SCL"
+    default 22
+
+config CO2_I2C_ADDR
+    hex "I2C address of CO2 sensor"
+    default 0x61
+
+config CO2_REST_URL
+    string "REST endpoint for CO2 measurements"
+    default ""
+    help
+        URL used when posting CO2 data over HTTP.
+
+config CO2_MQTT_TOPIC
+    string "MQTT topic for CO2 measurements"
+    default ""
+    help
+        Topic used when publishing CO2 data via MQTT.
+

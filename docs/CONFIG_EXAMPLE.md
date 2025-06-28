@@ -16,6 +16,9 @@ CONFIG_LIGHTING_REST_URL="http://example.com/light"
 CONFIG_LIGHTING_MQTT_TOPIC="/lizard/light"
 CONFIG_CO2_REST_URL="http://example.com/co2"
 CONFIG_CO2_MQTT_TOPIC="/lizard/co2"
+CONFIG_CO2_SDA_GPIO=21
+CONFIG_CO2_SCL_GPIO=22
+CONFIG_CO2_I2C_ADDR=0x61
 ```
 
 Ce fichier illustre comment définir certaines options via `sdkconfig`.
@@ -26,6 +29,10 @@ renseignez `CONFIG_STORAGE_TRANSFER_USERNAME` et
 laissées vides ou omises.
 Ces trois options sont définies dans `components/storage/Kconfig.projbuild` et
 contrôlent le transfert de fichiers via le Wi‑Fi.
+
+`CONFIG_LIGHTING_PWM_GPIO` indique le GPIO utilisé pour piloter l'éclairage.
+Les options `CONFIG_CO2_SDA_GPIO`, `CONFIG_CO2_SCL_GPIO` et
+`CONFIG_CO2_I2C_ADDR` permettent d'adapter le câblage du capteur CO2.
 
 `CONFIG_DB_DEFAULT_KEY` permet de définir la clé SQLCipher utilisée lors du
 premier démarrage. Laisser ce champ vide obligera l'utilisateur à saisir la

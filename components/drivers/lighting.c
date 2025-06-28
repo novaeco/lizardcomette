@@ -6,9 +6,6 @@
 
 static const char *TAG = "lighting";
 
-#ifndef CONFIG_LIGHTING_PWM_GPIO
-#define CONFIG_LIGHTING_PWM_GPIO 5
-#endif
 
 #define LEDC_TIMER   LEDC_TIMER_0
 #define LEDC_CHANNEL LEDC_CHANNEL_0
