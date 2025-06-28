@@ -63,3 +63,15 @@ bool animals_delete(int id)
     ESP_LOGI(TAG, "Suppression du reptile %d", id);
     return true;
 }
+
+int animals_count(void)
+{
+    return animal_count;
+}
+
+const Reptile *animals_get_by_index(int index)
+{
+    if (index < 0 || index >= animal_count)
+        return NULL;
+    return &animals[index];
+}

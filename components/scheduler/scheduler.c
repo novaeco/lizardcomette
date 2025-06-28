@@ -4,6 +4,7 @@
 #include "esp_log.h"
 #include "ui.h"
 #include "stocks.h"
+#include "legal.h"
 
 #define SCHEDULER_INTERVAL_MS 60000
 
@@ -18,6 +19,7 @@ static void notify(const char *msg)
 static void check_regulatory_deadlines(void)
 {
     notify("Verification des echeances reglementaires");
+    legal_check_documents();
 }
 
 static void check_stock_levels(void)

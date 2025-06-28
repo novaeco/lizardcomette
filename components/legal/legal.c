@@ -3,6 +3,7 @@
 #include "esp_log.h"
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 static const char *TAG = "legal";
 
@@ -75,6 +76,64 @@ bool legal_generate_invoice(const char *path, const Reptile *r)
     return write_basic_pdf(path, buffer);
 }
 
+bool legal_generate_cerfa_official(const char *path, const Reptile *r)
+{
+    if (!r)
+        return false;
+    char buffer[512];
+    snprintf(buffer, sizeof(buffer), cerfa_official_template,
+             r->name, r->species, r->sex, r->birth_date,
+             r->cdc_number, r->aoe_number, r->ifap_id,
+             r->quota_used, r->quota_limit);
+    return write_basic_pdf(path, buffer);
+}
+
+bool legal_generate_cites_official(const char *path, const Reptile *r)
+{
+    if (!r)
+        return false;
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), cites_official_template,
+             r->name, r->species, r->ifap_id);
+    return write_basic_pdf(path, buffer);
+}
+
+bool legal_is_cerfa_valid(const Reptile *r)
+{
+    if (!r)
+        return false;
+    return r->cerfa_valid_until > (int)time(NULL);
+}
+
+bool legal_is_cites_valid(const Reptile *r)
+{
+    if (!r)
+        return false;
+    return r->cites_valid_until > (int)time(NULL);
+}
+
+bool legal_quota_remaining(const Reptile *r)
+{
+    if (!r)
+        return false;
+    return r->quota_used < r->quota_limit;
+}
+
+void legal_check_documents(void)
+{
+    for (int i = 0; i < animals_count(); ++i) {
+        const Reptile *r = animals_get_by_index(i);
+        if (!r)
+            continue;
+        if (!legal_is_cerfa_valid(r) || !legal_is_cites_valid(r)) {
+            ESP_LOGW(TAG, "Documents expir\xC3\xA9s pour %s", r->name);
+        }
+        if (!legal_quota_remaining(r)) {
+            ESP_LOGW(TAG, "Quota atteint pour %s", r->name);
+        }
+    }
+}
+
 void legal_generate_all(const char *dir, const Reptile *r)
 {
     if (!dir || !r)
@@ -83,11 +142,17 @@ void legal_generate_all(const char *dir, const Reptile *r)
     snprintf(path, sizeof(path), "%s/cerfa.pdf", dir);
     legal_generate_cerfa(path, r);
 
+    snprintf(path, sizeof(path), "%s/cerfa_officiel.pdf", dir);
+    legal_generate_cerfa_official(path, r);
+
     snprintf(path, sizeof(path), "%s/ifap.pdf", dir);
     legal_generate_ifap(path, r);
 
     snprintf(path, sizeof(path), "%s/cites.pdf", dir);
     legal_generate_cites(path, r);
+
+    snprintf(path, sizeof(path), "%s/cites_officiel.pdf", dir);
+    legal_generate_cites_official(path, r);
 
     snprintf(path, sizeof(path), "%s/invoice.pdf", dir);
     legal_generate_invoice(path, r);
