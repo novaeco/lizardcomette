@@ -6,6 +6,7 @@
 #include "transactions.h"
 #include "legal.h"
 #include "storage.h"
+#include "auth.h"
 
 static const char *TAG = "ui";
 
@@ -26,6 +27,9 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_LEGAL_EXPIRED] = "Expired",
         [TXT_LANGUAGE] = "Language",
         [TXT_THEME] = "Theme",
+        [TXT_LOGIN] = "Login",
+        [TXT_USERNAME] = "Username",
+        [TXT_PASSWORD] = "Password",
     },
     [UI_LANG_FR] = {
         [TXT_ANIMALS] = "Animaux",
@@ -39,6 +43,9 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_LEGAL_EXPIRED] = "Expire",
         [TXT_LANGUAGE] = "Langue",
         [TXT_THEME] = "Th\xC3\xA8me",
+        [TXT_LOGIN] = "Connexion",
+        [TXT_USERNAME] = "Utilisateur",
+        [TXT_PASSWORD] = "Mot de passe",
     }
 };
 
@@ -46,6 +53,81 @@ static lv_obj_t *tabview;
 static lv_obj_t *notif_label;
 static lv_obj_t *tab_animals;
 static lv_obj_t *tab_terrariums;
+static lv_obj_t *login_win;
+static lv_obj_t *ta_user;
+static lv_obj_t *ta_pass;
+static lv_obj_t *btn_login;
+static lv_obj_t *lbl_login;
+static char logged_user[32];
+static user_role_t logged_role;
+static bool logged_in = false;
+
+static void login_event(lv_event_t *e)
+{
+    const char *user = lv_textarea_get_text(ta_user);
+    const char *pass = lv_textarea_get_text(ta_pass);
+    if (auth_check(user, pass)) {
+        strncpy(logged_user, user, sizeof(logged_user) - 1);
+        logged_user[sizeof(logged_user) - 1] = '\0';
+        logged_role = auth_get_role(user);
+        logged_in = true;
+        lv_obj_del(login_win);
+        build_tabs();
+        notif_label = lv_label_create(lv_scr_act());
+        lv_obj_align(notif_label, LV_ALIGN_BOTTOM_MID, 0, -10);
+        lv_label_set_text(notif_label, "");
+    } else {
+        ui_notify("Login failed");
+    }
+}
+
+static void create_login(void)
+{
+    login_win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(login_win, 300, 180);
+    lv_obj_center(login_win);
+
+    ta_user = lv_textarea_create(login_win);
+    lv_obj_set_width(ta_user, 280);
+    lv_textarea_set_placeholder_text(ta_user, ui_get_text(TXT_USERNAME));
+    lv_obj_align(ta_user, LV_ALIGN_TOP_MID, 0, 10);
+
+    ta_pass = lv_textarea_create(login_win);
+    lv_obj_set_width(ta_pass, 280);
+    lv_textarea_set_placeholder_text(ta_pass, ui_get_text(TXT_PASSWORD));
+    lv_textarea_set_password_mode(ta_pass, true);
+    lv_obj_align(ta_pass, LV_ALIGN_TOP_MID, 0, 60);
+
+    btn_login = lv_btn_create(login_win);
+    lv_obj_align(btn_login, LV_ALIGN_BOTTOM_MID, 0, -10);
+    lv_obj_add_event_cb(btn_login, login_event, LV_EVENT_CLICKED, NULL);
+    lbl_login = lv_label_create(btn_login);
+    lv_label_set_text(lbl_login, ui_get_text(TXT_LOGIN));
+}
+
+static void build_tabs(void)
+{
+    tabview = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, 40);
+    lv_obj_set_size(tabview, 800, 480);
+
+    tab_animals = lv_tabview_add_tab(tabview, ui_get_text(TXT_ANIMALS));
+    tab_terrariums = lv_tabview_add_tab(tabview, ui_get_text(TXT_TERRARIUMS));
+    lv_obj_t *tab_settings;
+    if (logged_role == ROLE_PROFESSIONNEL) {
+        lv_obj_t *tab3 = lv_tabview_add_tab(tabview, ui_get_text(TXT_STOCKS));
+        lv_obj_t *tab4 = lv_tabview_add_tab(tabview, ui_get_text(TXT_TRANSACTIONS));
+        tab_settings = lv_tabview_add_tab(tabview, ui_get_text(TXT_SETTINGS));
+        animals_tab_create(tab_animals);
+        terrariums_tab_create(tab_terrariums);
+        stocks_tab_create(tab3);
+        transactions_tab_create(tab4);
+    } else {
+        tab_settings = lv_tabview_add_tab(tabview, ui_get_text(TXT_SETTINGS));
+        animals_tab_create(tab_animals);
+        terrariums_tab_create(tab_terrariums);
+    }
+    settings_tab_create(tab_settings);
+}
 
 static void animals_tab_create(lv_obj_t *tab)
 {
@@ -187,6 +269,11 @@ void ui_set_language(ui_language_t lang)
         lv_tabview_set_tab_name(tabview, 3, ui_get_text(TXT_TRANSACTIONS));
         lv_tabview_set_tab_name(tabview, 4, ui_get_text(TXT_SETTINGS));
     }
+    if (login_win) {
+        lv_textarea_set_placeholder_text(ta_user, ui_get_text(TXT_USERNAME));
+        lv_textarea_set_placeholder_text(ta_pass, ui_get_text(TXT_PASSWORD));
+        lv_label_set_text(lbl_login, ui_get_text(TXT_LOGIN));
+    }
 }
 
 static void apply_theme(void)
@@ -215,25 +302,7 @@ void ui_init(ui_language_t lang, ui_theme_t theme)
     ESP_LOGI(TAG, "Initialisation de l'interface LVGL");
 
     apply_theme();
-
-    tabview = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, 40);
-    lv_obj_set_size(tabview, 800, 480);
-
-    tab_animals = lv_tabview_add_tab(tabview, ui_get_text(TXT_ANIMALS));
-    tab_terrariums = lv_tabview_add_tab(tabview, ui_get_text(TXT_TERRARIUMS));
-    lv_obj_t *tab3 = lv_tabview_add_tab(tabview, ui_get_text(TXT_STOCKS));
-    lv_obj_t *tab4 = lv_tabview_add_tab(tabview, ui_get_text(TXT_TRANSACTIONS));
-    lv_obj_t *tab5 = lv_tabview_add_tab(tabview, ui_get_text(TXT_SETTINGS));
-
-    animals_tab_create(tab_animals);
-    terrariums_tab_create(tab_terrariums);
-    stocks_tab_create(tab3);
-    transactions_tab_create(tab4);
-    settings_tab_create(tab5);
-
-    notif_label = lv_label_create(lv_scr_act());
-    lv_obj_align(notif_label, LV_ALIGN_BOTTOM_MID, 0, -10);
-    lv_label_set_text(notif_label, "");
+    create_login();
 }
 
 void ui_notify(const char *msg)
