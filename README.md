@@ -37,10 +37,16 @@ un `elevage_id`, un `type` (`CDC` ou `AOE`) et le `number`. Utilisez les fonctio
 `legal_is_cdc_valid()` et `legal_is_aoe_valid()` fonctionnent correctement.
 
 ## Base de données chiffrée
-Si SQLCipher est disponible, la base `lizard.db` est chiffrée. Définissez
-`CONFIG_DB_DEFAULT_KEY` dans `sdkconfig` ou saisissez un mot de passe au
-premier démarrage. La clef est ensuite stockée dans l'espace NVS "db" et
-peut être modifiée avec `db_set_key()`.
+Si SQLCipher est disponible, la base `lizard.db` est chiffrée. Au premier
+démarrage, si aucune clef n'est encore enregistrée dans l'espace NVS "db",
+le firmware vous invite à saisir un mot de passe. La valeur indiquée dans
+`CONFIG_DB_DEFAULT_KEY` sert alors de proposition initiale : si elle est
+définie dans votre `sdkconfig`, elle est utilisée par défaut mais vous
+pouvez la modifier à la saisie.
+
+Une fois cette étape terminée, la clef choisie est conservée dans le NVS et
+réutilisée à chaque redémarrage. Elle peut être changée à tout moment en
+appelant `db_set_key()` depuis votre application.
 
 ## Obligations et responsabilités
 Vous êtes seul responsable de la conformité des documents générés et du respect de la législation locale (France, Europe, international). Les exemples fournis ne constituent pas un conseil juridique et peuvent requérir l'avis d'un professionnel avant usage.
