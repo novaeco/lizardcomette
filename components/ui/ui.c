@@ -40,6 +40,13 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_SAVE] = "Save",
         [TXT_DELETE] = "Delete",
         [TXT_OK] = "OK",
+        [TXT_CDC_NUMBER] = "CDC number",
+        [TXT_AOE_NUMBER] = "AOE number",
+        [TXT_IFAP_ID] = "I-FAP ID",
+        [TXT_QUOTA_LIMIT] = "Quota limit",
+        [TXT_QUOTA_USED] = "Quota used",
+        [TXT_CERFA_EXPIRY] = "Cerfa expiry",
+        [TXT_CITES_EXPIRY] = "CITES expiry",
     },
     [UI_LANG_FR] = {
         [TXT_ANIMALS] = "Animaux",
@@ -61,6 +68,13 @@ static const char *translations[UI_LANG_COUNT][TXT_COUNT] = {
         [TXT_SAVE] = "Sauvegarder",
         [TXT_DELETE] = "Supprimer",
         [TXT_OK] = "OK",
+        [TXT_CDC_NUMBER] = "N° CDC",
+        [TXT_AOE_NUMBER] = "N° AOE",
+        [TXT_IFAP_ID] = "Identifiant I-FAP",
+        [TXT_QUOTA_LIMIT] = "Quota limite",
+        [TXT_QUOTA_USED] = "Quota utilisé",
+        [TXT_CERFA_EXPIRY] = "Validité Cerfa",
+        [TXT_CITES_EXPIRY] = "Validité CITES",
     }
 };
 
@@ -84,6 +98,13 @@ typedef struct {
     lv_obj_t *ta_species;
     lv_obj_t *ta_sex;
     lv_obj_t *ta_birth;
+    lv_obj_t *ta_cdc;
+    lv_obj_t *ta_aoe;
+    lv_obj_t *ta_ifap;
+    lv_obj_t *ta_quota_limit;
+    lv_obj_t *ta_quota_used;
+    lv_obj_t *ta_cerfa;
+    lv_obj_t *ta_cites;
     bool is_new;
     int orig_id;
 } AnimalFormCtx;
@@ -486,6 +507,13 @@ static void animal_save_event(lv_event_t *e)
     strncpy(r.species, lv_textarea_get_text(ctx->ta_species), sizeof(r.species) - 1);
     strncpy(r.sex, lv_textarea_get_text(ctx->ta_sex), sizeof(r.sex) - 1);
     strncpy(r.birth_date, lv_textarea_get_text(ctx->ta_birth), sizeof(r.birth_date) - 1);
+    strncpy(r.cdc_number, lv_textarea_get_text(ctx->ta_cdc), sizeof(r.cdc_number) - 1);
+    strncpy(r.aoe_number, lv_textarea_get_text(ctx->ta_aoe), sizeof(r.aoe_number) - 1);
+    strncpy(r.ifap_id, lv_textarea_get_text(ctx->ta_ifap), sizeof(r.ifap_id) - 1);
+    r.quota_limit = atoi(lv_textarea_get_text(ctx->ta_quota_limit));
+    r.quota_used = atoi(lv_textarea_get_text(ctx->ta_quota_used));
+    r.cerfa_valid_until = atoi(lv_textarea_get_text(ctx->ta_cerfa));
+    r.cites_valid_until = atoi(lv_textarea_get_text(ctx->ta_cites));
     if (ctx->is_new)
         animals_add(&r);
     else
@@ -520,7 +548,7 @@ static void open_animal_form(const Reptile *r)
     animal_form.is_new = (r == NULL);
     animal_form.orig_id = r ? r->id : 0;
     animal_form.win = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(animal_form.win, 300, 250);
+    lv_obj_set_size(animal_form.win, 300, 520);
     lv_obj_center(animal_form.win);
 
     animal_form.ta_id = lv_textarea_create(animal_form.win);
@@ -555,6 +583,48 @@ static void open_animal_form(const Reptile *r)
     lv_obj_align(animal_form.ta_birth, LV_ALIGN_TOP_MID, 0, 160);
     lv_textarea_set_placeholder_text(animal_form.ta_birth, "Birth");
     if (r) lv_textarea_set_text(animal_form.ta_birth, r->birth_date);
+
+    animal_form.ta_cdc = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_cdc, 280);
+    lv_obj_align(animal_form.ta_cdc, LV_ALIGN_TOP_MID, 0, 200);
+    lv_textarea_set_placeholder_text(animal_form.ta_cdc, ui_get_text(TXT_CDC_NUMBER));
+    if (r) lv_textarea_set_text(animal_form.ta_cdc, r->cdc_number);
+
+    animal_form.ta_aoe = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_aoe, 280);
+    lv_obj_align(animal_form.ta_aoe, LV_ALIGN_TOP_MID, 0, 240);
+    lv_textarea_set_placeholder_text(animal_form.ta_aoe, ui_get_text(TXT_AOE_NUMBER));
+    if (r) lv_textarea_set_text(animal_form.ta_aoe, r->aoe_number);
+
+    animal_form.ta_ifap = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_ifap, 280);
+    lv_obj_align(animal_form.ta_ifap, LV_ALIGN_TOP_MID, 0, 280);
+    lv_textarea_set_placeholder_text(animal_form.ta_ifap, ui_get_text(TXT_IFAP_ID));
+    if (r) lv_textarea_set_text(animal_form.ta_ifap, r->ifap_id);
+
+    animal_form.ta_quota_limit = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_quota_limit, 280);
+    lv_obj_align(animal_form.ta_quota_limit, LV_ALIGN_TOP_MID, 0, 320);
+    lv_textarea_set_placeholder_text(animal_form.ta_quota_limit, ui_get_text(TXT_QUOTA_LIMIT));
+    if (r) { char buf[16]; sprintf(buf, "%d", r->quota_limit); lv_textarea_set_text(animal_form.ta_quota_limit, buf); }
+
+    animal_form.ta_quota_used = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_quota_used, 280);
+    lv_obj_align(animal_form.ta_quota_used, LV_ALIGN_TOP_MID, 0, 360);
+    lv_textarea_set_placeholder_text(animal_form.ta_quota_used, ui_get_text(TXT_QUOTA_USED));
+    if (r) { char buf[16]; sprintf(buf, "%d", r->quota_used); lv_textarea_set_text(animal_form.ta_quota_used, buf); }
+
+    animal_form.ta_cerfa = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_cerfa, 280);
+    lv_obj_align(animal_form.ta_cerfa, LV_ALIGN_TOP_MID, 0, 400);
+    lv_textarea_set_placeholder_text(animal_form.ta_cerfa, ui_get_text(TXT_CERFA_EXPIRY));
+    if (r) { char buf[16]; sprintf(buf, "%d", r->cerfa_valid_until); lv_textarea_set_text(animal_form.ta_cerfa, buf); }
+
+    animal_form.ta_cites = lv_textarea_create(animal_form.win);
+    lv_obj_set_width(animal_form.ta_cites, 280);
+    lv_obj_align(animal_form.ta_cites, LV_ALIGN_TOP_MID, 0, 440);
+    lv_textarea_set_placeholder_text(animal_form.ta_cites, ui_get_text(TXT_CITES_EXPIRY));
+    if (r) { char buf[16]; sprintf(buf, "%d", r->cites_valid_until); lv_textarea_set_text(animal_form.ta_cites, buf); }
 
     lv_obj_t *btn_save = lv_btn_create(animal_form.win);
     lv_obj_align(btn_save, LV_ALIGN_BOTTOM_LEFT, 10, -10);

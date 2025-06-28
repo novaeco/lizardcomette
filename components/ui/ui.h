@@ -44,6 +44,13 @@ typedef enum {
     TXT_SAVE,
     TXT_DELETE,
     TXT_OK,
+    TXT_CDC_NUMBER,
+    TXT_AOE_NUMBER,
+    TXT_IFAP_ID,
+    TXT_QUOTA_LIMIT,
+    TXT_QUOTA_USED,
+    TXT_CERFA_EXPIRY,
+    TXT_CITES_EXPIRY,
     TXT_COUNT
 } ui_text_id_t;
 
