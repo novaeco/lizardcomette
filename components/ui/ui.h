@@ -27,7 +27,15 @@ typedef enum {
 typedef enum {
     TXT_ANIMALS,
     TXT_TERRARIUMS,
+    TXT_STOCKS,
+    TXT_TRANSACTIONS,
     TXT_SETTINGS,
+    TXT_EXPORT,
+    TXT_IMPORT,
+    TXT_LEGAL_OK,
+    TXT_LEGAL_EXPIRED,
+    TXT_LANGUAGE,
+    TXT_THEME,
     TXT_COUNT
 } ui_text_id_t;
 

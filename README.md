@@ -3,7 +3,7 @@
 LizardComette est un exemple de projet ESP‑IDF permettant de gérer un élevage de reptiles via une interface graphique LVGL. Il intègre des modules pour la base de données, l'authentification et la génération de documents légaux. Ce dépôt est fourni pour étude et nécessite une adaptation avant toute utilisation en production.
 
 ## Fonctionnalités principales
-- Gestion des animaux et des terrariums.
+- Gestion des animaux, des terrariums, du stock et des transactions.
 - Authentification multi-utilisateur avec mots de passe hachés et rôles.
 - Séparation des données par identifiant d'élevage pour les animaux et terrariums.
 - Drivers I2C/SPI pour capteurs environnementaux avec envoi REST/MQTT.
