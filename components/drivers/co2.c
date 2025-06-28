@@ -6,15 +6,6 @@
 
 static const char *TAG = "co2";
 
-#ifndef CONFIG_CO2_SDA_GPIO
-#define CONFIG_CO2_SDA_GPIO 21
-#endif
-#ifndef CONFIG_CO2_SCL_GPIO
-#define CONFIG_CO2_SCL_GPIO 22
-#endif
-#ifndef CONFIG_CO2_I2C_ADDR
-#define CONFIG_CO2_I2C_ADDR 0x61
-#endif
 #define I2C_PORT I2C_NUM_0
 #define I2C_FREQ_HZ 100000
 
