@@ -1,0 +1,6 @@
+config DB_DEFAULT_KEY
+    string "Default SQLCipher key"
+    default ""
+    help
+        Default encryption key used for lizard.db when SQLCipher is available.
+        Leave empty to input the key manually on first boot.
