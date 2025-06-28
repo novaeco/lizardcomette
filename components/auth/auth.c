@@ -74,6 +74,25 @@ void auth_init(void)
         sqlite3_finalize(stmt);
     }
 
+    stmt = db_query("SELECT username,elevage_id FROM user_elevages;");
+    if (stmt) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            const char *uname = (const char *)sqlite3_column_text(stmt, 0);
+            int elev_id = sqlite3_column_int(stmt, 1);
+            if (uname) {
+                for (int i = 0; i < user_count; ++i) {
+                    if (strcmp(users[i].username, uname) == 0) {
+                        if (users[i].elevage_count < AUTH_MAX_ELEVAGES_PER_USER) {
+                            users[i].elevages[users[i].elevage_count++] = elev_id;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        sqlite3_finalize(stmt);
+    }
+
     if (user_count == 0) {
         auth_add_user("admin", "changeme", ROLE_PARTICULIER);
         auth_link_elevage("admin", 0);
@@ -126,6 +145,9 @@ bool auth_link_elevage(const char *username, int elevage_id)
     for (int i = 0; i < user_count; ++i) {
         if (strcmp(users[i].username, username) == 0) {
             if (users[i].elevage_count >= AUTH_MAX_ELEVAGES_PER_USER)
+                return false;
+            if (!db_exec("INSERT INTO user_elevages(username,elevage_id) VALUES('%s',%d);",
+                         username, elevage_id))
                 return false;
             users[i].elevages[users[i].elevage_count++] = elevage_id;
             return true;
