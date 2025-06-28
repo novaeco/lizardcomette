@@ -26,9 +26,10 @@ idf.py set-target esp32s3
 idf.py build
 ```
 Le projet a besoin du composant `sqlite3` fourni par l'ESP‑IDF. Celui‑ci est
-déclaré dans `idf_component.yml` sous le nom `espressif/sqlite` et sera
-téléchargé automatiquement. Vous pouvez aussi l'ajouter manuellement avec
-`idf.py add-dependency` ou en le plaçant dans le répertoire `components/`.
+déclaré dans `idf_component.yml` sous le nom `espressif/sqlite3` et sera
+téléchargé automatiquement. Exécutez une fois la commande
+`idf.py add-dependency "espressif/sqlite3"` pour l'installer, ou placez le
+composant dans le répertoire `components/`.
 
 ## Utilisation
 Une fois flashé sur votre ESP32, le firmware démarre l'interface graphique en français ou en anglais selon la configuration. Les modules s'initialisent automatiquement puis le planificateur vérifie les tâches à venir. Consultez `docs/UI_USAGE.md` pour le détail des écrans et `docs/NOTICE.md` pour les avertissements légaux.
