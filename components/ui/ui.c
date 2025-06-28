@@ -9,6 +9,8 @@
 #include "breeding.h"
 #include "storage.h"
 #include "auth.h"
+#include "elevages.h"
+#include <string.h>
 #include <stdlib.h>
 
 static const char *TAG = "ui";
@@ -167,6 +169,10 @@ static lv_obj_t *lbl_login;
 static char logged_user[32];
 static user_role_t logged_role;
 static bool logged_in = false;
+static lv_obj_t *elevage_win;
+static lv_obj_t *dd_elevage;
+
+static void open_elevage_select(void);
 
 static void login_event(lv_event_t *e)
 {
@@ -178,10 +184,7 @@ static void login_event(lv_event_t *e)
         logged_role = auth_get_role(user);
         logged_in = true;
         lv_obj_del(login_win);
-        build_tabs();
-        notif_label = lv_label_create(lv_scr_act());
-        lv_obj_align(notif_label, LV_ALIGN_BOTTOM_MID, 0, -10);
-        lv_label_set_text(notif_label, "");
+        open_elevage_select();
     } else {
         ui_notify("Login failed");
     }
@@ -209,6 +212,63 @@ static void create_login(void)
     lv_obj_add_event_cb(btn_login, login_event, LV_EVENT_CLICKED, NULL);
     lbl_login = lv_label_create(btn_login);
     lv_label_set_text(lbl_login, ui_get_text(TXT_LOGIN));
+}
+
+static void elevage_ok_event(lv_event_t *e)
+{
+    (void)e;
+    uint32_t sel = lv_dropdown_get_selected(dd_elevage);
+    int id = auth_get_elevage_by_index(logged_user, sel);
+    ui_set_elevage(id);
+    lv_obj_del(elevage_win);
+    build_tabs();
+    notif_label = lv_label_create(lv_scr_act());
+    lv_obj_align(notif_label, LV_ALIGN_BOTTOM_MID, 0, -10);
+    lv_label_set_text(notif_label, "");
+}
+
+static void open_elevage_select(void)
+{
+    int count = auth_get_elevage_count(logged_user);
+    if (count <= 0) {
+        build_tabs();
+        notif_label = lv_label_create(lv_scr_act());
+        lv_obj_align(notif_label, LV_ALIGN_BOTTOM_MID, 0, -10);
+        lv_label_set_text(notif_label, "");
+        return;
+    }
+
+    if (count == 1) {
+        int id = auth_get_elevage_by_index(logged_user, 0);
+        ui_set_elevage(id);
+        build_tabs();
+        notif_label = lv_label_create(lv_scr_act());
+        lv_obj_align(notif_label, LV_ALIGN_BOTTOM_MID, 0, -10);
+        lv_label_set_text(notif_label, "");
+        return;
+    }
+
+    elevage_win = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(elevage_win, 300, 150);
+    lv_obj_center(elevage_win);
+
+    dd_elevage = lv_dropdown_create(elevage_win);
+    lv_obj_set_width(dd_elevage, 280);
+    char opts[256] = "";
+    for (int i = 0; i < count; ++i) {
+        int id = auth_get_elevage_by_index(logged_user, i);
+        const Elevage *ev = elevages_get(id);
+        const char *name = ev ? ev->name : "";
+        strcat(opts, name);
+        if (i < count - 1)
+            strcat(opts, "\n");
+    }
+    lv_dropdown_set_options(dd_elevage, opts);
+
+    lv_obj_t *btn = lv_btn_create(elevage_win);
+    lv_obj_align(btn, LV_ALIGN_BOTTOM_MID, 0, -10);
+    lv_obj_add_event_cb(btn, elevage_ok_event, LV_EVENT_CLICKED, NULL);
+    lv_label_set_text(lv_label_create(btn), "OK");
 }
 
 static void build_tabs(void)
