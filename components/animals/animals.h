@@ -10,6 +10,7 @@
  */
 typedef struct {
     int id;
+    int elevage_id;
     char name[32];
     char species[32];
     char sex[8];
@@ -52,5 +53,8 @@ bool animals_delete(int id);
 
 int animals_count(void);
 const Reptile *animals_get_by_index(int index);
+
+int animals_count_for_elevage(int elevage_id);
+const Reptile *animals_get_by_index_for_elevage(int index, int elevage_id);
 
 #endif // ANIMALS_H

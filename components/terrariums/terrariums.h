@@ -11,6 +11,7 @@
  */
 typedef struct {
     int id;
+    int elevage_id;
     char name[32];
     int capacity;
     char inventory[64];
@@ -46,5 +47,8 @@ bool terrariums_delete(int id);
  * \brief Enregistre une transaction ou un événement dans les logs.
  */
 void terrariums_log_transaction(const char *msg);
+
+int terrariums_count_for_elevage(int elevage_id);
+const Terrarium *terrariums_get_by_index_for_elevage(int index, int elevage_id);
 
 #endif // TERRARIUMS_H

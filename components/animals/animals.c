@@ -75,3 +75,26 @@ const Reptile *animals_get_by_index(int index)
         return NULL;
     return &animals[index];
 }
+
+int animals_count_for_elevage(int elevage_id)
+{
+    int count = 0;
+    for (int i = 0; i < animal_count; ++i) {
+        if (animals[i].elevage_id == elevage_id)
+            count++;
+    }
+    return count;
+}
+
+const Reptile *animals_get_by_index_for_elevage(int index, int elevage_id)
+{
+    int current = 0;
+    for (int i = 0; i < animal_count; ++i) {
+        if (animals[i].elevage_id == elevage_id) {
+            if (current == index)
+                return &animals[i];
+            current++;
+        }
+    }
+    return NULL;
+}

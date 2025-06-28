@@ -14,29 +14,45 @@ static void sha256_hash(const char *input, unsigned char output[32])
 }
 
 static const char *TAG = "auth";
-static unsigned char stored_hash[32];
-static user_role_t current_role = ROLE_PARTICULIER;
+static auth_user_t users[AUTH_MAX_USERS];
+static int user_count = 0;
 
 void auth_init(void)
 {
     ESP_LOGI(TAG, "Initialisation du module d'authentification");
-    auth_set_credentials("changeme", ROLE_PARTICULIER);
+    user_count = 0;
+    auth_add_user("admin", "changeme", ROLE_PARTICULIER);
 }
 
-void auth_set_credentials(const char *password, user_role_t role)
+bool auth_add_user(const char *username, const char *password, user_role_t role)
 {
-    sha256_hash(password, stored_hash);
-    current_role = role;
+    if (user_count >= AUTH_MAX_USERS || !username || !password)
+        return false;
+    strncpy(users[user_count].username, username, sizeof(users[user_count].username) - 1);
+    users[user_count].username[sizeof(users[user_count].username) - 1] = '\0';
+    sha256_hash(password, users[user_count].hash);
+    users[user_count].role = role;
+    user_count++;
+    return true;
 }
 
-bool auth_check(const char *password)
+bool auth_check(const char *username, const char *password)
 {
     unsigned char hash[32];
     sha256_hash(password, hash);
-    return memcmp(hash, stored_hash, sizeof(hash)) == 0;
+    for (int i = 0; i < user_count; ++i) {
+        if (strcmp(users[i].username, username) == 0 &&
+            memcmp(users[i].hash, hash, sizeof(hash)) == 0)
+            return true;
+    }
+    return false;
 }
 
-user_role_t auth_get_role(void)
+user_role_t auth_get_role(const char *username)
 {
-    return current_role;
+    for (int i = 0; i < user_count; ++i) {
+        if (strcmp(users[i].username, username) == 0)
+            return users[i].role;
+    }
+    return ROLE_PARTICULIER;
 }
