@@ -24,6 +24,8 @@ L'authentification HTTP est facultative. Si elle est nécessaire,
 renseignez `CONFIG_STORAGE_TRANSFER_USERNAME` et
 `CONFIG_STORAGE_TRANSFER_PASSWORD` ; sinon, ces variables peuvent être
 laissées vides ou omises.
+Ces trois options sont définies dans `components/storage/Kconfig.projbuild` et
+contrôlent le transfert de fichiers via le Wi‑Fi.
 
 `CONFIG_DB_DEFAULT_KEY` permet de définir la clé SQLCipher utilisée lors du
 premier démarrage. Laisser ce champ vide obligera l'utilisateur à saisir la
