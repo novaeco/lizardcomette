@@ -5,7 +5,7 @@
 #include "animals.h"
 
 /**
- * \brief Initialise et monte le stockage externe (SD, SPIFFS...).
+ * \brief Initialise le stockage externe et charge la cle AES.
  */
 void storage_init(void);
 
@@ -52,5 +52,12 @@ bool storage_encrypt_file(const char *path);
  * \param dst Fichier de sortie dechiffre.
  */
 bool storage_decrypt_file(const char *src, const char *dst);
+
+/**
+ * \brief Definit la cle AES utilisee pour le chiffrement.
+ * \param key Tableau de 16 octets.
+ * \return true si la cle a ete enregistree.
+ */
+bool storage_set_aes_key(const unsigned char key[16]);
 
 #endif // STORAGE_H
