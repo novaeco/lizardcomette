@@ -1,4 +1,4 @@
 idf_component_register(
-    SRCS "legal_numbers.c"
+    SRCS "legal.c" "legal_templates.c"
     INCLUDE_DIRS "."
 )
