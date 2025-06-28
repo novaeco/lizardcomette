@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: espressif/github-actions/setup-esp-idf@v1
+        with:
+          version: latest
+      - name: Build
+        run: idf.py build
+      - name: Run unit tests
+        run: idf.py build && idf.py unity_test

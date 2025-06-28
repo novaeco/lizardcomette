@@ -13,6 +13,65 @@ static const char *TAG = "db";
 static sqlite3 *db_handle = NULL;
 static char db_key[64];
 
+static bool open_db(const char *path)
+{
+    if (sqlite3_open(path, &db_handle) != SQLITE_OK) {
+        ESP_LOGE(TAG, "Impossible d'ouvrir la base de données: %s", sqlite3_errmsg(db_handle));
+        return false;
+    }
+#ifdef SQLITE_HAS_CODEC
+    if (db_key[0] != '\0') {
+        sqlite3_key(db_handle, db_key, strlen(db_key));
+    }
+#endif
+    return true;
+}
+
+static void create_tables(void)
+{
+    exec_simple("CREATE TABLE IF NOT EXISTS elevages(""
+                "id INTEGER PRIMARY KEY,""
+                "name TEXT,""
+                "description TEXT);");
+
+    exec_simple("CREATE TABLE IF NOT EXISTS animals(""
+                "id INTEGER PRIMARY KEY,""
+                "elevage_id INTEGER,""
+                "name TEXT,""
+                "species TEXT,""
+                "sex TEXT,""
+                "birth_date TEXT,""
+                "health TEXT,""
+                "breeding_cycle TEXT);");
+
+    exec_simple("CREATE TABLE IF NOT EXISTS terrariums(""
+                "id INTEGER PRIMARY KEY,""
+                "elevage_id INTEGER,""
+                "name TEXT,""
+                "capacity INTEGER,""
+                "inventory TEXT,""
+                "notes TEXT);");
+
+    exec_simple("CREATE TABLE IF NOT EXISTS terrarium_logs(""
+                "id INTEGER PRIMARY KEY AUTOINCREMENT,""
+                "terrarium_id INTEGER,""
+                "message TEXT,""
+                "timestamp INTEGER DEFAULT (strftime('%s','now')));");
+
+    exec_simple("CREATE TABLE IF NOT EXISTS stocks(""
+                "id INTEGER PRIMARY KEY,""
+                "name TEXT,""
+                "quantity INTEGER,""
+                "min_quantity INTEGER);");
+
+    exec_simple("CREATE TABLE IF NOT EXISTS transactions(""
+                "id INTEGER PRIMARY KEY AUTOINCREMENT,""
+                "stock_id INTEGER,""
+                "quantity INTEGER,""
+                "type TEXT,""
+                "timestamp INTEGER DEFAULT (strftime('%s','now')));");
+}
+
 static void load_db_key(void)
 {
     nvs_handle_t h;
@@ -90,6 +149,22 @@ sqlite3_stmt *db_query(const char *format, ...)
         return NULL;
     }
     return stmt;
+}
+
+bool db_open_custom(const char *path)
+{
+    if (!open_db(path))
+        return false;
+    create_tables();
+    return true;
+}
+
+void db_close(void)
+{
+    if (db_handle) {
+        sqlite3_close(db_handle);
+        db_handle = NULL;
+    }
 }
 
 void db_init(void)
