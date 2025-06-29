@@ -10,8 +10,6 @@
 static const char *TAG = "drivers";
 
 #define I2C_PORT           I2C_NUM_0
-#define I2C_SDA_GPIO       21
-#define I2C_SCL_GPIO       22
 #define I2C_FREQ_HZ        100000
 
 #define SHT3X_ADDR         0x44
@@ -25,8 +23,8 @@ void drivers_init(void)
 
     i2c_config_t conf = {
         .mode = I2C_MODE_MASTER,
-        .sda_io_num = I2C_SDA_GPIO,
-        .scl_io_num = I2C_SCL_GPIO,
+        .sda_io_num = CONFIG_I2C_SDA_GPIO,
+        .scl_io_num = CONFIG_I2C_SCL_GPIO,
         .sda_pullup_en = GPIO_PULLUP_ENABLE,
         .scl_pullup_en = GPIO_PULLUP_ENABLE,
         .master.clk_speed = I2C_FREQ_HZ,
