@@ -82,6 +82,11 @@ TEST_CASE("pdfs generated on sale","[transactions]")
 {
     db_set_key("");
     TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    legal_numbers_init();
+    LegalNumber ln1 = {.id=1, .username="", .elevage_id=0, .type="CDC", .number="CDC123"};
+    LegalNumber ln2 = {.id=2, .username="", .elevage_id=0, .type="AOE", .number="AOE456"};
+    TEST_ASSERT_TRUE(legal_numbers_add(&ln1));
+    TEST_ASSERT_TRUE(legal_numbers_add(&ln2));
     animals_init();
     transactions_init();
     Reptile r = {
@@ -91,8 +96,8 @@ TEST_CASE("pdfs generated on sale","[transactions]")
         .species = "Lizard",
         .sex = "F",
         .birth_date = "2021",
-        .cdc_number = "",
-        .aoe_number = "",
+        .cdc_number = "CDC123",
+        .aoe_number = "AOE456",
         .ifap_id = "",
         .quota_limit = 0,
         .quota_used = 0,

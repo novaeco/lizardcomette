@@ -1,6 +1,8 @@
 #include "animals.h"
 #include "db.h"
 #include "esp_log.h"
+#include "legal_numbers.h"
+#include "ui.h"
 #include <sqlite3.h>
 #include <string.h>
 
@@ -55,6 +57,16 @@ void animals_init(void) {
 bool animals_add(const Reptile *r) {
   if (animal_count >= ANIMALS_MAX || !r)
     return false;
+  if (!legal_numbers_is_cdc_valid(r->cdc_number, NULL, r->elevage_id)) {
+    ESP_LOGW(TAG, "CDC invalide pour %s", r->name);
+    ui_notify("CDC invalide");
+    return false;
+  }
+  if (!legal_numbers_is_aoe_valid(r->aoe_number, NULL, r->elevage_id)) {
+    ESP_LOGW(TAG, "AOE invalide pour %s", r->name);
+    ui_notify("AOE invalide");
+    return false;
+  }
   sqlite3_stmt *stmt = db_prepare(
       "INSERT INTO animals(id,elevage_id,name,species,sex,birth_date,health,"
       "breeding_cycle,cdc_number,aoe_number,ifap_id,quota_limit,quota_used,"
@@ -103,6 +115,16 @@ bool animals_update(int id, const Reptile *r) {
   int idx = find_index(id);
   if (idx < 0 || !r)
     return false;
+  if (!legal_numbers_is_cdc_valid(r->cdc_number, NULL, r->elevage_id)) {
+    ESP_LOGW(TAG, "CDC invalide pour %s", r->name);
+    ui_notify("CDC invalide");
+    return false;
+  }
+  if (!legal_numbers_is_aoe_valid(r->aoe_number, NULL, r->elevage_id)) {
+    ESP_LOGW(TAG, "AOE invalide pour %s", r->name);
+    ui_notify("AOE invalide");
+    return false;
+  }
   sqlite3_stmt *stmt = db_prepare(
       "UPDATE animals SET elevage_id=?,name=?,species=?,sex=?,birth_date=?,health=?,"
       "breeding_cycle=?,cdc_number=?,aoe_number=?,ifap_id=?,quota_limit=?,quota_used=?,"
