@@ -21,3 +21,15 @@ config CO2_SCL_GPIO
 config CO2_I2C_ADDR
     hex "I2C address of CO2 sensor"
     default 0x61
+
+config LIGHTING_SDA_GPIO
+    int "GPIO for lighting driver SDA"
+    default 21
+
+config LIGHTING_SCL_GPIO
+    int "GPIO for lighting driver SCL"
+    default 22
+
+config LIGHTING_I2C_ADDR
+    hex "I2C address of lighting controller"
+    default 0x40
