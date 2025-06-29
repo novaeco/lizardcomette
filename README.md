@@ -19,6 +19,10 @@ LizardComette est un exemple de projet ESP‑IDF permettant de gérer un élevag
 3. Inspirez‑vous de `docs/CONFIG_EXAMPLE.md` pour créer votre propre `sdkconfig` (Wi‑Fi, stockage, REST/MQTT, etc.).
 4. Placez vos fichiers de licences CITES et autres documents dans le répertoire approprié.
 5. Ajustez `partition_table.csv` si vous avez besoin d'une taille différente pour les partitions SPIFFS ou SD afin de stocker la base de données.
+6. Pour envoyer automatiquement les sauvegardes sur un serveur HTTP, renseignez
+   `CONFIG_STORAGE_TRANSFER_URL` dans `sdkconfig`. Si votre serveur exige une
+   authentification, complétez également `CONFIG_STORAGE_TRANSFER_USERNAME` et
+   `CONFIG_STORAGE_TRANSFER_PASSWORD`.
 
 ## Installation des composants tiers
 Certaines bibliothèques ne sont pas incluses dans ce dépôt et doivent être téléchargées via le registre d'Espressif. Utilisez `idf.py add-dependency` pour installer chaque composant indiqué dans `idf_component.yml`. Par exemple, le projet requiert le composant `sqlite3` :
