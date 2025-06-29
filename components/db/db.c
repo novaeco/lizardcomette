@@ -261,16 +261,8 @@ void db_init(void) {
     }
   }
 
-  if (sqlite3_open("/spiffs/lizard.db", &db_handle) != SQLITE_OK) {
-    ESP_LOGE(TAG, "Impossible d'ouvrir la base de données: %s",
-             sqlite3_errmsg(db_handle));
+  if (!open_db("/spiffs/lizard.db"))
     return;
-  }
-#ifdef SQLITE_HAS_CODEC
-  if (db_key[0] != '\0') {
-    sqlite3_key(db_handle, db_key, strlen(db_key));
-  }
-#endif
 
   create_tables();
 }
