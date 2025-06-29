@@ -31,6 +31,7 @@ Vous pouvez aussi copier manuellement les composants dans le dossier `components
 
 ## Compilation
 ```bash
+idf.py add-dependency "espressif/sqlite3"
 idf.py set-target esp32s3
 idf.py build
 ```
