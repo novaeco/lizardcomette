@@ -27,6 +27,8 @@ static bool open_db(const char *path) {
   return true;
 }
 
+static void exec_simple(const char *sql);
+
 static void create_tables(void) {
   exec_simple("CREATE TABLE IF NOT EXISTS elevages("
               "
