@@ -41,8 +41,16 @@ bool elevages_add(const Elevage *e)
 {
     if (elevage_count >= ELEVAGES_MAX || !e)
         return false;
-    if (!db_exec("INSERT INTO elevages(id,name,description) VALUES(%d,'%s','%s');",
-                 e->id, e->name, e->description))
+    sqlite3_stmt *stmt =
+        db_query("INSERT INTO elevages(id,name,description) VALUES(?,?,?);");
+    if (!stmt)
+        return false;
+    sqlite3_bind_int(stmt, 1, e->id);
+    sqlite3_bind_text(stmt, 2, e->name, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, e->description, -1, SQLITE_TRANSIENT);
+    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
+    sqlite3_finalize(stmt);
+    if (!ok)
         return false;
     elevages[elevage_count] = *e;
     elevage_count++;
@@ -63,8 +71,16 @@ bool elevages_update(int id, const Elevage *e)
     int idx = find_index(id);
     if (idx < 0 || !e)
         return false;
-    if (!db_exec("UPDATE elevages SET name='%s',description='%s' WHERE id=%d;",
-                 e->name, e->description, id))
+    sqlite3_stmt *stmt =
+        db_query("UPDATE elevages SET name=?,description=? WHERE id=?;");
+    if (!stmt)
+        return false;
+    sqlite3_bind_text(stmt, 1, e->name, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, e->description, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, 3, id);
+    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
+    sqlite3_finalize(stmt);
+    if (!ok)
         return false;
     elevages[idx] = *e;
     ESP_LOGI(TAG, "Mise a jour de l'elevage %d", id);
@@ -76,7 +92,13 @@ bool elevages_delete(int id)
     int idx = find_index(id);
     if (idx < 0)
         return false;
-    if (!db_exec("DELETE FROM elevages WHERE id=%d;", id))
+    sqlite3_stmt *stmt = db_query("DELETE FROM elevages WHERE id=?;");
+    if (!stmt)
+        return false;
+    sqlite3_bind_int(stmt, 1, id);
+    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
+    sqlite3_finalize(stmt);
+    if (!ok)
         return false;
     for (int i = idx; i < elevage_count - 1; ++i) {
         elevages[i] = elevages[i + 1];
