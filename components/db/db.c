@@ -622,18 +622,42 @@ void db_import_csv(const char *path)
       char *tok_id = next_token(&ptr);
       char *name = next_token(&ptr);
       char *desc = ptr;
-      db_exec("INSERT INTO elevages(id,name,description) VALUES(%d,'%s','%s');",
-              atoi(tok_id), name, desc);
+      sqlite3_stmt *stmt =
+          db_query("INSERT INTO elevages(id,name,description) VALUES(?,?,?);");
+      if (stmt) {
+        sqlite3_bind_int(stmt, 1, atoi(tok_id));
+        sqlite3_bind_text(stmt, 2, name, -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 3, desc, -1, SQLITE_TRANSIENT);
+        sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+      }
     } else if (strcmp(table, "animals") == 0) {
       char *tok[15];
       for (int i = 0; i < 14; ++i)
         tok[i] = next_token(&ptr);
       tok[14] = ptr;
-      db_exec("INSERT INTO animals(id,elevage_id,name,species,sex,birth_date,health,breeding_cycle,cdc_number,aoe_number,ifap_id,quota_limit,quota_used,cerfa_valid_until,cites_valid_until) "
-              "VALUES(%d,%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s',%d,%d,%d,%d);",
-              atoi(tok[0]), atoi(tok[1]), tok[2], tok[3], tok[4], tok[5], tok[6],
-              tok[7], tok[8], tok[9], tok[10], atoi(tok[11]), atoi(tok[12]),
-              atoi(tok[13]), atoi(tok[14]));
+      sqlite3_stmt *stmt = db_query(
+          "INSERT INTO animals(id,elevage_id,name,species,sex,birth_date,health,breeding_cycle,cdc_number,aoe_number,ifap_id,quota_limit,quota_used,cerfa_valid_until,cites_valid_until) "
+          "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+      if (stmt) {
+        sqlite3_bind_int(stmt, 1, atoi(tok[0]));
+        sqlite3_bind_int(stmt, 2, atoi(tok[1]));
+        sqlite3_bind_text(stmt, 3, tok[2], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 4, tok[3], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 5, tok[4], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 6, tok[5], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 7, tok[6], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 8, tok[7], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 9, tok[8], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 10, tok[9], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 11, tok[10], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_int(stmt, 12, atoi(tok[11]));
+        sqlite3_bind_int(stmt, 13, atoi(tok[12]));
+        sqlite3_bind_int(stmt, 14, atoi(tok[13]));
+        sqlite3_bind_int(stmt, 15, atoi(tok[14]));
+        sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+      }
     } else if (strcmp(table, "terrariums") == 0) {
       char *tok_id = next_token(&ptr);
       char *tok_elev = next_token(&ptr);
@@ -641,26 +665,51 @@ void db_import_csv(const char *path)
       char *cap = next_token(&ptr);
       char *inv = next_token(&ptr);
       char *notes = ptr;
-      db_exec(
+      sqlite3_stmt *stmt = db_query(
           "INSERT INTO terrariums(id,elevage_id,name,capacity,inventory,notes) "
-          "VALUES(%d,%d,'%s',%d,'%s','%s');",
-          atoi(tok_id), atoi(tok_elev), name, atoi(cap), inv, notes);
+          "VALUES(?,?,?,?,?,?);");
+      if (stmt) {
+        sqlite3_bind_int(stmt, 1, atoi(tok_id));
+        sqlite3_bind_int(stmt, 2, atoi(tok_elev));
+        sqlite3_bind_text(stmt, 3, name, -1, SQLITE_TRANSIENT);
+        sqlite3_bind_int(stmt, 4, atoi(cap));
+        sqlite3_bind_text(stmt, 5, inv, -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 6, notes, -1, SQLITE_TRANSIENT);
+        sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+      }
     } else if (strcmp(table, "stocks") == 0) {
       char *tok_id = next_token(&ptr);
       char *name = next_token(&ptr);
       char *qty = next_token(&ptr);
       char *min = ptr;
-      db_exec("INSERT INTO stocks(id,name,quantity,min_quantity) VALUES(%d,'%s',%d,%d);",
-              atoi(tok_id), name, atoi(qty), atoi(min));
+      sqlite3_stmt *stmt =
+          db_query("INSERT INTO stocks(id,name,quantity,min_quantity) VALUES(?,?,?,?);");
+      if (stmt) {
+        sqlite3_bind_int(stmt, 1, atoi(tok_id));
+        sqlite3_bind_text(stmt, 2, name, -1, SQLITE_TRANSIENT);
+        sqlite3_bind_int(stmt, 3, atoi(qty));
+        sqlite3_bind_int(stmt, 4, atoi(min));
+        sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+      }
     } else if (strcmp(table, "transactions") == 0) {
       char *tok_id = next_token(&ptr);
       char *stock_id = next_token(&ptr);
       char *qty = next_token(&ptr);
       char *type = next_token(&ptr);
       char *timestamp = ptr;
-      db_exec(
-          "INSERT INTO transactions(id,stock_id,quantity,type,timestamp) VALUES(%d,%d,%d,'%s',%d);",
-          atoi(tok_id), atoi(stock_id), atoi(qty), type, atoi(timestamp));
+      sqlite3_stmt *stmt = db_query(
+          "INSERT INTO transactions(id,stock_id,quantity,type,timestamp) VALUES(?,?,?,?,?);");
+      if (stmt) {
+        sqlite3_bind_int(stmt, 1, atoi(tok_id));
+        sqlite3_bind_int(stmt, 2, atoi(stock_id));
+        sqlite3_bind_int(stmt, 3, atoi(qty));
+        sqlite3_bind_text(stmt, 4, type, -1, SQLITE_TRANSIENT);
+        sqlite3_bind_int(stmt, 5, atoi(timestamp));
+        sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+      }
     }
   }
 
