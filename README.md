@@ -34,6 +34,8 @@ idf.py add-dependency "espressif/sqlite3"
 Vous pouvez aussi copier manuellement les composants dans le dossier `components/`.
 
 ## Compilation
+Avant la première compilation, installez la dépendance puis lancez la
+construction du projet&nbsp;:
 ```bash
 idf.py add-dependency "espressif/sqlite3"
 idf.py set-target esp32s3
