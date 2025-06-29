@@ -40,4 +40,8 @@ config LIGHTING_I2C_ADDR
     hex "I2C address of lighting controller"
     default 0x40
 
+config LIGHT_SENSOR_ADDR
+    hex "I2C address of light sensor"
+    default 0x23
+
 endmenu

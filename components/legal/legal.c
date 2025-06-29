@@ -229,22 +229,32 @@ void legal_check_documents(void)
             ESP_LOGW(TAG, "AOE invalide pour %s", r->name);
             ui_notify("AOE invalide");
         }
+
+        int days_cerfa = (r->cerfa_valid_until - now) / 86400;
+        int days_cites = (r->cites_valid_until - now) / 86400;
         if (!legal_is_cerfa_valid(r) || !legal_is_cites_valid(r)) {
             ESP_LOGW(TAG, "Documents expir\xC3\xA9s pour %s", r->name);
             ui_notify("Documents expir\xC3\xA9s");
-        } else {
-            if (r->cerfa_valid_until - now < 30 * 86400 ||
-                r->cites_valid_until - now < 30 * 86400) {
-                ESP_LOGI(TAG, "Documents bientot expir\xC3\xA9s pour %s", r->name);
-                ui_notify("Documents bientot expir\xC3\xA9s");
-            }
+        } else if (days_cerfa < 30 || days_cites < 30) {
+            ESP_LOGI(TAG, "Documents bientot expir\xC3\xA9s pour %s", r->name);
+            ui_notify("Documents bientot expir\xC3\xA9s");
+        } else if (days_cerfa < 60 || days_cites < 60) {
+            ESP_LOGI(TAG, "Documents \xC3\xA0 renouveler sous 2 mois pour %s", r->name);
+            ui_notify("Renouvellement dans 2 mois");
         }
-        if (!legal_quota_remaining(r)) {
+
+        if (r->quota_limit < 0 || r->quota_used < 0) {
+            ESP_LOGW(TAG, "Quota invalide pour %s", r->name);
+            ui_notify("Quota invalide");
+        } else if (!legal_quota_remaining(r)) {
             ESP_LOGW(TAG, "Quota atteint pour %s", r->name);
             ui_notify("Quota atteint");
         } else if (r->quota_limit - r->quota_used <= 1) {
             ESP_LOGI(TAG, "Quota presque atteint pour %s", r->name);
             ui_notify("Quota presque atteint");
+        } else if (r->quota_used >= r->quota_limit * 0.8f) {
+            ESP_LOGI(TAG, "Quota a 80%% pour %s", r->name);
+            ui_notify("Quota 80%%");
         }
     }
 }
