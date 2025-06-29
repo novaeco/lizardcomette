@@ -1,2 +1,2 @@
 dependencies:
-  espressif/sqlite3: "~3.42"
+  espressif/sqlite3: "^3.42"
