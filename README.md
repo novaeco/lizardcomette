@@ -25,7 +25,7 @@ LizardComette est un exemple de projet ESP‑IDF permettant de gérer un élevag
    `CONFIG_STORAGE_TRANSFER_PASSWORD`.
 
 ## Installation des composants tiers
-Certaines bibliothèques ne sont pas incluses dans ce dépôt et doivent être téléchargées via le registre d'Espressif. Utilisez `idf.py add-dependency` pour installer chaque composant indiqué dans `idf_component.yml`. Par exemple, le projet requiert le composant `sqlite3` :
+Certaines bibliothèques ne sont pas incluses dans ce dépôt et doivent être téléchargées via le registre d'Espressif, en utilisant le gestionnaire de composants ESP‑IDF (component manager). Utilisez `idf.py add-dependency` pour installer chaque composant indiqué dans `idf_component.yml`. Par exemple, le projet requiert le composant `sqlite3` :
 
 ```bash
 idf.py add-dependency "espressif/sqlite3"
