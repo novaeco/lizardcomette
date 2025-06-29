@@ -37,15 +37,13 @@ Vous pouvez aussi copier manuellement les composants dans le dossier `components
 Avant la première compilation, téléchargez obligatoirement le composant `sqlite3` depuis le registre d'Espressif avec `idf.py add-dependency`, puis lancez la
 construction du projet&nbsp;:
 ```bash
-idf.py add-dependency "espressif/sqlite3"
+idf.py add-dependency "espressif/sqlite3^3"
 idf.py set-target esp32s3
 idf.py build
 ```
 Le projet a besoin du composant `sqlite3` fourni par l'ESP‑IDF. Celui‑ci est
 déclaré dans `idf_component.yml` sous le nom `espressif/sqlite3` et sera
-téléchargé automatiquement. Exécutez une fois la commande
-`idf.py add-dependency "espressif/sqlite3"` pour l'installer, ou placez le
-composant dans le répertoire `components/`.
+téléchargé automatiquement. Exécutez `idf.py create-component-manifest` ou `idf.py add-dependency "espressif/sqlite3^3"` pour générer `dependencies.lock` et installer la dépendance, ou placez le composant dans le répertoire `components/`.
 
 ## Tests
 L'ensemble des tests unitaires écrits avec Unity est regroupé dans le
