@@ -233,6 +233,25 @@ sqlite3_stmt *db_query(const char *format, ...) {
   return stmt;
 }
 
+sqlite3_stmt *db_prepare(const char *sql) {
+  sqlite3_stmt *stmt = NULL;
+  if (sqlite3_prepare_v2(db_handle, sql, -1, &stmt, NULL) != SQLITE_OK) {
+    ESP_LOGE(TAG, "SQL prepare error: %s", sqlite3_errmsg(db_handle));
+    return NULL;
+  }
+  return stmt;
+}
+
+bool db_step_finalize(sqlite3_stmt *stmt) {
+  if (!stmt)
+    return false;
+  bool ok = sqlite3_step(stmt) == SQLITE_DONE;
+  if (!ok)
+    ESP_LOGE(TAG, "SQL step error: %s", sqlite3_errmsg(db_handle));
+  sqlite3_finalize(stmt);
+  return ok;
+}
+
 bool db_open_custom(const char *path) {
   if (!open_db(path))
     return false;

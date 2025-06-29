@@ -45,16 +45,14 @@ bool transactions_add(const Transaction *t)
         return false;
     const char *type = t->type == TRANSACTION_SALE ? "SALE" : "PURCHASE";
     sqlite3_stmt *stmt =
-        db_query("INSERT INTO transactions(id,stock_id,quantity,type) VALUES(?,?,?,?);");
+        db_prepare("INSERT INTO transactions(id,stock_id,quantity,type) VALUES(?,?,?,?);");
     if (!stmt)
         return false;
     sqlite3_bind_int(stmt, 1, t->id);
     sqlite3_bind_int(stmt, 2, t->stock_id);
     sqlite3_bind_int(stmt, 3, t->quantity);
     sqlite3_bind_text(stmt, 4, type, -1, SQLITE_TRANSIENT);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     transactions[transaction_count] = *t;
     transaction_count++;
@@ -76,7 +74,7 @@ bool transactions_update(int id, const Transaction *t)
     if (idx < 0 || !t)
         return false;
     const char *type = t->type == TRANSACTION_SALE ? "SALE" : "PURCHASE";
-    sqlite3_stmt *stmt = db_query(
+    sqlite3_stmt *stmt = db_prepare(
         "UPDATE transactions SET stock_id=?,quantity=?,type=? WHERE id=?;");
     if (!stmt)
         return false;
@@ -84,9 +82,7 @@ bool transactions_update(int id, const Transaction *t)
     sqlite3_bind_int(stmt, 2, t->quantity);
     sqlite3_bind_text(stmt, 3, type, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 4, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     transactions[idx] = *t;
     ESP_LOGI(TAG, "Mise a jour de la transaction %d", id);
@@ -98,13 +94,11 @@ bool transactions_delete(int id)
     int idx = find_index(id);
     if (idx < 0)
         return false;
-    sqlite3_stmt *stmt = db_query("DELETE FROM transactions WHERE id=?;");
+    sqlite3_stmt *stmt = db_prepare("DELETE FROM transactions WHERE id=?;");
     if (!stmt)
         return false;
     sqlite3_bind_int(stmt, 1, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     for (int i = idx; i < transaction_count - 1; ++i) {
         transactions[i] = transactions[i + 1];

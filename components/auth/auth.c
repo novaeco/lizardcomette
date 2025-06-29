@@ -112,15 +112,13 @@ bool auth_add_user(const char *username, const char *password, user_role_t role)
     char hex[65];
     hash_to_hex(users[user_count].hash, hex);
     sqlite3_stmt *stmt =
-        db_query("INSERT INTO users(username,hash,role) VALUES(?,?,?);");
+        db_prepare("INSERT INTO users(username,hash,role) VALUES(?,?,?);");
     if (!stmt)
         return false;
     sqlite3_bind_text(stmt, 1, users[user_count].username, -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 2, hex, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 3, role);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
 
     user_count++;
@@ -155,14 +153,12 @@ bool auth_link_elevage(const char *username, int elevage_id)
             if (users[i].elevage_count >= AUTH_MAX_ELEVAGES_PER_USER)
                 return false;
             sqlite3_stmt *stmt =
-                db_query("INSERT INTO user_elevages(username,elevage_id) VALUES(?,?);");
+                db_prepare("INSERT INTO user_elevages(username,elevage_id) VALUES(?,?);");
             if (!stmt)
                 return false;
             sqlite3_bind_text(stmt, 1, username, -1, SQLITE_TRANSIENT);
             sqlite3_bind_int(stmt, 2, elevage_id);
-            bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-            sqlite3_finalize(stmt);
-            if (!ok)
+            if (!db_step_finalize(stmt))
                 return false;
             users[i].elevages[users[i].elevage_count++] = elevage_id;
             return true;

@@ -42,15 +42,13 @@ bool elevages_add(const Elevage *e)
     if (elevage_count >= ELEVAGES_MAX || !e)
         return false;
     sqlite3_stmt *stmt =
-        db_query("INSERT INTO elevages(id,name,description) VALUES(?,?,?);");
+        db_prepare("INSERT INTO elevages(id,name,description) VALUES(?,?,?);");
     if (!stmt)
         return false;
     sqlite3_bind_int(stmt, 1, e->id);
     sqlite3_bind_text(stmt, 2, e->name, -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 3, e->description, -1, SQLITE_TRANSIENT);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     elevages[elevage_count] = *e;
     elevage_count++;
@@ -72,15 +70,13 @@ bool elevages_update(int id, const Elevage *e)
     if (idx < 0 || !e)
         return false;
     sqlite3_stmt *stmt =
-        db_query("UPDATE elevages SET name=?,description=? WHERE id=?;");
+        db_prepare("UPDATE elevages SET name=?,description=? WHERE id=?;");
     if (!stmt)
         return false;
     sqlite3_bind_text(stmt, 1, e->name, -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 2, e->description, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 3, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     elevages[idx] = *e;
     ESP_LOGI(TAG, "Mise a jour de l'elevage %d", id);
@@ -92,13 +88,11 @@ bool elevages_delete(int id)
     int idx = find_index(id);
     if (idx < 0)
         return false;
-    sqlite3_stmt *stmt = db_query("DELETE FROM elevages WHERE id=?;");
+    sqlite3_stmt *stmt = db_prepare("DELETE FROM elevages WHERE id=?;");
     if (!stmt)
         return false;
     sqlite3_bind_int(stmt, 1, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     for (int i = idx; i < elevage_count - 1; ++i) {
         elevages[i] = elevages[i + 1];

@@ -43,16 +43,14 @@ bool stocks_add(const StockItem *item)
     if (stock_count >= STOCKS_MAX || !item)
         return false;
     sqlite3_stmt *stmt =
-        db_query("INSERT INTO stocks(id,name,quantity,min_quantity) VALUES(?,?,?,?);");
+        db_prepare("INSERT INTO stocks(id,name,quantity,min_quantity) VALUES(?,?,?,?);");
     if (!stmt)
         return false;
     sqlite3_bind_int(stmt, 1, item->id);
     sqlite3_bind_text(stmt, 2, item->name, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 3, item->quantity);
     sqlite3_bind_int(stmt, 4, item->min_quantity);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     stock_items[stock_count] = *item;
     stock_count++;
@@ -74,16 +72,14 @@ bool stocks_update(int id, const StockItem *item)
     if (idx < 0 || !item)
         return false;
     sqlite3_stmt *stmt =
-        db_query("UPDATE stocks SET name=?,quantity=?,min_quantity=? WHERE id=?;");
+        db_prepare("UPDATE stocks SET name=?,quantity=?,min_quantity=? WHERE id=?;");
     if (!stmt)
         return false;
     sqlite3_bind_text(stmt, 1, item->name, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 2, item->quantity);
     sqlite3_bind_int(stmt, 3, item->min_quantity);
     sqlite3_bind_int(stmt, 4, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     stock_items[idx] = *item;
     ESP_LOGI(TAG, "Mise a jour de l'article %d", id);
@@ -95,13 +91,11 @@ bool stocks_delete(int id)
     int idx = find_index(id);
     if (idx < 0)
         return false;
-    sqlite3_stmt *stmt = db_query("DELETE FROM stocks WHERE id=?;");
+    sqlite3_stmt *stmt = db_prepare("DELETE FROM stocks WHERE id=?;");
     if (!stmt)
         return false;
     sqlite3_bind_int(stmt, 1, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     for (int i = idx; i < stock_count - 1; ++i) {
         stock_items[i] = stock_items[i + 1];

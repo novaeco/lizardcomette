@@ -55,12 +55,10 @@ void animals_init(void) {
 bool animals_add(const Reptile *r) {
   if (animal_count >= ANIMALS_MAX || !r)
     return false;
-  sqlite3_stmt *stmt =
-      db_query("INSERT INTO "
-               "animals(id,elevage_id,name,species,sex,birth_date,health,"
-               "breeding_cycle,cdc_number,aoe_number,ifap_id,quota_limit,quota_"
-               "used,cerfa_valid_until,cites_valid_until) "
-               "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+  sqlite3_stmt *stmt = db_prepare(
+      "INSERT INTO animals(id,elevage_id,name,species,sex,birth_date,health,"
+      "breeding_cycle,cdc_number,aoe_number,ifap_id,quota_limit,quota_used,"
+      "cerfa_valid_until,cites_valid_until) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
   if (!stmt)
     return false;
   sqlite3_bind_int(stmt, 1, r->id);
@@ -78,9 +76,7 @@ bool animals_add(const Reptile *r) {
   sqlite3_bind_int(stmt, 13, r->quota_used);
   sqlite3_bind_int(stmt, 14, r->cerfa_valid_until);
   sqlite3_bind_int(stmt, 15, r->cites_valid_until);
-  bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-  sqlite3_finalize(stmt);
-  if (!ok)
+  if (!db_step_finalize(stmt))
     return false;
   animals[animal_count] = *r;
   animal_count++;
@@ -107,11 +103,10 @@ bool animals_update(int id, const Reptile *r) {
   int idx = find_index(id);
   if (idx < 0 || !r)
     return false;
-  sqlite3_stmt *stmt =
-      db_query("UPDATE animals SET elevage_id=?,name=?,species=?,sex=?,"
-               "birth_date=?,health=?,breeding_cycle=?,cdc_number=?,aoe_number=?,"
-               "ifap_id=?,quota_limit=?,quota_used=?,cerfa_valid_until=?,cites_"
-               "valid_until=? WHERE id=?;");
+  sqlite3_stmt *stmt = db_prepare(
+      "UPDATE animals SET elevage_id=?,name=?,species=?,sex=?,birth_date=?,health=?,"
+      "breeding_cycle=?,cdc_number=?,aoe_number=?,ifap_id=?,quota_limit=?,quota_used=?,"
+      "cerfa_valid_until=?,cites_valid_until=? WHERE id=?;");
   if (!stmt)
     return false;
   sqlite3_bind_int(stmt, 1, r->elevage_id);
@@ -129,9 +124,7 @@ bool animals_update(int id, const Reptile *r) {
   sqlite3_bind_int(stmt, 13, r->cerfa_valid_until);
   sqlite3_bind_int(stmt, 14, r->cites_valid_until);
   sqlite3_bind_int(stmt, 15, id);
-  bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-  sqlite3_finalize(stmt);
-  if (!ok)
+  if (!db_step_finalize(stmt))
     return false;
   animals[idx] = *r;
   ESP_LOGI(TAG, "Mise a jour du reptile %d", id);
@@ -142,14 +135,11 @@ bool animals_delete(int id) {
   int idx = find_index(id);
   if (idx < 0)
     return false;
-  sqlite3_stmt *stmt =
-      db_query("DELETE FROM animals WHERE id=?;");
+  sqlite3_stmt *stmt = db_prepare("DELETE FROM animals WHERE id=?;");
   if (!stmt)
     return false;
   sqlite3_bind_int(stmt, 1, id);
-  bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-  sqlite3_finalize(stmt);
-  if (!ok)
+  if (!db_step_finalize(stmt))
     return false;
   for (int i = idx; i < animal_count - 1; ++i) {
     animals[i] = animals[i + 1];
