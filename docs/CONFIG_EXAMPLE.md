@@ -29,6 +29,8 @@ renseignez `CONFIG_STORAGE_TRANSFER_USERNAME` et
 laissées vides ou omises.
 Ces trois options sont définies dans `components/storage/Kconfig.projbuild` et
 contrôlent le transfert de fichiers via le Wi‑Fi.
+Lorsque ces paramètres sont renseignés, la commande `db_backup()` du firmware
+crée une sauvegarde chiffrée puis la transmet automatiquement à l'URL fournie.
 
 `CONFIG_LIGHTING_PWM_GPIO` indique le GPIO utilisé pour piloter l'éclairage.
 Les options `CONFIG_CO2_SDA_GPIO`, `CONFIG_CO2_SCL_GPIO` et
