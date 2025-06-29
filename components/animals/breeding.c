@@ -41,7 +41,7 @@ bool breeding_add(const BreedingEvent *ev)
 {
     if (event_count >= BREEDING_MAX || !ev)
         return false;
-    sqlite3_stmt *stmt = db_query(
+    sqlite3_stmt *stmt = db_prepare(
         "INSERT INTO breeding_events(id,animal_id,description,date) VALUES(?,?,?,?);");
     if (!stmt)
         return false;
@@ -49,9 +49,7 @@ bool breeding_add(const BreedingEvent *ev)
     sqlite3_bind_int(stmt, 2, ev->animal_id);
     sqlite3_bind_text(stmt, 3, ev->description, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 4, ev->date);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     events[event_count] = *ev;
     event_count++;
@@ -72,7 +70,7 @@ bool breeding_update(int id, const BreedingEvent *ev)
     int idx = find_index(id);
     if (idx < 0 || !ev)
         return false;
-    sqlite3_stmt *stmt = db_query(
+    sqlite3_stmt *stmt = db_prepare(
         "UPDATE breeding_events SET animal_id=?,description=?,date=? WHERE id=?;");
     if (!stmt)
         return false;
@@ -80,9 +78,7 @@ bool breeding_update(int id, const BreedingEvent *ev)
     sqlite3_bind_text(stmt, 2, ev->description, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 3, ev->date);
     sqlite3_bind_int(stmt, 4, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     events[idx] = *ev;
     events[idx].id = id;
@@ -95,13 +91,11 @@ bool breeding_delete(int id)
     int idx = find_index(id);
     if (idx < 0)
         return false;
-    sqlite3_stmt *stmt = db_query("DELETE FROM breeding_events WHERE id=?;");
+    sqlite3_stmt *stmt = db_prepare("DELETE FROM breeding_events WHERE id=?;");
     if (!stmt)
         return false;
     sqlite3_bind_int(stmt, 1, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     for (int i = idx; i < event_count - 1; ++i)
         events[i] = events[i + 1];

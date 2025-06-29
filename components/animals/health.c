@@ -41,7 +41,7 @@ bool health_add(const HealthRecord *rec)
 {
     if (record_count >= HEALTH_MAX || !rec)
         return false;
-    sqlite3_stmt *stmt = db_query(
+    sqlite3_stmt *stmt = db_prepare(
         "INSERT INTO health_records(id,animal_id,description,date) VALUES(?,?,?,?);");
     if (!stmt)
         return false;
@@ -49,9 +49,7 @@ bool health_add(const HealthRecord *rec)
     sqlite3_bind_int(stmt, 2, rec->animal_id);
     sqlite3_bind_text(stmt, 3, rec->description, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 4, rec->date);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     records[record_count] = *rec;
     record_count++;
@@ -72,7 +70,7 @@ bool health_update(int id, const HealthRecord *rec)
     int idx = find_index(id);
     if (idx < 0 || !rec)
         return false;
-    sqlite3_stmt *stmt = db_query(
+    sqlite3_stmt *stmt = db_prepare(
         "UPDATE health_records SET animal_id=?,description=?,date=? WHERE id=?;");
     if (!stmt)
         return false;
@@ -80,9 +78,7 @@ bool health_update(int id, const HealthRecord *rec)
     sqlite3_bind_text(stmt, 2, rec->description, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 3, rec->date);
     sqlite3_bind_int(stmt, 4, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     records[idx] = *rec;
     records[idx].id = id;
@@ -95,13 +91,11 @@ bool health_delete(int id)
     int idx = find_index(id);
     if (idx < 0)
         return false;
-    sqlite3_stmt *stmt = db_query("DELETE FROM health_records WHERE id=?;");
+    sqlite3_stmt *stmt = db_prepare("DELETE FROM health_records WHERE id=?;");
     if (!stmt)
         return false;
     sqlite3_bind_int(stmt, 1, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     for (int i = idx; i < record_count - 1; ++i)
         records[i] = records[i + 1];

@@ -56,8 +56,7 @@ bool terrariums_add(const Terrarium *t)
     if (terrarium_count >= TERRARIUMS_MAX || !t)
         return false;
     sqlite3_stmt *stmt =
-        db_query("INSERT INTO terrariums(id,elevage_id,name,capacity,inventory,notes) "
-                 "VALUES(?,?,?,?,?,?);");
+        db_prepare("INSERT INTO terrariums(id,elevage_id,name,capacity,inventory,notes) VALUES(?,?,?,?,?,?);");
     if (!stmt)
         return false;
     sqlite3_bind_int(stmt, 1, t->id);
@@ -66,9 +65,7 @@ bool terrariums_add(const Terrarium *t)
     sqlite3_bind_int(stmt, 4, t->capacity);
     sqlite3_bind_text(stmt, 5, t->inventory, -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 6, t->notes, -1, SQLITE_TRANSIENT);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     terrariums[terrarium_count] = *t;
     terrarium_count++;
@@ -98,7 +95,7 @@ bool terrariums_update(int id, const Terrarium *t)
     int idx = find_index(id);
     if (idx < 0 || !t)
         return false;
-    sqlite3_stmt *stmt = db_query(
+    sqlite3_stmt *stmt = db_prepare(
         "UPDATE terrariums SET elevage_id=?,name=?,capacity=?,inventory=?,notes=? WHERE id=?;");
     if (!stmt)
         return false;
@@ -108,9 +105,7 @@ bool terrariums_update(int id, const Terrarium *t)
     sqlite3_bind_text(stmt, 4, t->inventory, -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 5, t->notes, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 6, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     terrariums[idx] = *t;
     ESP_LOGI(TAG, "Mise a jour du terrarium %d", id);
@@ -122,13 +117,11 @@ bool terrariums_delete(int id)
     int idx = find_index(id);
     if (idx < 0)
         return false;
-    sqlite3_stmt *stmt = db_query("DELETE FROM terrariums WHERE id=?;");
+    sqlite3_stmt *stmt = db_prepare("DELETE FROM terrariums WHERE id=?;");
     if (!stmt)
         return false;
     sqlite3_bind_int(stmt, 1, id);
-    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-    sqlite3_finalize(stmt);
-    if (!ok)
+    if (!db_step_finalize(stmt))
         return false;
     for (int i = idx; i < terrarium_count - 1; ++i) {
         terrariums[i] = terrariums[i + 1];
@@ -143,7 +136,7 @@ void terrariums_log_transaction(const char *msg)
     if (log_count >= LOGS_MAX || !msg)
         return;
     sqlite3_stmt *stmt =
-        db_query("INSERT INTO terrarium_logs(message,terrarium_id) VALUES(?,0);");
+        db_prepare("INSERT INTO terrarium_logs(message,terrarium_id) VALUES(?,0);");
     if (!stmt)
         return;
     sqlite3_bind_text(stmt, 1, msg, -1, SQLITE_TRANSIENT);

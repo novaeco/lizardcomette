@@ -46,6 +46,17 @@ bool db_exec(const char *format, ...);
 sqlite3_stmt *db_query(const char *format, ...);
 
 /**
+ * \brief Prépare une requête SQL sans arguments de format.
+ */
+sqlite3_stmt *db_prepare(const char *sql);
+
+/**
+ * \brief Exécute puis finalise une requête préparée.
+ * \return true si l'exécution s'est terminée sans erreur.
+ */
+bool db_step_finalize(sqlite3_stmt *stmt);
+
+/**
  * \brief Définit la clé SQLCipher à utiliser pour chiffrer la base.
  * \param key Chaîne de caractères UTF-8.
  * \return true si la clé a été enregistrée.
