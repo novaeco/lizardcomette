@@ -6,6 +6,11 @@
 #include "esp_http_client.h"
 #include "mqtt_client.h"
 #include <string.h>
+#include "humidity_ctrl.h"
+#include "lighting_schedule.h"
+#include "lighting.h"
+#include "co2.h"
+#include "light_sensor.h"
 
 static const char *TAG = "drivers";
 
@@ -16,6 +21,27 @@ static const char *TAG = "drivers";
 
 static drivers_rest_hook_t rest_hook = NULL;
 static drivers_mqtt_hook_t mqtt_hook = NULL;
+static esp_mqtt_client_handle_t mqtt_client = NULL;
+
+static void auto_rest(const sensor_data_t *data)
+{
+    if (strlen(CONFIG_DRIVERS_REST_URL))
+        drivers_rest_post(CONFIG_DRIVERS_REST_URL, data);
+}
+
+static void auto_mqtt(const sensor_data_t *data)
+{
+    if (!strlen(CONFIG_DRIVERS_MQTT_URI))
+        return;
+    if (!mqtt_client) {
+        esp_mqtt_client_config_t cfg = { .uri = CONFIG_DRIVERS_MQTT_URI };
+        mqtt_client = esp_mqtt_client_init(&cfg);
+        if (mqtt_client)
+            esp_mqtt_client_start(mqtt_client);
+    }
+    if (mqtt_client)
+        drivers_mqtt_publish(mqtt_client, CONFIG_DRIVERS_MQTT_TOPIC, data);
+}
 
 void drivers_init(void)
 {
@@ -31,6 +57,15 @@ void drivers_init(void)
     };
     ESP_ERROR_CHECK(i2c_param_config(I2C_PORT, &conf));
     ESP_ERROR_CHECK(i2c_driver_install(I2C_PORT, conf.mode, 0, 0, 0));
+
+    light_sensor_init();
+    co2_init();
+    lighting_init();
+    humidity_ctrl_init();
+    lighting_schedule_init();
+
+    drivers_set_rest_hook(auto_rest);
+    drivers_set_mqtt_hook(auto_mqtt);
 }
 
 sensor_data_t drivers_read(void)

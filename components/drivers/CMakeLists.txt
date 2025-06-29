@@ -1,4 +1,4 @@
-idf_component_register(SRCS "drivers.c" "lighting.c" "co2.c" "light_sensor.c"
+idf_component_register(SRCS "drivers.c" "lighting.c" "co2.c" "light_sensor.c" "humidity_ctrl.c" "lighting_schedule.c"
                        INCLUDE_DIRS "."
                        REQUIRES driver esp_http_client mqtt)
 

@@ -44,4 +44,10 @@ config LIGHT_SENSOR_ADDR
     hex "I2C address of light sensor"
     default 0x23
 
+config HUMIDITY_PWM_GPIO
+    int "GPIO for humidity control PWM"
+    default 18
+    help
+        Pin connected to the humidifier PWM output.
+
 endmenu
