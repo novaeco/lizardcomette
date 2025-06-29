@@ -22,6 +22,11 @@ CONFIG_CO2_I2C_ADDR=0x61
 CONFIG_LIGHT_SENSOR_REST_URL="http://example.com/light_sensor"
 CONFIG_LIGHT_SENSOR_MQTT_TOPIC="/lizard/lux"
 CONFIG_LIGHT_SENSOR_ADDR=0x23
+CONFIG_HUMIDITY_PWM_GPIO=18
+CONFIG_HUMIDITY_REST_URL="http://example.com/humidity"
+CONFIG_HUMIDITY_MQTT_TOPIC="/lizard/humidity"
+CONFIG_LIGHTING_SCHEDULE_REST_URL="http://example.com/lighting_schedule"
+CONFIG_LIGHTING_SCHEDULE_MQTT_TOPIC="/lizard/lighting_schedule"
 ```
 
 Ce fichier illustre comment définir certaines options via `sdkconfig`.
@@ -41,6 +46,13 @@ Les options `CONFIG_CO2_SDA_GPIO`, `CONFIG_CO2_SCL_GPIO` et
 `CONFIG_LIGHT_SENSOR_REST_URL` et `CONFIG_LIGHT_SENSOR_MQTT_TOPIC` définissent
 les destinations réseau pour la luminosité mesurée, tandis que
 `CONFIG_LIGHT_SENSOR_ADDR` précise l'adresse I2C du capteur BH1750.
+
+`CONFIG_HUMIDITY_PWM_GPIO` définit le GPIO utilisé pour piloter l'humidificateur.
+Les options `CONFIG_HUMIDITY_REST_URL` et `CONFIG_HUMIDITY_MQTT_TOPIC`
+permettent d'envoyer l'état d'humidification sur le réseau.
+
+`CONFIG_LIGHTING_SCHEDULE_REST_URL` et `CONFIG_LIGHTING_SCHEDULE_MQTT_TOPIC`
+spécifient où publier le programme d'éclairage.
 
 `CONFIG_DB_DEFAULT_KEY` permet de définir la clé SQLCipher utilisée lors du
 premier démarrage. Laisser ce champ vide obligera l'utilisateur à saisir la

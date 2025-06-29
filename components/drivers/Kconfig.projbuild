@@ -92,3 +92,33 @@ config LIGHT_SENSOR_ADDR
     hex "I2C address of light sensor"
     default 0x23
 
+config HUMIDITY_REST_URL
+    string "REST endpoint for humidity control"
+    default ""
+    help
+        URL used when sending humidity level over HTTP.
+
+config HUMIDITY_MQTT_TOPIC
+    string "MQTT topic for humidity control"
+    default ""
+    help
+        Topic used when publishing humidity level via MQTT.
+
+config HUMIDITY_PWM_GPIO
+    int "GPIO for humidity control PWM"
+    default 18
+    help
+        Pin connected to the humidifier PWM output.
+
+config LIGHTING_SCHEDULE_REST_URL
+    string "REST endpoint for lighting schedule"
+    default ""
+    help
+        URL used when sending lighting schedule over HTTP.
+
+config LIGHTING_SCHEDULE_MQTT_TOPIC
+    string "MQTT topic for lighting schedule"
+    default ""
+    help
+        Topic used when publishing lighting schedule via MQTT.
+
