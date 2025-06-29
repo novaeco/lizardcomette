@@ -3,6 +3,7 @@
 #include "db.h"
 #include "animals.h"
 #include "legal.h"
+#include "storage.h"
 #include <sqlite3.h>
 #include <string.h>
 
@@ -62,11 +63,8 @@ bool transactions_add(const Transaction *t)
 
     if (t->type == TRANSACTION_SALE) {
         const Reptile *r = animals_get(t->stock_id);
-        if (r) {
-            char path[32];
-            snprintf(path, sizeof(path), "invoice_%d.pdf", t->id);
-            legal_generate_invoice(path, r);
-        }
+        if (r)
+            storage_export_pdf(".", r);
     }
     return true;
 }

@@ -78,7 +78,7 @@ TEST_CASE("quota edge cases","[legal]")
     TEST_ASSERT_FALSE(legal_quota_remaining(&r));
 }
 
-TEST_CASE("invoice generated on sale","[transactions]")
+TEST_CASE("pdfs generated on sale","[transactions]")
 {
     db_set_key("");
     TEST_ASSERT_TRUE(db_open_custom(":memory:"));
@@ -103,7 +103,9 @@ TEST_CASE("invoice generated on sale","[transactions]")
     Transaction t = { .id = 1, .stock_id = 1, .quantity = 1, .type = TRANSACTION_SALE };
     TEST_ASSERT_TRUE(transactions_add(&t));
     struct stat st;
-    TEST_ASSERT_EQUAL_INT(0, stat("invoice_1.pdf", &st));
-    unlink("invoice_1.pdf");
+    TEST_ASSERT_EQUAL_INT(0, stat("invoice.pdf", &st));
+    TEST_ASSERT_EQUAL_INT(0, stat("cerfa.pdf", &st));
+    unlink("invoice.pdf");
+    unlink("cerfa.pdf");
     db_close();
 }
