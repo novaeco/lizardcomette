@@ -89,6 +89,8 @@ idf.py add-dependency "espressif/sqlite3^3"
 ```
 
 Ceci télécharge le composant *SQLite3* et crée le fichier `dependencies.lock` nécessaire.
+N'oubliez pas d'ajouter ce fichier au contrôle de version afin d'éviter de
+télécharger à nouveau les dépendances lors des prochaines compilations.
 
 ## Utilisation
 Une fois flashé sur votre ESP32, le firmware démarre l'interface graphique en français ou en anglais selon la configuration. Les modules s'initialisent automatiquement puis le planificateur vérifie les tâches à venir. Consultez `docs/UI_USAGE.md` pour le détail des écrans et `docs/NOTICE.md` pour les avertissements légaux.
