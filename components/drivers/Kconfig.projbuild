@@ -34,6 +34,24 @@ config LIGHTING_MQTT_TOPIC
     help
         Topic used when publishing lighting state via MQTT.
 
+config LIGHTING_SDA_GPIO
+    int "GPIO for lighting driver SDA"
+    default 21
+    help
+        I2C SDA pin used by the lighting controller.
+
+config LIGHTING_SCL_GPIO
+    int "GPIO for lighting driver SCL"
+    default 22
+    help
+        I2C SCL pin used by the lighting controller.
+
+config LIGHTING_I2C_ADDR
+    hex "I2C address of lighting controller"
+    default 0x40
+    help
+        I2C address used to communicate with the lighting controller.
+
 config CO2_SDA_GPIO
     int "GPIO for CO2 sensor SDA"
     default 21
