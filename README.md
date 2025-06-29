@@ -48,16 +48,18 @@ téléchargé automatiquement. Exécutez une fois la commande
 composant dans le répertoire `components/`.
 
 ## Tests
-Les tests unitaires basés sur Unity se trouvent dans le dossier `tests/`. Après
-configuration de l'ESP‑IDF, lancez la compilation puis l'exécution des tests
-avec&nbsp;:
+L'ensemble des tests unitaires écrits avec Unity est regroupé dans le
+répertoire [`tests/`](tests/). Après avoir configuré l'ESP‑IDF, compilez le
+projet puis exécutez les tests avec&nbsp;:
 
 ```bash
-idf.py build && idf.py unity_test
+idf.py build
+idf.py unity_test
 ```
 
-Ces commandes sont aussi utilisées par le workflow CI
-[`ci.yml`](.github/workflows/ci.yml) pour valider chaque contribution.
+Cette procédure est également employée par le workflow CI
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) pour valider chaque
+contribution.
 
 ## Utilisation
 Une fois flashé sur votre ESP32, le firmware démarre l'interface graphique en français ou en anglais selon la configuration. Les modules s'initialisent automatiquement puis le planificateur vérifie les tâches à venir. Consultez `docs/UI_USAGE.md` pour le détail des écrans et `docs/NOTICE.md` pour les avertissements légaux.
