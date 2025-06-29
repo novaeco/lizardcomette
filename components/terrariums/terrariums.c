@@ -33,9 +33,10 @@ void terrariums_init(int log_offset)
 
     // Chargement des logs existants avec pagination
     sqlite3_stmt *log_stmt = db_query(
-        "SELECT message FROM terrarium_logs ORDER BY id DESC LIMIT %d OFFSET %d;",
-        LOGS_MAX, log_offset);
+        "SELECT message FROM terrarium_logs ORDER BY id DESC LIMIT ? OFFSET ?;");
     if (log_stmt) {
+        sqlite3_bind_int(log_stmt, 1, LOGS_MAX);
+        sqlite3_bind_int(log_stmt, 2, log_offset);
         while (sqlite3_step(log_stmt) == SQLITE_ROW && log_count < LOGS_MAX) {
             const unsigned char *msg = sqlite3_column_text(log_stmt, 0);
             if (msg) {
