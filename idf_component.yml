@@ -1,2 +1,2 @@
 dependencies:
-  espressif/sqlite3: "*"
+  espressif/sqlite3: "^3"
