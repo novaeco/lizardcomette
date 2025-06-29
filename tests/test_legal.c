@@ -3,6 +3,7 @@
 #include "legal_numbers.h"
 #include "db.h"
 #include "animals.h"
+#include "transactions.h"
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
@@ -75,4 +76,34 @@ TEST_CASE("quota edge cases","[legal]")
     TEST_ASSERT_FALSE(legal_quota_remaining(&r));
     r.quota_used = -1;
     TEST_ASSERT_FALSE(legal_quota_remaining(&r));
+}
+
+TEST_CASE("invoice generated on sale","[transactions]")
+{
+    db_set_key("");
+    TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+    animals_init();
+    transactions_init();
+    Reptile r = {
+        .id = 1,
+        .elevage_id = 0,
+        .name = "Liz",
+        .species = "Lizard",
+        .sex = "F",
+        .birth_date = "2021",
+        .cdc_number = "",
+        .aoe_number = "",
+        .ifap_id = "",
+        .quota_limit = 0,
+        .quota_used = 0,
+        .cerfa_valid_until = 0,
+        .cites_valid_until = 0
+    };
+    TEST_ASSERT_TRUE(animals_add(&r));
+    Transaction t = { .id = 1, .stock_id = 1, .quantity = 1, .type = TRANSACTION_SALE };
+    TEST_ASSERT_TRUE(transactions_add(&t));
+    struct stat st;
+    TEST_ASSERT_EQUAL_INT(0, stat("invoice_1.pdf", &st));
+    unlink("invoice_1.pdf");
+    db_close();
 }

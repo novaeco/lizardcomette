@@ -1,6 +1,8 @@
 #include "transactions.h"
 #include "esp_log.h"
 #include "db.h"
+#include "animals.h"
+#include "legal.h"
 #include <sqlite3.h>
 #include <string.h>
 
@@ -57,6 +59,15 @@ bool transactions_add(const Transaction *t)
     transactions[transaction_count] = *t;
     transaction_count++;
     ESP_LOGI(TAG, "Ajout de la transaction %d", t->id);
+
+    if (t->type == TRANSACTION_SALE) {
+        const Reptile *r = animals_get(t->stock_id);
+        if (r) {
+            char path[32];
+            snprintf(path, sizeof(path), "invoice_%d.pdf", t->id);
+            legal_generate_invoice(path, r);
+        }
+    }
     return true;
 }
 
