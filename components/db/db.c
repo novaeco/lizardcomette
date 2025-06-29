@@ -280,7 +280,7 @@ void db_init(void) {
     }
   }
 
-  if (!open_db("/spiffs/lizard.db"))
+  if (!db_handle && !open_db("/spiffs/lizard.db"))
     return;
 
   create_tables();
