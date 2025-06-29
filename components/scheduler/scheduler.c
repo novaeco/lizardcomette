@@ -8,6 +8,10 @@
 #include "animals.h"
 #include "health.h"
 #include "breeding.h"
+#include "drivers.h"
+#include "lighting.h"
+#include "co2.h"
+#include "light_sensor.h"
 #include <time.h>
 
 #define SCHEDULER_INTERVAL_MS 60000
@@ -80,6 +84,17 @@ static void check_breeding_alerts(void)
     }
 }
 
+static void check_environmental_sensors(void)
+{
+    sensor_data_t s = drivers_read();
+    light_data_t l = light_sensor_read();
+    co2_data_t c = co2_read();
+    char msg[80];
+    snprintf(msg, sizeof(msg), "Temp %.1fC Hum %.1f%% Lux %.1f CO2 %u ppm",
+             s.temperature_c, s.humidity_percent, l.lux, c.ppm);
+    notify(msg);
+}
+
 static void scheduler_task(void *arg)
 {
     (void)arg;
@@ -89,6 +104,7 @@ static void scheduler_task(void *arg)
         check_compliance();
         check_health_alerts();
         check_breeding_alerts();
+        check_environmental_sensors();
         vTaskDelay(pdMS_TO_TICKS(SCHEDULER_INTERVAL_MS));
     }
 }
@@ -112,4 +128,9 @@ void scheduler_check_regulatory_deadlines(void)
 void scheduler_check_compliance(void)
 {
     check_compliance();
+}
+
+void scheduler_check_environmental_sensors(void)
+{
+    check_environmental_sensors();
 }

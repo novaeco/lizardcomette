@@ -76,3 +76,19 @@ config CO2_MQTT_TOPIC
     help
         Topic used when publishing CO2 data via MQTT.
 
+config LIGHT_SENSOR_REST_URL
+    string "REST endpoint for light sensor measurements"
+    default ""
+    help
+        URL used when posting light sensor data over HTTP.
+
+config LIGHT_SENSOR_MQTT_TOPIC
+    string "MQTT topic for light sensor measurements"
+    default ""
+    help
+        Topic used when publishing light sensor data via MQTT.
+
+config LIGHT_SENSOR_ADDR
+    hex "I2C address of light sensor"
+    default 0x23
+
