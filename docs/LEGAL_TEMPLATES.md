@@ -22,3 +22,13 @@ uniquement de tester la génération de documents. Pour adapter les superpositio
 à votre version des formulaires, modifiez les chaînes définies dans
 `components/legal/legal_templates.c` en ajustant le texte et les positions
 si nécessaire.
+
+## Personnalisation des superpositions
+
+Chaque constante déclarée dans `legal_templates.c` contient le texte qui sera
+ajouté en fin de PDF lors de la génération. Vous pouvez les modifier pour
+changer les intitulés ou la mise en page. Si vous devez positionner les
+champs de manière précise, insérez des commandes PDF (par exemple
+`X Y Td (contenu) Tj`) dans ces chaînes afin de placer les informations aux
+coordonnées souhaitées. Après toute modification, recompilez puis flashez le
+firmware pour vérifier le résultat sur vos formulaires officiels.
