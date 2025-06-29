@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: espressif/setup-esp-idf@v1
+      - uses: espressif/setup-esp-idf@v3
         with:
           version: latest
       - name: Cache managed components
