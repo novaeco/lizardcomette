@@ -45,6 +45,29 @@ Le projet a besoin du composant `sqlite3` fourni par l'ESP‑IDF. Celui‑ci est
 déclaré dans `idf_component.yml` sous le nom `espressif/sqlite3` et sera
 téléchargé automatiquement. Exécutez `idf.py create-component-manifest` ou `idf.py add-dependency "espressif/sqlite3^3"` pour générer `dependencies.lock` et installer la dépendance, ou placez le composant dans le répertoire `components/`.
 
+## Mise en route
+Ce petit tutoriel résume les étapes nécessaires lors de la première
+compilation et du flashage&nbsp;:
+
+1. Préparez l'environnement ESP‑IDF et ouvrez un terminal dans ce dépôt.
+2. Récupérez les dépendances déclarées dans `idf_component.yml`&nbsp;:
+   ```bash
+   idf.py add-dependency "espressif/sqlite3^3"
+   ```
+3. Sélectionnez la cible puis construisez le projet&nbsp;:
+   ```bash
+   idf.py set-target esp32s3
+   idf.py build
+   ```
+4. Branchez votre carte et flashez le firmware (remplacez le port
+   par celui de votre système)&nbsp;:
+   ```bash
+   idf.py -p /dev/ttyUSB0 flash monitor
+   ```
+5. Téléchargez les formulaires CERFA et CITES mentionnés dans
+   `docs/LEGAL_TEMPLATES.md` puis copiez-les dans le dossier `forms/`
+   en conservant les noms fournis.
+
 ## Tests
 L'ensemble des tests unitaires écrits avec Unity est regroupé dans le
 répertoire [`tests/`](tests/). Après avoir configuré l'ESP‑IDF, compilez le
