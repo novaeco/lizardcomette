@@ -23,13 +23,7 @@ static drivers_rest_hook_t rest_hook = NULL;
 static drivers_mqtt_hook_t mqtt_hook = NULL;
 static esp_mqtt_client_handle_t mqtt_client = NULL;
 
-static void auto_rest(const sensor_data_t *data)
-{
-    if (strlen(CONFIG_DRIVERS_REST_URL))
-        drivers_rest_post(CONFIG_DRIVERS_REST_URL, data);
-}
-
-static void auto_mqtt(const sensor_data_t *data)
+static void ensure_mqtt_client(void)
 {
     if (!strlen(CONFIG_DRIVERS_MQTT_URI))
         return;
@@ -39,8 +33,84 @@ static void auto_mqtt(const sensor_data_t *data)
         if (mqtt_client)
             esp_mqtt_client_start(mqtt_client);
     }
+}
+
+static void auto_rest(const sensor_data_t *data)
+{
+    if (strlen(CONFIG_DRIVERS_REST_URL))
+        drivers_rest_post(CONFIG_DRIVERS_REST_URL, data);
+}
+
+static void auto_mqtt(const sensor_data_t *data)
+{
+    ensure_mqtt_client();
     if (mqtt_client)
         drivers_mqtt_publish(mqtt_client, CONFIG_DRIVERS_MQTT_TOPIC, data);
+}
+
+static void auto_lighting_rest(const lighting_state_t *state)
+{
+    if (strlen(CONFIG_LIGHTING_REST_URL))
+        lighting_rest_post(CONFIG_LIGHTING_REST_URL, state);
+}
+
+static void auto_lighting_mqtt(const lighting_state_t *state)
+{
+    ensure_mqtt_client();
+    if (mqtt_client)
+        lighting_mqtt_publish(mqtt_client, CONFIG_LIGHTING_MQTT_TOPIC, state);
+}
+
+static void auto_humidity_rest(const humidity_state_t *state)
+{
+    if (strlen(CONFIG_HUMIDITY_REST_URL))
+        humidity_ctrl_rest_post(CONFIG_HUMIDITY_REST_URL, state);
+}
+
+static void auto_humidity_mqtt(const humidity_state_t *state)
+{
+    ensure_mqtt_client();
+    if (mqtt_client)
+        humidity_ctrl_mqtt_publish(mqtt_client, CONFIG_HUMIDITY_MQTT_TOPIC, state);
+}
+
+static void auto_co2_rest(const co2_data_t *data)
+{
+    if (strlen(CONFIG_CO2_REST_URL))
+        co2_rest_post(CONFIG_CO2_REST_URL, data);
+}
+
+static void auto_co2_mqtt(const co2_data_t *data)
+{
+    ensure_mqtt_client();
+    if (mqtt_client)
+        co2_mqtt_publish(mqtt_client, CONFIG_CO2_MQTT_TOPIC, data);
+}
+
+static void auto_light_sensor_rest(const light_data_t *data)
+{
+    if (strlen(CONFIG_LIGHT_SENSOR_REST_URL))
+        light_sensor_rest_post(CONFIG_LIGHT_SENSOR_REST_URL, data);
+}
+
+static void auto_light_sensor_mqtt(const light_data_t *data)
+{
+    ensure_mqtt_client();
+    if (mqtt_client)
+        light_sensor_mqtt_publish(mqtt_client, CONFIG_LIGHT_SENSOR_MQTT_TOPIC, data);
+}
+
+static void auto_schedule_rest(const lighting_schedule_t *sched)
+{
+    if (strlen(CONFIG_LIGHTING_SCHEDULE_REST_URL))
+        lighting_schedule_rest_post(CONFIG_LIGHTING_SCHEDULE_REST_URL, sched);
+}
+
+static void auto_schedule_mqtt(const lighting_schedule_t *sched)
+{
+    ensure_mqtt_client();
+    if (mqtt_client)
+        lighting_schedule_mqtt_publish(mqtt_client, CONFIG_LIGHTING_SCHEDULE_MQTT_TOPIC, sched);
 }
 
 void drivers_init(void)
@@ -63,6 +133,17 @@ void drivers_init(void)
     lighting_init();
     humidity_ctrl_init();
     lighting_schedule_init();
+
+    light_sensor_set_rest_hook(auto_light_sensor_rest);
+    light_sensor_set_mqtt_hook(auto_light_sensor_mqtt);
+    co2_set_rest_hook(auto_co2_rest);
+    co2_set_mqtt_hook(auto_co2_mqtt);
+    lighting_set_rest_hook(auto_lighting_rest);
+    lighting_set_mqtt_hook(auto_lighting_mqtt);
+    humidity_ctrl_set_rest_hook(auto_humidity_rest);
+    humidity_ctrl_set_mqtt_hook(auto_humidity_mqtt);
+    lighting_schedule_set_rest_hook(auto_schedule_rest);
+    lighting_schedule_set_mqtt_hook(auto_schedule_mqtt);
 
     drivers_set_rest_hook(auto_rest);
     drivers_set_mqtt_hook(auto_mqtt);
