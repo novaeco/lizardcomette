@@ -11,6 +11,11 @@
 TEST_CASE("animals crud", "[animals]") {
   db_set_key("");
   TEST_ASSERT_TRUE(db_open_custom(":memory:"));
+  legal_numbers_init();
+  LegalNumber n1 = {.id = 1, .username = "", .elevage_id = 1, .type = "CDC", .number = "CDC1"};
+  LegalNumber n2 = {.id = 2, .username = "", .elevage_id = 1, .type = "AOE", .number = "AOE1"};
+  TEST_ASSERT_TRUE(legal_numbers_add(&n1));
+  TEST_ASSERT_TRUE(legal_numbers_add(&n2));
   animals_init();
   Reptile r = {.id = 1,
                .elevage_id = 1,
@@ -20,8 +25,8 @@ TEST_CASE("animals crud", "[animals]") {
                .birth_date = "2021",
                .health = "o'k",
                .breeding_cycle = "",
-               .cdc_number = "",
-               .aoe_number = "",
+               .cdc_number = "CDC1",
+               .aoe_number = "AOE1",
                .ifap_id = "",
                .quota_limit = 0,
                .quota_used = 0,
