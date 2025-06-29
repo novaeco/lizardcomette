@@ -49,8 +49,18 @@ bool legal_numbers_add(const LegalNumber *n)
 {
     if (number_count >= LEGAL_NUMBERS_MAX || !n)
         return false;
-    if (!db_exec("INSERT INTO cdc_aoe_numbers(id,username,elevage_id,type,number) VALUES(%d,'%s',%d,'%s','%s');",
-                 n->id, n->username, n->elevage_id, n->type, n->number))
+    sqlite3_stmt *stmt = db_query(
+        "INSERT INTO cdc_aoe_numbers(id,username,elevage_id,type,number) VALUES(?,?,?,?,?);");
+    if (!stmt)
+        return false;
+    sqlite3_bind_int(stmt, 1, n->id);
+    sqlite3_bind_text(stmt, 2, n->username, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, 3, n->elevage_id);
+    sqlite3_bind_text(stmt, 4, n->type, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 5, n->number, -1, SQLITE_TRANSIENT);
+    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
+    sqlite3_finalize(stmt);
+    if (!ok)
         return false;
     numbers[number_count] = *n;
     number_count++;
@@ -71,8 +81,18 @@ bool legal_numbers_update(int id, const LegalNumber *n)
     int idx = find_index(id);
     if (idx < 0 || !n)
         return false;
-    if (!db_exec("UPDATE cdc_aoe_numbers SET username='%s',elevage_id=%d,type='%s',number='%s' WHERE id=%d;",
-                 n->username, n->elevage_id, n->type, n->number, id))
+    sqlite3_stmt *stmt =
+        db_query("UPDATE cdc_aoe_numbers SET username=?,elevage_id=?,type=?,number=? WHERE id=?;");
+    if (!stmt)
+        return false;
+    sqlite3_bind_text(stmt, 1, n->username, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, 2, n->elevage_id);
+    sqlite3_bind_text(stmt, 3, n->type, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, n->number, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, 5, id);
+    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
+    sqlite3_finalize(stmt);
+    if (!ok)
         return false;
     numbers[idx] = *n;
     ESP_LOGI(TAG, "Mise a jour numero %d", id);
@@ -84,7 +104,13 @@ bool legal_numbers_delete(int id)
     int idx = find_index(id);
     if (idx < 0)
         return false;
-    if (!db_exec("DELETE FROM cdc_aoe_numbers WHERE id=%d;", id))
+    sqlite3_stmt *stmt = db_query("DELETE FROM cdc_aoe_numbers WHERE id=?;");
+    if (!stmt)
+        return false;
+    sqlite3_bind_int(stmt, 1, id);
+    bool ok = sqlite3_step(stmt) == SQLITE_DONE;
+    sqlite3_finalize(stmt);
+    if (!ok)
         return false;
     for (int i = idx; i < number_count - 1; ++i)
         numbers[i] = numbers[i + 1];
