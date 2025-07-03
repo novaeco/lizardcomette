@@ -28,7 +28,10 @@ mod tests {
 
     #[test]
     fn sauvegarde_et_chargement() {
-        let r = Record { id: 1, notes: "ok".into() };
+        let r = Record {
+            id: 1,
+            notes: "ok".into(),
+        };
         let path = "/tmp/record.json";
         sauvegarder(&r, path).unwrap();
         let loaded = charger(path).unwrap();

@@ -48,7 +48,9 @@ pub fn definir_chiffrage(val: bool) -> Result<()> {
 /// Exemple de lecture et écriture de JSON avec `serde`.
 pub fn exemple_json(path: &str) -> Result<()> {
     #[derive(Serialize, Deserialize, PartialEq, Debug)]
-    struct Exemple { nombre: u32 }
+    struct Exemple {
+        nombre: u32,
+    }
 
     let donnees = Exemple { nombre: 42 };
     let contenu = serde_json::to_string(&donnees)?;

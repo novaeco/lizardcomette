@@ -2,8 +2,8 @@
 #![no_main]
 
 use esp_idf_hal::entry;
-use reptile_manager::tasks::spawner::spawn_tasks;
 use reptile_manager::hardware::watchdog;
+use reptile_manager::tasks::spawner::spawn_tasks;
 
 #[entry]
 fn main() -> ! {

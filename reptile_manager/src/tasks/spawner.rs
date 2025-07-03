@@ -1,9 +1,9 @@
 //! Création des tâches système.
 
+use crate::hardware::watchdog;
 use core::ffi::c_void;
 use esp_idf_hal::{delay::FreeRtos, task};
 use esp_idf_sys::{self as _, EspError};
-use crate::hardware::watchdog;
 
 extern "C" fn ui_task(_ptr: *mut c_void) {
     loop {
