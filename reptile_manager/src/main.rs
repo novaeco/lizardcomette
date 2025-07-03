@@ -10,9 +10,14 @@ mod ui;
 mod utils;
 
 use esp_idf_hal::entry;
+use tasks::spawner::spawn_tasks;
 
 #[entry]
 fn main() -> ! {
+    // TODO: initialiser le matériel
+    // Lance les tâches système une fois le matériel prêt
+    spawn_tasks().expect("erreur lancement tâches");
+
     loop {}
 }
 
