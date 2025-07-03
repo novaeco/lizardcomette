@@ -3,9 +3,11 @@
 use core::ffi::c_void;
 use esp_idf_hal::{delay::FreeRtos, task};
 use esp_idf_sys::{self as _, EspError};
+use crate::hardware::watchdog;
 
 extern "C" fn ui_task(_ptr: *mut c_void) {
     loop {
+        watchdog::reset();
         // Appel périodique de la boucle LVGL
         unsafe {
             lvgl::sys::lv_timer_handler();
@@ -17,6 +19,7 @@ extern "C" fn ui_task(_ptr: *mut c_void) {
 
 extern "C" fn sensor_task(_ptr: *mut c_void) {
     loop {
+        watchdog::reset();
         // TODO: lire périodiquement les capteurs
         FreeRtos::delay_ms(100);
     }
@@ -24,6 +27,7 @@ extern "C" fn sensor_task(_ptr: *mut c_void) {
 
 extern "C" fn pid_task(_ptr: *mut c_void) {
     loop {
+        watchdog::reset();
         // TODO: contrôler les actionneurs avec un PID
         FreeRtos::delay_ms(50);
     }
@@ -31,6 +35,7 @@ extern "C" fn pid_task(_ptr: *mut c_void) {
 
 extern "C" fn network_task(_ptr: *mut c_void) {
     loop {
+        watchdog::reset();
         // TODO: gérer le Wi-Fi et les appels API
         FreeRtos::delay_ms(200);
     }
