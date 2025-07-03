@@ -1,0 +1,12 @@
+[package]
+name = "reptile_manager"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+
+[dependencies]
+esp-idf-sys = { version = "0.29", features = ["binstart"] }
+esp-idf-hal = "0.29"
+lvgl = { version = "0.8", features = ["embedded_graphics"] }
+anyhow = "1"
+log = "0.4"
