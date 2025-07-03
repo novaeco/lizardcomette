@@ -19,3 +19,16 @@ Utility modules live under `reptile_manager/src/utils`.
 
 These modules are publicly exported in `utils::` and can be used across the
 project with `use crate::utils::time::Rtc;` for example.
+
+## Dependencies and features
+
+`reptile_manager` relies on a few external crates to run on ESP32 hardware:
+
+- [`pcf85063a`](https://crates.io/crates/pcf85063a) provides the RTC driver.
+- [`chrono`](https://crates.io/crates/chrono) handles timestamp conversions. In
+  embedded (`no_std`) environments the crate must be built with
+  `default-features = false` and the `alloc` feature enabled:
+
+```toml
+chrono = { version = "0.4", default-features = false, features = ["alloc"] }
+```

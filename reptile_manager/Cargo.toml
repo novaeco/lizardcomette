@@ -11,6 +11,8 @@ lvgl = { version = "0.8", features = ["embedded_graphics"] }
 anyhow = "1"
 log = "0.4"
 serde = { version = "1", features = ["derive"] }
+pcf85063a = "0.1"
+chrono = { version = "0.4", default-features = false, features = ["alloc"] }
 
 [lib]
 doctest = true
