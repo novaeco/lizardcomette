@@ -17,6 +17,8 @@ xpt2046 = "0.3"
 bme280 = "0.5"
 onewire = "0.4"
 ds18b20 = "0.1"
+serde_json = "1"
+esp-idf-svc = "0.51"
 
 [lib]
 doctest = true
