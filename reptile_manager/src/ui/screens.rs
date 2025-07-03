@@ -72,6 +72,12 @@ pub fn afficher_principal() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn screens_order() {
+        let all = tous();
+        assert_eq!(all.len(), 5);
+        assert_eq!(all[0].name(), "Accueil");
+    }
 }

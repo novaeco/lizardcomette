@@ -38,7 +38,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn placeholder() {
-        let _ = monter_littlefs_chiffre("storage", "/littlefs");
+    fn exemple_json_roundtrip() {
+        let path = "/tmp/test.json";
+        exemple_json(path).unwrap();
     }
 }

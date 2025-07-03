@@ -8,6 +8,11 @@ pub fn celsius_en_fahrenheit(c: f32) -> f32 {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn converts_celsius_to_fahrenheit() {
+        let f = celsius_en_fahrenheit(0.0);
+        assert_eq!(f, 32.0);
+    }
 }

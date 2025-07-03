@@ -9,3 +9,13 @@ pub fn start() {
         sys::esp_task_wdt_reset(); // marque d'activité pendant la mise à jour
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn start_runs() {
+        start();
+    }
+}

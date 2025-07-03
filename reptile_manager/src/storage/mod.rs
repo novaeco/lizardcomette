@@ -6,6 +6,12 @@ pub mod filesystem;
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn modules_run() {
+        cache::vider();
+        database::ouvrir();
+        let _ = filesystem::exemple_json("/tmp/test.json");
+    }
 }

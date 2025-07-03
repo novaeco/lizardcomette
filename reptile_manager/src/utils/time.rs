@@ -23,6 +23,12 @@ impl Rtc {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn rtc_now_and_set_time() {
+        let mut rtc = Rtc {};
+        assert_eq!(rtc.now().unwrap(), 0);
+        assert!(rtc.set_time(10).is_ok());
+    }
 }

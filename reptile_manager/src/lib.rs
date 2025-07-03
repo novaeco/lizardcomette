@@ -11,6 +11,17 @@ pub mod utils;
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn modules_can_be_used() {
+        let _ = config::AppConfig::default();
+        domain::animals::ajouter();
+        hardware::watchdog::reset();
+        network::http::envoyer();
+        storage::cache::vider();
+        tasks::jobs::executer();
+        ui::widgets::creer_bouton();
+        utils::math::moyenne(1.0, 2.0);
+    }
 }

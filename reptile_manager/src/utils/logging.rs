@@ -7,6 +7,10 @@ pub fn init() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn init_does_not_panic() {
+        init();
+    }
 }

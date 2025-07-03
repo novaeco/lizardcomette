@@ -7,6 +7,10 @@ pub fn publier() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn publier_runs() {
+        publier();
+    }
 }

@@ -7,6 +7,13 @@ pub mod health;
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn modules_accessible() {
+        animals::ajouter();
+        environment::mettre_a_jour();
+        feeding::planifier();
+        health::enregistrer();
+    }
 }
