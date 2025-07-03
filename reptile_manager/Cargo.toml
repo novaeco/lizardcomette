@@ -10,6 +10,7 @@ esp-idf-hal = "0.29"
 lvgl = { version = "0.8", features = ["embedded_graphics"] }
 anyhow = "1"
 log = "0.4"
+serde = { version = "1", features = ["derive"] }
 
 [lib]
 doctest = true
