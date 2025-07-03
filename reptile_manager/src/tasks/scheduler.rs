@@ -7,6 +7,10 @@ pub fn lancer() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn lancer_runs() {
+        lancer();
+    }
 }

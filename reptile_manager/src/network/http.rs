@@ -7,6 +7,10 @@ pub fn envoyer() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn envoyer_runs() {
+        envoyer();
+    }
 }

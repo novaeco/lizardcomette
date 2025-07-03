@@ -7,6 +7,10 @@ pub fn executer() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn executer_runs() {
+        executer();
+    }
 }

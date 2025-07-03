@@ -51,6 +51,10 @@ impl ApiServer {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn api_server_new() {
+        let _ = ApiServer::new();
+    }
 }

@@ -7,6 +7,10 @@ pub fn enregistrer() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn enregistrer_runs() {
+        enregistrer();
+    }
 }

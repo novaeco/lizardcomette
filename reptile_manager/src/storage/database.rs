@@ -7,6 +7,10 @@ pub fn ouvrir() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn ouvrir_runs() {
+        ouvrir();
+    }
 }

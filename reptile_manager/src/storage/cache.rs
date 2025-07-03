@@ -7,6 +7,10 @@ pub fn vider() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn vider_runs() {
+        vider();
+    }
 }

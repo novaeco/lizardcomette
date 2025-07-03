@@ -21,6 +21,10 @@ pub fn activer() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn activer_compiles() {
+        activer();
+    }
 }

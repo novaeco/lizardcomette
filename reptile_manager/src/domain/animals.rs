@@ -7,6 +7,10 @@ pub fn ajouter() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn ajouter_runs() {
+        ajouter();
+    }
 }

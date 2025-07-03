@@ -7,6 +7,10 @@ pub fn planifier() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn planifier_runs() {
+        planifier();
+    }
 }

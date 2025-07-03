@@ -58,6 +58,10 @@ pub fn appliquer() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn apply_sets_default() {
+        appliquer();
+    }
 }
