@@ -36,3 +36,42 @@ chrono = { version = "0.4", default-features = false, features = ["alloc"] }
 - [`xpt2046`](https://crates.io/crates/xpt2046) drives the SPI touch controller.
 - [`bme280`](https://crates.io/crates/bme280) provides environmental sensing over I2C.
 - [`onewire`](https://crates.io/crates/onewire) and [`ds18b20`](https://crates.io/crates/ds18b20) handle OneWire devices.
+
+## Building with ESP-IDF
+
+To compile and flash the firmware onto an ESP32, use the standard ESP-IDF workflow:
+
+```bash
+idf.py set-target esp32
+idf.py build
+idf.py -p /dev/ttyUSB0 flash monitor
+```
+
+Replace `/dev/ttyUSB0` with the serial port attached to your board.
+
+## OTA Updates
+
+Once the device is connected to Wi‑Fi, firmware can be uploaded over the air. After building, run:
+
+```bash
+idf.py build
+idf.py ota --ip <DEVICE_IP>
+```
+
+This uses `espota.py` under the hood to push the new binary.
+
+## Architecture
+
+```
+          +---------+
+          |   UI    |
+          +---------+
+               |
+    +----------+------------+
+    |          |            |
+  Network   Hardware      Tasks
+    |          |            |
+  Storage    Config      Domain
+               |
+             Utils
+```
