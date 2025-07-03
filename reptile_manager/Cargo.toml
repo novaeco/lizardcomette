@@ -13,6 +13,10 @@ log = "0.4"
 serde = { version = "1", features = ["derive"] }
 pcf85063a = "0.1"
 chrono = { version = "0.4", default-features = false, features = ["alloc"] }
+xpt2046 = "0.3"
+bme280 = "0.5"
+onewire = "0.4"
+ds18b20 = "0.1"
 
 [lib]
 doctest = true

@@ -32,3 +32,7 @@ project with `use crate::utils::time::Rtc;` for example.
 ```toml
 chrono = { version = "0.4", default-features = false, features = ["alloc"] }
 ```
+
+- [`xpt2046`](https://crates.io/crates/xpt2046) drives the SPI touch controller.
+- [`bme280`](https://crates.io/crates/bme280) provides environmental sensing over I2C.
+- [`onewire`](https://crates.io/crates/onewire) and [`ds18b20`](https://crates.io/crates/ds18b20) handle OneWire devices.
