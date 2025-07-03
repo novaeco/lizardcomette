@@ -3,8 +3,8 @@
 pub mod api;
 pub mod http;
 pub mod mqtt;
-pub mod wifi;
 pub mod ota;
+pub mod wifi;
 
 #[cfg(test)]
 mod tests {

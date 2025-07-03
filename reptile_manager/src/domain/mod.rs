@@ -16,6 +16,9 @@ mod tests {
         environment::mettre_a_jour();
         feeding::planifier();
         health::enregistrer();
-        let _ = records::Record { id: 0, notes: String::new() };
+        let _ = records::Record {
+            id: 0,
+            notes: String::new(),
+        };
     }
 }

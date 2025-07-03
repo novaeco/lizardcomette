@@ -1,9 +1,9 @@
 //! Serveur HTTP exposant les routes de l'application et intégrant MQTT.
 
 use embedded_svc::http::Method;
-use embedded_svc::mqtt::client::{Client, QoS};
 use embedded_svc::io::Write;
-use esp_idf_svc::http::server::{EspHttpServer, Configuration as HttpConfig};
+use embedded_svc::mqtt::client::{Client, QoS};
+use esp_idf_svc::http::server::{Configuration as HttpConfig, EspHttpServer};
 use esp_idf_svc::mqtt::client::{EspMqttClient, MqttClientConfiguration};
 use log::info;
 
@@ -44,7 +44,8 @@ impl ApiServer {
 
     /// Publie un message via MQTT.
     pub fn publish_status(&self) -> anyhow::Result<()> {
-        self.mqtt.publish("reptile/status", QoS::AtLeastOnce, false, b"ok")?;
+        self.mqtt
+            .publish("reptile/status", QoS::AtLeastOnce, false, b"ok")?;
         Ok(())
     }
 }

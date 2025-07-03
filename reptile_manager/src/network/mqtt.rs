@@ -39,7 +39,10 @@ impl MqttService {
             }
         });
 
-        Ok(Self { client, _events_task: tx })
+        Ok(Self {
+            client,
+            _events_task: tx,
+        })
     }
 
     /// S\'enregistre sur un topic.

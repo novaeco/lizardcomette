@@ -1,8 +1,8 @@
 //! Gestion du module Wi-Fi.
 
+use anyhow::Result;
 use embedded_svc::wifi::{ClientConfiguration, Configuration, Wifi};
 use esp_idf_hal::peripherals::Peripherals;
-use anyhow::Result;
 use esp_idf_svc::eventloop::{EspEventLoop, EspSubscription, System};
 use esp_idf_svc::nvs::{EspDefaultNvsPartition, EspNvs};
 use esp_idf_svc::wifi::{EspWifi, WifiEvent};
@@ -46,16 +46,20 @@ impl WifiManager {
             _ => {}
         })?;
 
-        Ok(Self { wifi, _subscription: subscription })
+        Ok(Self {
+            wifi,
+            _subscription: subscription,
+        })
     }
 
     /// Connecte l'appareil au réseau.
     pub fn connect(&mut self, ssid: &str, password: &str) -> anyhow::Result<()> {
-        self.wifi.set_configuration(&Configuration::Client(ClientConfiguration {
-            ssid: ssid.into(),
-            password: password.into(),
-            ..Default::default()
-        }))?;
+        self.wifi
+            .set_configuration(&Configuration::Client(ClientConfiguration {
+                ssid: ssid.into(),
+                password: password.into(),
+                ..Default::default()
+            }))?;
         self.wifi.start()?;
         self.wifi.connect()?;
         save_credentials(ssid, password)?;
