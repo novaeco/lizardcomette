@@ -39,6 +39,10 @@ pub fn configurer() -> Xpt2046<
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn configurer_compiles() {
+        let _ = configurer();
+    }
 }

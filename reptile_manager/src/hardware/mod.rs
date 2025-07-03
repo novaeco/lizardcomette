@@ -8,6 +8,14 @@ pub mod watchdog;
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn modules_compile() {
+        actuators::activer();
+        let _ = display::Display::init();
+        let _ = sensors::lire();
+        let _ = touch::configurer();
+        let _ = watchdog::init(1000);
+    }
 }

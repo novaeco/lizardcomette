@@ -7,6 +7,13 @@ pub mod widgets;
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn modules_accessible() {
+        navigation::suivant();
+        screens::afficher_principal();
+        theme::appliquer();
+        widgets::creer_bouton();
+    }
 }

@@ -83,6 +83,10 @@ pub fn spawn_tasks() -> Result<(), EspError> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn spawn_tasks_runs() {
+        let _ = spawn_tasks();
+    }
 }

@@ -7,6 +7,13 @@ pub mod worker;
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn modules_compile() {
+        jobs::executer();
+        scheduler::lancer();
+        let _ = spawner::spawn_tasks();
+        worker::demarrer();
+    }
 }

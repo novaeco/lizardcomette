@@ -8,6 +8,10 @@ pub mod time;
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn moyenne_works_via_mod() {
+        assert_eq!(math::moyenne(1.0, 3.0), 2.0);
+    }
 }

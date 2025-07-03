@@ -23,3 +23,14 @@ pub fn reset() {
         sys::esp_task_wdt_reset();
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn init_and_reset_compile() {
+        let _ = init(1000);
+        reset();
+    }
+}

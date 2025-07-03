@@ -7,6 +7,10 @@ pub fn creer_bouton() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn creer_bouton_runs() {
+        creer_bouton();
+    }
 }

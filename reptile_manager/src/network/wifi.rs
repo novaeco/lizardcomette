@@ -54,6 +54,12 @@ impl WifiManager {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use esp_idf_hal::peripherals::Peripherals;
+
     #[test]
-    fn placeholder() {}
+    fn wifi_manager_new() {
+        let peripherals = Peripherals::take().unwrap();
+        let _ = WifiManager::new(peripherals);
+    }
 }

@@ -62,6 +62,10 @@ pub unsafe extern "C" fn flush_cb(
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn display_init_compiles() {
+        let _ = Display::init();
+    }
 }

@@ -7,6 +7,10 @@ pub fn demarrer() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn demarrer_runs() {
+        demarrer();
+    }
 }

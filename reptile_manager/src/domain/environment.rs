@@ -7,6 +7,10 @@ pub fn mettre_a_jour() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn mettre_a_jour_runs() {
+        mettre_a_jour();
+    }
 }

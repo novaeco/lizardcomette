@@ -7,6 +7,10 @@ pub fn charger() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn charger_runs() {
+        charger();
+    }
 }

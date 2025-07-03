@@ -25,6 +25,10 @@ pub fn lire() -> bme280::Result<bme280::Measurements<I2c<'static>>> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn lire_compiles() {
+        let _ = lire();
+    }
 }

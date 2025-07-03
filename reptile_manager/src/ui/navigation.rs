@@ -41,6 +41,12 @@ pub fn suivant() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn placeholder() {}
+    fn navigator_cycle() {
+        let mut nav = Navigator::new();
+        nav.suivant();
+        assert_eq!(nav.index, 1);
+    }
 }
