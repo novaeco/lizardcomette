@@ -5,21 +5,22 @@ edition = "2021"
 resolver = "2"
 
 [dependencies]
-esp-idf-sys = { version = "0.29", features = ["binstart"] }
-esp-idf-hal = "0.29"
-LvgL = { version = "0.8", features = ["embedded_graphics"] }
-anyhow = "1"
+esp-idf-sys = { version = "0.36", features = ["binstart"] }
+esp-idf-hal = "0.45"
+lvgl = { version = "0.6.2", features = ["embedded_graphics"] }
+anyhow = { version = "1", default-features = false }
 log = "0.4"
 serde = { version = "1", features = ["derive"] }
 pcf85063a = "0.1"
 chrono = { version = "0.4", default-features = false, features = ["alloc"] }
 xpt2046 = "0.3"
-bme280 = "0.5"
+bme280 = "0.4.4"
 onewire = "0.4"
 ds18b20 = "0.1"
-serde_json = "1"
+serde_json = { version = "1", default-features = false, features = ["alloc"] }
 esp-idf-svc = "0.51"
 edge-mqtt = "0.4"
+embedded-svc = { version = "0.28", default-features = false, features = ["alloc"] }
 
 [lib]
 doctest = true
