@@ -1,5 +1,13 @@
 #![no_std]
 #![no_main]
+mod config;
+mod domain;
+mod hardware;
+mod network;
+mod storage;
+mod tasks;
+mod ui;
+mod utils;
 
 use esp_idf_hal::entry;
 
