@@ -4,3 +4,9 @@
 pub fn suivant() {
     // TODO: navigation vers l'écran suivant
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

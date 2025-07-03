@@ -4,3 +4,9 @@
 pub fn ajouter() {
     // TODO: implémenter l'ajout d'un animal
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

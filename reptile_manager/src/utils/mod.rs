@@ -5,3 +5,9 @@ pub mod errors;
 pub mod logging;
 pub mod math;
 pub mod time;
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

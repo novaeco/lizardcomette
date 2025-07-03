@@ -4,3 +4,9 @@
 pub fn mettre_a_jour() {
     // TODO: mettre à jour l'environnement
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

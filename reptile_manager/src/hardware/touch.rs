@@ -4,3 +4,9 @@
 pub fn configurer() {
     // TODO: configurer le périphérique tactile
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

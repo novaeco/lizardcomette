@@ -45,12 +45,7 @@ impl Display {
 }
 
 impl Flush for Display {
-    fn flush(
-        &mut self,
-        disp_drv: &mut lv_disp_drv_t,
-        area: &lv_area_t,
-        color: *const lv_color_t,
-    ) {
+    fn flush(&mut self, disp_drv: &mut lv_disp_drv_t, area: &lv_area_t, color: *const lv_color_t) {
         unsafe { flush_cb(disp_drv, area, color) }
     }
 }
@@ -63,4 +58,10 @@ pub unsafe extern "C" fn flush_cb(
 ) {
     // TODO: transmettre les pixels via SPI
     lvgl::disp_flush_ready(disp_drv);
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
 }

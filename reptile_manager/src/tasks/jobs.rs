@@ -4,3 +4,9 @@
 pub fn executer() {
     // TODO: exécuter la tâche
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

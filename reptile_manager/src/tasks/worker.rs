@@ -4,3 +4,9 @@
 pub fn demarrer() {
     // TODO: lancer le travailleur
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

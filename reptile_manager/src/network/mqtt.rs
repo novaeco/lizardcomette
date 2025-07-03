@@ -4,3 +4,9 @@
 pub fn publier() {
     // TODO: publier un message
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

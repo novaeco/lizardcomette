@@ -4,3 +4,9 @@
 pub fn sauvegarder() {
     // TODO: écrire les données sur le disque
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}
