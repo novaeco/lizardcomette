@@ -4,3 +4,9 @@
 pub fn charger() {
     // TODO: charger la configuration
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

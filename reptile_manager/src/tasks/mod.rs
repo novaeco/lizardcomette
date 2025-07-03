@@ -2,5 +2,11 @@
 
 pub mod jobs;
 pub mod scheduler;
-pub mod worker;
 pub mod spawner;
+pub mod worker;
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

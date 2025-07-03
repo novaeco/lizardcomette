@@ -23,3 +23,9 @@ impl ApiServer {
         // TODO: publier l'état via MQTT
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

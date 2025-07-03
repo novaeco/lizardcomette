@@ -4,3 +4,9 @@
 pub fn lancer() {
     // TODO: démarrer la planification
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

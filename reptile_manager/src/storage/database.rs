@@ -4,3 +4,9 @@
 pub fn ouvrir() {
     // TODO: ouvrir la connexion
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

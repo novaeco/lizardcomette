@@ -4,3 +4,9 @@
 pub fn activer() {
     // TODO: activer l'actionneur
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

@@ -4,3 +4,9 @@
 pub fn enregistrer() {
     // TODO: enregistrer les données de santé
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

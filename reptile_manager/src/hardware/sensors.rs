@@ -4,3 +4,9 @@
 pub fn lire() {
     // TODO: lire les capteurs
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

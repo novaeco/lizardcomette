@@ -4,3 +4,9 @@
 pub fn appliquer() {
     // TODO: appliquer le thème
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

@@ -4,3 +4,9 @@
 pub fn vider() {
     // TODO: vider le cache
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}

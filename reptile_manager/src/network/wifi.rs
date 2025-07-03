@@ -28,3 +28,9 @@ impl WifiManager {
         // TODO: réagir à la déconnexion
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {}
+}
